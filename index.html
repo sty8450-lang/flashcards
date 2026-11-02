@@ -66,6 +66,8 @@
         /* ① Top Diagram Area */
         .diagram-wrapper { display: none; flex-direction: column; }
         .diagram-box { background: rgba(2, 6, 23, 0.55); border: 1px solid rgba(56, 189, 248, 0.25); padding: 10px 12px; border-radius: 8px; font-family: "Pretendard", "Malgun Gothic", monospace; font-size: 0.8rem; white-space: pre-wrap; line-height: 1.5; color: #e2e8f0; }
+        .diagram-box.has-image { background: #ffffff; padding: 8px; display: flex; justify-content: center; align-items: center; white-space: normal; }
+        .diagram-box img { max-width: 100%; max-height: 220px; width: auto; height: auto; object-fit: contain; border-radius: 6px; display: block; }
 
         /* ② Bottom Sub-note Table Area */
         .subnote-table-wrapper { display: none; flex-direction: column; }
@@ -328,10 +330,23 @@
                 kwContainer.style.display = 'none';
             }
 
-            // ① 상단 다이어그램 영역
+            // ① 상단 다이어그램 영역 (이미지 또는 텍스트 렌더링)
             const diagWrapper = document.getElementById('diagram-wrapper');
             const diagBox = document.getElementById('back-diagram');
-            if (card.diagram && card.diagram.trim() !== '') {
+            diagBox.classList.remove('has-image');
+            diagBox.innerHTML = '';
+
+            const imgSrc = card.diagramImg || (typeof card.diagram === 'string' && /\.(png|jpe?g|gif|webp|svg)$/i.test(card.diagram.trim()) ? card.diagram.trim() : null);
+
+            if (imgSrc) {
+                diagWrapper.style.display = 'flex';
+                diagBox.classList.add('has-image');
+                diagBox.innerHTML = `<img src="${imgSrc}" alt="${card.topic} 구성도">`;
+            } else if (typeof card.diagram === 'string' && card.diagram.trim().startsWith('<img')) {
+                diagWrapper.style.display = 'flex';
+                diagBox.classList.add('has-image');
+                diagBox.innerHTML = card.diagram;
+            } else if (card.diagram && card.diagram.trim() !== '') {
                 diagWrapper.style.display = 'flex';
                 diagBox.innerText = card.diagram;
             } else {
