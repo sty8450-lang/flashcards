@@ -96,7 +96,7 @@
 </head>
 <body>
     <div class="container">
-        <header>
+        <header id="app-header">
             <h1>기술사 암기장</h1>
             <span id="total-badge" style="font-size: 0.8rem; color: var(--text-secondary);"></span>
         </header>
@@ -138,13 +138,13 @@
                     </div>
                     <!-- Back -->
                     <div class="card-face card-back">
-                        <div>
-                            <span class="card-tag" id="back-domain" style="color: #93c5fd;">핵심 구성도 및 서브노트</span>
-                            <div class="card-title" id="back-title" style="font-size: 1.08rem;">토픽 제목</div>
-                            <div class="keywords-container" id="back-keywords"></div>
-                        </div>
+                        <div class="card-body" id="back-scroll-body">
+                            <div>
+                                <span class="card-tag" id="back-domain" style="color: #93c5fd;">핵심 구성도 및 서브노트</span>
+                                <div class="card-title" id="back-title" style="font-size: 1.08rem; color: #f8fafc;">토픽 제목</div>
+                                <div class="keywords-container" id="back-keywords"></div>
+                            </div>
 
-                        <div class="card-body">
                             <!-- ⓪ 최상단: 1단락 핵심 정의 콜아웃 영역 -->
                             <div class="definition-wrapper" id="definition-wrapper">
                                 <div class="back-section-label">1단락 핵심 정의 (25~30자)</div>
@@ -233,6 +233,7 @@
 
             currentIndex = 0;
             isFlipped = false;
+            document.getElementById('app-header').style.display = 'none';
             document.getElementById('home-view').style.display = 'none';
             document.getElementById('study-view').style.display = 'flex';
             renderCard();
@@ -240,6 +241,7 @@
 
         function goHome() {
             document.getElementById('study-view').style.display = 'none';
+            document.getElementById('app-header').style.display = 'flex';
             document.getElementById('home-view').style.display = 'flex';
         }
 
@@ -389,6 +391,9 @@
 
             // ② 하단 서브노트 표 영역 (tableRows가 있을 때만 동적 렌더링)
             renderSubnoteTable(card.tableRows);
+
+            const backScroll = document.getElementById('back-scroll-body');
+            if (backScroll) backScroll.scrollTop = 0;
 
             document.getElementById('progress-text').innerText = `${currentIndex + 1} / ${currentDeck.length}`;
         }
