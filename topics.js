@@ -712,19 +712,26 @@ const topics = [
   {
     domain: "CAOS",
     topic: "경쟁조건 (Race Condition)",
-    mnemonic: "프·네 / 상·진·한 / 세·뮤·램·에",
+    mnemonic: "공·쓰·동 / 데·피·램·세·모 / 타·카·인",
     definition: "공유자원 동시 접근 시 순서에 따라 무결성 깨지는 현상",
     keywords: [
-      "공유 자원 동시 접근 무결성 훼손",
-      "실행 순서(타이밍) 의존적 결함",
-      "데이터 불일치 (Lost Update)",
-      "커널 모드 · 인터럽트 · 멀티스레드 경합"
+      "3대 발생조건 (공유자원 · Write · 동기화 부재)",
+      "SW 해결기법 (데피램세모)",
+      "HW 해결기법 (타카인: TAS · CAS · 인터럽트)"
     ],
     diagram: "race_condition.png",
     tableRows: [
-      { major: "핵심 개념", minor: "Race Condition 정의", desc: "두 개 이상의 프로세스나 스레드가 공유 자원(X=10)에 동시에 접근·조작할 때, 실행 순서나 타이밍에 따라 기대결과(X=10)와 실제결과(X=100)가 달라져 무결성이 깨지는 현상" },
-      { major: "발생 메커니즘", minor: "비원자적 교차 실행", desc: "• 프로세스 A가 X=10을 READ한 직후 완료 전에 프로세스 B가 개입하여 X=X×10(100)으로 MODIFY 수행\n• 단일 연산이 기계어(Read → Modify → Write)로 분리 수행되는 도중 문맥교환/선점 발생" },
-      { major: "예방 대책", minor: "임계영역 보호 & 원자성", desc: "공유 자원 접근 구간을 임계영역(Critical Section)으로 설정하고 상호배제(뮤텍스, 세마포어, 모니터) 및 원자적 연산(Atomic) 적용" }
+      { major: "발생 3대 필수조건", minor: "1. 공유자원", desc: "여러 스레드가 동일한 메모리 공간 참조" },
+      { major: "", minor: "2. Write Operations", desc: "읽기만 하면 문제 안 생기나, 쓰기 발생 시 문제발생" },
+      { major: "", minor: "3. 동기화 부재", desc: "접근순서 제어 규칙이 없다." },
+      { major: "SW 해결방안\n(데피램세모)", minor: "데커 (Dekker)", desc: "우선순위 관리" },
+      { major: "", minor: "피터슨 (Peterson)", desc: "임계영역 순서 양보" },
+      { major: "", minor: "램포트 (Lamport)", desc: "권한부여 관리" },
+      { major: "", minor: "세마포어 (Semaphore)", desc: "P, V 함수, S 공유" },
+      { major: "", minor: "모니터 (Monitor)", desc: "프로그래밍 가능" },
+      { major: "HW 해결방안\n(타카인)", minor: "Test&Set (TAS)", desc: "명령어 상태 점검 후 변경 수행" },
+      { major: "", minor: "Compare&Swap (CAS)", desc: "Lock-Free(락 프리) 알고리즘" },
+      { major: "", minor: "인터럽트 비활성화", desc: "인터럽트 Disable, 원자성 확보" }
     ]
   },
   {
