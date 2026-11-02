@@ -1,648 +1,257 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>정보관리기술사 플래시카드 암기장</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <style>
-    @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
-    body {
-      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
-      background-color: #0f172a;
-      color: #f8fafc;
-      user-select: none;
-    }
-    .perspective {
-      perspective: 1400px;
-    }
-    .flip-card-inner {
-      position: relative;
-      width: 100%;
-      min-height: 520px;
-      transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
-      transform-style: preserve-3d;
-    }
-    .flipped .flip-card-inner {
-      transform: rotateY(180deg);
-    }
-    .flip-card-front, .flip-card-back {
-      position: absolute;
-      inset: 0;
-      backface-visibility: hidden;
-      -webkit-backface-visibility: hidden;
-      border-radius: 1.25rem;
-    }
-    .flip-card-back {
-      transform: rotateY(180deg);
-    }
-    /* Custom scrollbar */
-    ::-webkit-scrollbar {
-      width: 6px;
-      height: 6px;
-    }
-    ::-webkit-scrollbar-track {
-      background: #1e293b;
-    }
-    ::-webkit-scrollbar-thumb {
-      background: #475569;
-      border-radius: 9999px;
-    }
-  </style>
-</head>
-<body class="min-h-screen flex flex-col">
-
-  <!-- Top Header -->
-  <header class="border-b border-slate-800 bg-slate-900/90 backdrop-blur sticky top-0 z-30">
-    <div class="max-w-5xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
-      <div class="flex items-center gap-2.5">
-        <span class="text-2xl">🎓</span>
-        <div>
-          <h1 class="text-lg font-bold tracking-tight text-white flex items-center gap-2">
-            정보관리기술사 플래시카드
-            <span id="total-badge" class="text-xs font-semibold px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">0 토픽</span>
-          </h1>
-          <p class="text-xs text-slate-400">정의 · 구성도 · 키워드(두음) 반사신경 훈련</p>
-        </div>
-      </div>
-
-      <div class="flex items-center gap-2">
-        <!-- Search input -->
-        <div class="relative">
-          <input
-            id="search-input"
-            type="text"
-            placeholder="토픽·키워드 검색..."
-            class="bg-slate-800/90 border border-slate-700 text-sm rounded-lg pl-8 pr-3 py-1.5 text-slate-200 placeholder-slate-500 focus:outline-none focus:border-indigo-500 w-44 sm:w-56"
-          />
-          <span class="absolute left-2.5 top-2 text-slate-500 text-xs">🔍</span>
-        </div>
-
-        <!-- Filter by Memorized Status -->
-        <button
-          id="filter-unmemorized-btn"
-          onclick="toggleUnmemorizedFilter()"
-          class="text-xs font-medium px-3 py-1.5 rounded-lg border border-slate-700 bg-slate-800 text-slate-300 hover:bg-slate-700 transition flex items-center gap-1.5"
-          title="아직 완벽 암기하지 않은 카드만 보기"
-        >
-          <span>🔥 미암기만</span>
-        </button>
-
-        <!-- Shuffle Button -->
-        <button
-          onclick="shuffleCards()"
-          class="text-xs font-medium px-3 py-1.5 rounded-lg border border-slate-700 bg-slate-800 text-slate-300 hover:bg-slate-700 transition flex items-center gap-1"
-          title="카드 순서 랜덤 섞기"
-        >
-          <span>🔀 셔플</span>
-        </button>
-
-        <!-- Topic List Drawer Toggle -->
-        <button
-          onclick="toggleListModal()"
-          class="text-xs font-medium px-3 py-1.5 rounded-lg border border-indigo-500/40 bg-indigo-600/20 text-indigo-300 hover:bg-indigo-600/30 transition flex items-center gap-1"
-        >
-          <span>📋 전체 목차</span>
-        </button>
-      </div>
-    </div>
-
-    <!-- 10 Domain Tabs -->
-    <div class="max-w-5xl mx-auto px-4 pb-2.5 overflow-x-auto">
-      <div id="domain-tabs" class="flex items-center gap-1.5 min-w-max"></div>
-    </div>
-  </header>
-
-  <!-- Main Content -->
-  <main class="flex-1 max-w-4xl w-full mx-auto px-4 py-6 flex flex-col justify-between gap-5">
-
-    <!-- Progress & Card Status Bar -->
-    <div class="flex items-center justify-between text-xs text-slate-400 px-1">
-      <div class="flex items-center gap-2">
-        <span id="current-domain-label" class="font-semibold text-indigo-400"></span>
-        <span>·</span>
-        <span id="progress-text" class="font-mono text-slate-300">1 / 10</span>
-      </div>
-      <div class="flex items-center gap-3">
-        <span id="memorized-counter" class="text-emerald-400 font-medium">✅ 암기 완료: 0개</span>
-        <span class="hidden sm:inline text-slate-500">단축키: [Space] 뒤집기 · [←/→] 이동 · [1/2] 암기체크</span>
-      </div>
-    </div>
-
-    <!-- Flashcard Container -->
-    <div id="card-wrapper" class="perspective w-full cursor-pointer" onclick="flipCard(event)">
-      <div id="card-inner" class="flip-card-inner">
-
-        <!-- FRONT OF CARD (토픽 문제 화면) -->
-        <div class="flip-card-front bg-gradient-to-br from-slate-800 via-slate-800/95 to-slate-900 border border-slate-700/80 shadow-2xl p-6 sm:p-10 flex flex-col justify-between">
-          <div class="flex items-center justify-between">
-            <div class="flex items-center gap-2">
-              <span id="front-domain-badge" class="px-3 py-1 rounded-full text-xs font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
-                AI
-              </span>
-              <span id="front-importance" class="text-amber-400 text-xs font-semibold tracking-wider">★★★</span>
-            </div>
-            <span id="front-status-badge" class="text-xs px-2.5 py-1 rounded-full bg-slate-700/60 text-slate-400">
-              미학습
-            </span>
-          </div>
-
-          <!-- Center Topic Title -->
-          <div class="my-auto py-8 text-center space-y-3">
-            <div class="inline-block text-xs font-semibold tracking-widest text-indigo-400/90 bg-indigo-950/60 px-3 py-1 rounded-md border border-indigo-800/50">
-              핵심 토픽 문제
-            </div>
-            <h2 id="front-title" class="text-2xl sm:text-4xl font-extrabold text-white tracking-tight leading-snug break-keep">
-              토픽 제목
-            </h2>
-            <p id="front-subtitle" class="text-sm sm:text-base text-slate-400 font-medium">
-              부제목 설명
-            </p>
-
-            <!-- Self Check Prompts -->
-            <div class="pt-6 max-w-lg mx-auto grid grid-cols-3 gap-2.5 text-left" onclick="event.stopPropagation()">
-              <div onclick="toggleHint('def')" class="p-3 rounded-xl bg-slate-900/70 border border-slate-700/70 hover:border-indigo-500/50 transition cursor-pointer">
-                <div class="text-xs font-bold text-indigo-400 mb-1">① 정의 (리드문)</div>
-                <div id="hint-def" class="text-[11px] text-slate-400 line-clamp-2">클릭 시 앞글자 힌트 보기</div>
-              </div>
-              <div onclick="toggleHint('diag')" class="p-3 rounded-xl bg-slate-900/70 border border-slate-700/70 hover:border-emerald-500/50 transition cursor-pointer">
-                <div class="text-xs font-bold text-emerald-400 mb-1">② 구성도</div>
-                <div id="hint-diag" class="text-[11px] text-slate-400 line-clamp-2">클릭 시 구성도 힌트 보기</div>
-              </div>
-              <div onclick="toggleHint('kw')" class="p-3 rounded-xl bg-slate-900/70 border border-slate-700/70 hover:border-amber-500/50 transition cursor-pointer">
-                <div class="text-xs font-bold text-amber-400 mb-1">③ 키워드·두음</div>
-                <div id="hint-kw" class="text-[11px] text-slate-400 line-clamp-2">클릭 시 두음 힌트 보기</div>
-              </div>
-            </div>
-          </div>
-
-          <div class="text-center text-xs text-slate-400 flex items-center justify-center gap-2 pt-2 border-t border-slate-800">
-            <span class="inline-block w-2 h-2 rounded-full bg-indigo-400 animate-ping"></span>
-            <span>카드를 클릭하거나 <kbd class="px-1.5 py-0.5 bg-slate-700 text-slate-200 rounded text-[11px]">Space</kbd> 키를 눌러 정답(정의·구성도·키워드) 확인</span>
-          </div>
-        </div>
-
-        <!-- BACK OF CARD (정의 / 구성도 / 키워드 정답 화면) -->
-        <div class="flip-card-back bg-slate-900 border border-indigo-500/40 shadow-2xl p-5 sm:p-7 flex flex-col justify-between overflow-y-auto">
-          <!-- Back Header -->
-          <div class="flex items-start justify-between gap-3 border-b border-slate-800 pb-3">
-            <div>
-              <div class="flex items-center gap-2 mb-1">
-                <span id="back-domain-badge" class="px-2.5 py-0.5 rounded-md text-[11px] font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
-                  AI
-                </span>
-                <span id="back-subtitle" class="text-xs text-slate-400"></span>
-              </div>
-              <h3 id="back-title" class="text-lg sm:text-xl font-bold text-white"></h3>
-            </div>
-            <span class="text-xs text-slate-400 shrink-0 bg-slate-800 px-2.5 py-1 rounded-lg border border-slate-700">
-              👆 클릭하여 앞면으로
-            </span>
-          </div>
-
-          <!-- Back Content: 1. 정의 / 2. 구성도 / 3. 키워드 -->
-          <div class="my-3 space-y-3.5 text-sm flex-1">
-
-            <!-- 1. 정의 (Definition) -->
-            <div class="bg-slate-800/70 border-l-4 border-indigo-500 rounded-r-xl p-3.5">
-              <div class="text-xs font-bold text-indigo-400 uppercase tracking-wider mb-1">
-                1. 정의 (1단락 리드문)
-              </div>
-              <p id="back-definition" class="text-slate-100 leading-relaxed font-medium text-sm sm:text-[15px] break-keep"></p>
-            </div>
-
-            <!-- 2. 구성도 (Diagram / Architecture) -->
-            <div class="bg-slate-800/50 border border-slate-700/80 rounded-xl p-3.5">
-              <div class="flex items-center justify-between mb-2">
-                <span class="text-xs font-bold text-emerald-400 uppercase tracking-wider">
-                  2. 핵심 구성도 / 비교표
-                </span>
-                <span id="back-diagram-caption" class="text-[11px] text-slate-400"></span>
-              </div>
-              <div id="back-diagram-body" class="space-y-2"></div>
-            </div>
-
-            <!-- 3. 두음 & 핵심 키워드 (Keywords) -->
-            <div class="bg-slate-800/50 border border-slate-700/80 rounded-xl p-3.5">
-              <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
-                <span class="text-xs font-bold text-amber-400 uppercase tracking-wider">
-                  3. 두음 & 핵심 키워드
-                </span>
-                <span id="back-mnemonic" class="text-xs font-bold px-2.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30"></span>
-              </div>
-              <div id="back-keywords" class="flex flex-wrap gap-1.5"></div>
-              <p id="back-note" class="mt-2.5 text-xs text-slate-400 bg-slate-900/70 px-3 py-1.5 rounded-lg border border-slate-800"></p>
-            </div>
-
-          </div>
-
-          <!-- Back Footer: Self-Evaluation Buttons -->
-          <div class="pt-3 border-t border-slate-800 flex items-center justify-between gap-3" onclick="event.stopPropagation()">
-            <button
-              onclick="markStatus('retry')"
-              class="flex-1 py-2 px-3 rounded-xl bg-rose-500/15 hover:bg-rose-500/25 text-rose-300 border border-rose-500/30 text-xs sm:text-sm font-semibold transition flex items-center justify-center gap-1.5"
-            >
-              <span>😅 다시 볼래요 (키 1)</span>
-            </button>
-            <button
-              onclick="markStatus('done')"
-              class="flex-1 py-2 px-3 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border border-emerald-500/30 text-xs sm:text-sm font-semibold transition flex items-center justify-center gap-1.5"
-            >
-              <span>✅ 완벽 암기! (키 2)</span>
-            </button>
-          </div>
-        </div>
-
-      </div>
-    </div>
-
-    <!-- Bottom Navigation Controls -->
-    <div class="flex items-center justify-between gap-4 pt-1">
-      <button
-        onclick="prevCard()"
-        class="px-5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-sm font-semibold text-slate-200 transition flex items-center gap-2"
-      >
-        <span>← 이전 토픽</span>
-      </button>
-
-      <button
-        onclick="flipCard(event)"
-        class="px-6 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-sm font-bold text-white shadow-lg shadow-indigo-600/25 transition"
-      >
-        🔄 카드 뒤집기 (Space)
-      </button>
-
-      <button
-        onclick="nextCard()"
-        class="px-5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-sm font-semibold text-slate-200 transition flex items-center gap-2"
-      >
-        <span>다음 토픽 →</span>
-      </button>
-    </div>
-
-  </main>
-
-  <!-- Topic List Modal (전체 토픽 목차) -->
-  <div id="list-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden items-center justify-center p-4" onclick="toggleListModal()">
-    <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-2xl w-full max-h-[80vh] flex flex-col shadow-2xl" onclick="event.stopPropagation()">
-      <div class="p-4 border-b border-slate-800 flex items-center justify-between">
-        <h3 class="font-bold text-white text-base flex items-center gap-2">
-          <span>📋 전체 토픽 목차</span>
-          <span id="modal-count" class="text-xs text-slate-400 font-normal"></span>
-        </h3>
-        <button onclick="toggleListModal()" class="text-slate-400 hover:text-white text-sm px-2 py-1">✕ 닫기</button>
-      </div>
-      <div id="modal-topic-list" class="p-4 overflow-y-auto space-y-2 flex-1"></div>
-    </div>
-  </div>
-
-  <script src="topics.js"></script>
-  <script>
-    const STORAGE_KEY = 'itpe_card_status_v1';
-    let cardStatus = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
-    let currentDomain = 'ALL';
-    let onlyUnmemorized = false;
-    let searchQuery = '';
-    let filteredTopics = [];
-    let currentIndex = 0;
-    let isFlipped = false;
-
-    function saveStatus() {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(cardStatus));
-      updateStats();
-    }
-
-    function getDomainObj(domainId) {
-      return window.ITPE_DOMAINS.find(d => d.id === domainId) || { id: domainId, name: domainId, fullName: domainId, icon: '📌' };
-    }
-
-    function renderDomainTabs() {
-      const container = document.getElementById('domain-tabs');
-      container.innerHTML = '';
-
-      window.ITPE_DOMAINS.forEach(dom => {
-        const count = dom.id === 'ALL'
-          ? window.ITPE_TOPICS.length
-          : window.ITPE_TOPICS.filter(t => t.domain === dom.id).length;
-
-        const active = currentDomain === dom.id;
-        const btn = document.createElement('button');
-        btn.className = active
-          ? 'px-3 py-1.5 rounded-lg text-xs font-bold bg-indigo-600 text-white shadow-sm transition flex items-center gap-1.5'
-          : 'px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-800/80 text-slate-300 hover:bg-slate-700/80 border border-slate-700/60 transition flex items-center gap-1.5';
-        btn.onclick = () => selectDomain(dom.id);
-        btn.innerHTML = `<span>${dom.icon}</span><span>${dom.name}</span><span class="opacity-70 text-[11px]">(${count})</span>`;
-        container.appendChild(btn);
-      });
-    }
-
-    function applyFilters() {
-      filteredTopics = window.ITPE_TOPICS.filter(t => {
-        if (currentDomain !== 'ALL' && t.domain !== currentDomain) return false;
-        if (onlyUnmemorized && cardStatus[t.id] === 'done') return false;
-        if (searchQuery.trim() !== '') {
-          const q = searchQuery.toLowerCase();
-          const inTitle = t.title.toLowerCase().includes(q) || (t.subtitle || '').toLowerCase().includes(q);
-          const inDef = (t.definition || '').toLowerCase().includes(q);
-          const inKw = (t.keywords || []).some(k => k.toLowerCase().includes(q));
-          const inMn = (t.mnemonic || '').toLowerCase().includes(q);
-          if (!inTitle && !inDef && !inKw && !inMn) return false;
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ITPE Flashcards</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --accent: #38bdf8;
+            --accent-gradient: linear-gradient(135deg, #38bdf8 0%, #3b82f6 100%);
+            --border-color: #334155;
         }
-        return true;
-      });
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-primary); min-height: 100vh; display: flex; flex-direction: column; }
+        .container { max-width: 600px; width: 100%; margin: 0 auto; padding: 16px; flex: 1; display: flex; flex-direction: column; }
+        
+        /* Header */
+        header { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; margin-bottom: 16px; border-bottom: 1px solid var(--border-color); }
+        h1 { font-size: 1.2rem; font-weight: 700; color: var(--accent); }
+        
+        /* Home View */
+        #home-view { display: flex; flex-direction: column; gap: 16px; flex: 1; }
+        .hero-card { background: var(--accent-gradient); border-radius: 16px; padding: 20px; color: #fff; text-align: center; cursor: pointer; box-shadow: 0 4px 12px rgba(56, 189, 248, 0.2); transition: transform 0.1s; }
+        .hero-card:active { transform: scale(0.98); }
+        .hero-card h2 { font-size: 1.3rem; margin-bottom: 6px; }
+        .hero-card p { font-size: 0.85rem; opacity: 0.9; }
 
-      if (currentIndex >= filteredTopics.length) {
-        currentIndex = 0;
-      }
-      renderCard();
-      updateStats();
-    }
+        .section-title { font-size: 0.95rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 10px; }
+        
+        /* Domain Grid - Optimized for Fold 7 Cover & Inner screens */
+        .domain-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+        @media (min-width: 500px) { .domain-grid { grid-template-columns: repeat(3, 1fr); } }
+        
+        .domain-btn { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 14px 12px; text-align: left; cursor: pointer; color: var(--text-primary); transition: all 0.2s; display: flex; flex-direction: column; justify-content: space-between; min-height: 75px; }
+        .domain-btn:active { background: var(--border-color); }
+        .domain-name { font-weight: 600; font-size: 1rem; }
+        .domain-count { font-size: 0.75rem; color: var(--text-secondary); margin-top: 4px; }
 
-    function selectDomain(domainId) {
-      currentDomain = domainId;
-      currentIndex = 0;
-      isFlipped = false;
-      renderDomainTabs();
-      applyFilters();
-    }
+        /* Study View */
+        #study-view { display: none; flex-direction: column; flex: 1; gap: 14px; }
+        .study-header { display: flex; justify-content: space-between; align-items: center; }
+        .back-btn { background: none; border: 1px solid var(--border-color); color: var(--text-secondary); padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 0.85rem; }
+        .progress-text { font-size: 0.85rem; color: var(--text-secondary); }
 
-    function toggleUnmemorizedFilter() {
-      onlyUnmemorized = !onlyUnmemorized;
-      const btn = document.getElementById('filter-unmemorized-btn');
-      if (onlyUnmemorized) {
-        btn.className = 'text-xs font-bold px-3 py-1.5 rounded-lg border border-amber-500/50 bg-amber-500/20 text-amber-300 transition flex items-center gap-1.5';
-      } else {
-        btn.className = 'text-xs font-medium px-3 py-1.5 rounded-lg border border-slate-700 bg-slate-800 text-slate-300 hover:bg-slate-700 transition flex items-center gap-1.5';
-      }
-      currentIndex = 0;
-      applyFilters();
-    }
+        /* Flashcard */
+        .card-container { perspective: 1000px; flex: 1; display: flex; min-height: 320px; cursor: pointer; }
+        .card { width: 100%; height: 100%; position: relative; transform-style: preserve-3d; transition: transform 0.4s ease; border-radius: 16px; box-shadow: 0 6px 20px rgba(0,0,0,0.3); }
+        .card.is-flipped { transform: rotateY(180deg); }
+        .card-face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 16px; padding: 20px; display: flex; flex-direction: column; justify-content: space-between; }
+        .card-back { transform: rotateY(180deg); background: #172554; border-color: #1e40af; }
+        
+        .card-tag { font-size: 0.7rem; font-weight: 600; color: var(--accent); text-transform: uppercase; letter-spacing: 0.05em; }
+        .card-title { font-size: 1.25rem; font-weight: 700; margin: 8px 0; line-height: 1.35; }
+        .card-body { font-size: 0.9rem; color: var(--text-secondary); line-height: 1.45; flex: 1; overflow-y: auto; }
+        .keywords-container { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px; }
+        .keyword-badge { background: rgba(56, 189, 248, 0.15); color: var(--accent); padding: 3px 8px; border-radius: 16px; font-size: 0.75rem; font-weight: 500; }
+        .diagram-box { background: rgba(0,0,0,0.25); padding: 8px; border-radius: 6px; font-family: monospace; font-size: 0.8rem; white-space: pre-wrap; margin-top: 8px; color: #e2e8f0; }
 
-    function shuffleCards() {
-      for (let i = filteredTopics.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [filteredTopics[i], filteredTopics[j]] = [filteredTopics[j], filteredTopics[i]];
-      }
-      currentIndex = 0;
-      isFlipped = false;
-      renderCard();
-    }
+        /* Controls */
+        .controls { display: flex; gap: 10px; margin-top: 10px; padding-bottom: 10px; }
+        .ctrl-btn { flex: 1; background: var(--card-bg); border: 1px solid var(--border-color); color: var(--text-primary); padding: 12px; border-radius: 10px; font-weight: 600; font-size: 0.95rem; cursor: pointer; }
+        .ctrl-btn:active { background: var(--border-color); }
+        .ctrl-btn.primary { background: var(--accent); color: #0f172a; border: none; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>ITPE Flashcards</h1>
+            <span id="total-badge" style="font-size: 0.8rem; color: var(--text-secondary);"></span>
+        </header>
 
-    function updateStats() {
-      document.getElementById('total-badge').textContent = `${window.ITPE_TOPICS.length} 토픽`;
-      const doneCount = window.ITPE_TOPICS.filter(t => cardStatus[t.id] === 'done').length;
-      document.getElementById('memorized-counter').textContent = `✅ 암기 완료: ${doneCount} / ${window.ITPE_TOPICS.length}`;
-    }
-
-    function renderDiagram(diagram) {
-      const container = document.getElementById('back-diagram-body');
-      const captionEl = document.getElementById('back-diagram-caption');
-      container.innerHTML = '';
-      captionEl.textContent = diagram?.caption || '';
-
-      if (!diagram) return;
-
-      if (diagram.type === 'layers') {
-        const colorMap = {
-          indigo: 'bg-indigo-950/60 border-indigo-700/60 text-indigo-200',
-          blue: 'bg-sky-950/60 border-sky-700/60 text-sky-200',
-          emerald: 'bg-emerald-950/60 border-emerald-700/60 text-emerald-200',
-          amber: 'bg-amber-950/60 border-amber-700/60 text-amber-200'
-        };
-        diagram.rows.forEach(row => {
-          const c = colorMap[row.color] || colorMap.indigo;
-          const div = document.createElement('div');
-          div.className = `rounded-lg border p-2.5 flex flex-col sm:flex-row sm:items-center gap-2 ${c}`;
-          const itemsHtml = row.items.map(it =>
-            `<span class="px-2.5 py-1 rounded bg-slate-900/80 border border-slate-700/80 text-xs text-slate-100 font-medium">${it}</span>`
-          ).join('');
-          div.innerHTML = `
-            <div class="text-xs font-bold sm:w-44 shrink-0">${row.label}</div>
-            <div class="flex flex-wrap gap-1.5 flex-1">${itemsHtml}</div>
-          `;
-          container.appendChild(div);
-        });
-      } else if (diagram.type === 'flow') {
-        const grid = document.createElement('div');
-        grid.className = 'grid grid-cols-1 sm:grid-cols-4 gap-2';
-        diagram.steps.forEach((st, idx) => {
-          const box = document.createElement('div');
-          box.className = 'p-2.5 rounded-lg bg-slate-900/90 border border-slate-700 flex flex-col justify-between';
-          box.innerHTML = `
-            <div class="text-xs font-bold text-emerald-400 mb-1">${st.title}</div>
-            <div class="text-[11px] text-slate-300 leading-snug">${st.desc}</div>
-          `;
-          grid.appendChild(box);
-        });
-        container.appendChild(grid);
-      } else if (diagram.type === 'table') {
-        const wrap = document.createElement('div');
-        wrap.className = 'overflow-x-auto rounded-lg border border-slate-700';
-        const ths = diagram.headers.map(h => `<th class="px-2.5 py-1.5 bg-slate-800 text-left text-[11px] font-bold text-slate-300 border-b border-slate-700">${h}</th>`).join('');
-        const trs = diagram.rows.map(r => {
-          const tds = r.map((cell, i) => `<td class="px-2.5 py-1.5 text-xs ${i === 0 ? 'font-bold text-indigo-300 bg-slate-900/60' : 'text-slate-200'} border-b border-slate-800">${cell}</td>`).join('');
-          return `<tr>${tds}</tr>`;
-        }).join('');
-        wrap.innerHTML = `<table class="w-full border-collapse"><thead><tr>${ths}</tr></thead><tbody>${trs}</tbody></table>`;
-        container.appendChild(wrap);
-      } else if (diagram.type === 'image') {
-        container.innerHTML = `<img src="${diagram.src}" alt="구성도" class="max-h-56 mx-auto rounded-lg border border-slate-700 object-contain" />`;
-      }
-    }
-
-    function renderCard() {
-      const wrapper = document.getElementById('card-wrapper');
-      if (isFlipped) {
-        wrapper.classList.add('flipped');
-      } else {
-        wrapper.classList.remove('flipped');
-      }
-
-      const domObj = getDomainObj(currentDomain);
-      document.getElementById('current-domain-label').textContent =
-        currentDomain === 'ALL' ? '📚 전체 도메인' : `${domObj.icon} ${domObj.name} (${domObj.fullName || ''})`;
-
-      if (filteredTopics.length === 0) {
-        document.getElementById('progress-text').textContent = '0 / 0';
-        document.getElementById('front-title').textContent = '조건에 맞는 토픽이 없습니다';
-        document.getElementById('front-subtitle').textContent = '필터나 검색어를 초기화해 주세요';
-        return;
-      }
-
-      const topic = filteredTopics[currentIndex];
-      const tDom = getDomainObj(topic.domain);
-
-      document.getElementById('progress-text').textContent = `${currentIndex + 1} / ${filteredTopics.length}`;
-
-      // Front
-      document.getElementById('front-domain-badge').textContent = `${tDom.icon} ${tDom.name} · ${tDom.fullName || ''}`;
-      document.getElementById('front-importance').textContent = topic.importance || '★★★';
-      document.getElementById('front-title').textContent = topic.title;
-      document.getElementById('front-subtitle').textContent = topic.subtitle || '';
-
-      // Reset Hints
-      document.getElementById('hint-def').textContent = '클릭 시 리드문 힌트 보기';
-      document.getElementById('hint-diag').textContent = '클릭 시 구성도 힌트 보기';
-      document.getElementById('hint-kw').textContent = '클릭 시 두음 힌트 보기';
-
-      // Status badge
-      const st = cardStatus[topic.id];
-      const statusEl = document.getElementById('front-status-badge');
-      if (st === 'done') {
-        statusEl.textContent = '✅ 암기 완료';
-        statusEl.className = 'text-xs px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-semibold';
-      } else if (st === 'retry') {
-        statusEl.textContent = '😅 복습 필요';
-        statusEl.className = 'text-xs px-2.5 py-1 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/30 font-semibold';
-      } else {
-        statusEl.textContent = '미학습';
-        statusEl.className = 'text-xs px-2.5 py-1 rounded-full bg-slate-700/60 text-slate-400';
-      }
-
-      // Back
-      document.getElementById('back-domain-badge').textContent = `${tDom.icon} ${tDom.name}`;
-      document.getElementById('back-title').textContent = topic.title;
-      document.getElementById('back-subtitle').textContent = topic.subtitle || '';
-      document.getElementById('back-definition').textContent = topic.definition || '';
-      document.getElementById('back-mnemonic').textContent = topic.mnemonic ? `💡 두음: ${topic.mnemonic}` : '';
-
-      renderDiagram(topic.diagram);
-
-      const kwContainer = document.getElementById('back-keywords');
-      kwContainer.innerHTML = '';
-      (topic.keywords || []).forEach(kw => {
-        const span = document.createElement('span');
-        span.className = 'px-2.5 py-1 rounded-md bg-slate-900 border border-slate-700 text-xs font-medium text-amber-200';
-        span.textContent = kw;
-        kwContainer.appendChild(span);
-      });
-
-      const noteEl = document.getElementById('back-note');
-      if (topic.note) {
-        noteEl.style.display = 'block';
-        noteEl.textContent = `📌 답안 차별화 팁: ${topic.note}`;
-      } else {
-        noteEl.style.display = 'none';
-      }
-    }
-
-    function toggleHint(type) {
-      if (filteredTopics.length === 0) return;
-      const topic = filteredTopics[currentIndex];
-      if (type === 'def') {
-        const el = document.getElementById('hint-def');
-        el.textContent = topic.definition.slice(0, 28) + '...';
-        el.className = 'text-[11px] text-indigo-200 font-medium';
-      } else if (type === 'diag') {
-        const el = document.getElementById('hint-diag');
-        el.textContent = topic.diagram?.caption || '구성도 없음';
-        el.className = 'text-[11px] text-emerald-200 font-medium';
-      } else if (type === 'kw') {
-        const el = document.getElementById('hint-kw');
-        el.textContent = topic.mnemonic || (topic.keywords || []).slice(0, 2).join(', ');
-        el.className = 'text-[11px] text-amber-200 font-medium';
-      }
-    }
-
-    function flipCard(e) {
-      if (filteredTopics.length === 0) return;
-      isFlipped = !isFlipped;
-      renderCard();
-    }
-
-    function nextCard() {
-      if (filteredTopics.length === 0) return;
-      isFlipped = false;
-      currentIndex = (currentIndex + 1) % filteredTopics.length;
-      renderCard();
-    }
-
-    function prevCard() {
-      if (filteredTopics.length === 0) return;
-      isFlipped = false;
-      currentIndex = (currentIndex - 1 + filteredTopics.length) % filteredTopics.length;
-      renderCard();
-    }
-
-    function markStatus(status) {
-      if (filteredTopics.length === 0) return;
-      const topic = filteredTopics[currentIndex];
-      cardStatus[topic.id] = status;
-      saveStatus();
-      nextCard();
-    }
-
-    function toggleListModal() {
-      const modal = document.getElementById('list-modal');
-      if (modal.classList.contains('hidden')) {
-        renderModalList();
-        modal.classList.remove('hidden');
-        modal.classList.add('flex');
-      } else {
-        modal.classList.add('hidden');
-        modal.classList.remove('flex');
-      }
-    }
-
-    function renderModalList() {
-      const list = document.getElementById('modal-topic-list');
-      document.getElementById('modal-count').textContent = `(현재 필터 ${filteredTopics.length}개)`;
-      list.innerHTML = '';
-
-      filteredTopics.forEach((t, idx) => {
-        const d = getDomainObj(t.domain);
-        const st = cardStatus[t.id];
-        const badge = st === 'done' ? '✅' : st === 'retry' ? '😅' : '⚪';
-        const item = document.createElement('div');
-        item.className = 'p-3 rounded-xl bg-slate-800/80 hover:bg-slate-800 border border-slate-700/70 flex items-center justify-between cursor-pointer transition';
-        item.onclick = () => {
-          currentIndex = idx;
-          isFlipped = false;
-          renderCard();
-          toggleListModal();
-        };
-        item.innerHTML = `
-          <div class="flex items-center gap-2.5">
-            <span class="text-xs px-2 py-0.5 rounded bg-slate-700 text-slate-200 font-bold">${d.name}</span>
-            <div>
-              <div class="text-sm font-bold text-white">${t.title}</div>
-              <div class="text-xs text-slate-400">${t.subtitle || ''}</div>
+        <!-- Home View -->
+        <div id="home-view">
+            <div class="hero-card" onclick="startStudy('ALL')">
+                <h2>전체 셔플 학습</h2>
+                <p>모든 도메인 카드를 무작위로 섞어서 풀기</p>
             </div>
-          </div>
-          <div class="text-sm">${badge}</div>
-        `;
-        list.appendChild(item);
-      });
-    }
 
-    // Search input listener
-    document.getElementById('search-input').addEventListener('input', (e) => {
-      searchQuery = e.target.value;
-      currentIndex = 0;
-      isFlipped = false;
-      applyFilters();
-    });
+            <div>
+                <div class="section-title">도메인 선택</div>
+                <div class="domain-grid" id="domain-grid">
+                    <!-- Dynamic Loading -->
+                </div>
+            </div>
+        </div>
 
-    // Keyboard shortcuts
-    window.addEventListener('keydown', (e) => {
-      if (document.activeElement.tagName === 'INPUT') return;
-      if (e.code === 'Space') {
-        e.preventDefault();
-        flipCard();
-      } else if (e.code === 'ArrowRight') {
-        nextCard();
-      } else if (e.code === 'ArrowLeft') {
-        prevCard();
-      } else if (e.key === '1') {
-        markStatus('retry');
-      } else if (e.key === '2') {
-        markStatus('done');
-      }
-    });
+        <!-- Study View -->
+        <div id="study-view">
+            <div class="study-header">
+                <button class="back-btn" onclick="goHome()">← 홈으로</button>
+                <div class="progress-text" id="progress-text">1 / 10</div>
+            </div>
 
-    // Init
-    renderDomainTabs();
-    applyFilters();
-  </script>
+            <div class="card-container" onclick="flipCard()">
+                <div class="card" id="flashcard">
+                    <!-- Front -->
+                    <div class="card-face card-front">
+                        <div>
+                            <span class="card-tag" id="front-domain">도메인</span>
+                            <div class="card-title" id="front-title">토픽 제목</div>
+                        </div>
+                        <div class="card-body" style="display: flex; align-items: center; justify-content: center; text-align: center; color: var(--text-secondary);">
+                            카드를 터치하여 뒷면 확인
+                        </div>
+                        <div style="text-align: center; font-size: 0.75rem; color: var(--text-secondary);">탭하여 뒤집기 ↻</div>
+                    </div>
+                    <!-- Back -->
+                    <div class="card-face card-back">
+                        <div>
+                            <span class="card-tag" style="color: #93c5fd;">핵심 키워드 및 구성도</span>
+                            <div class="card-title" id="back-title" style="font-size: 1.1rem;">토픽 제목</div>
+                            <div class="keywords-container" id="back-keywords"></div>
+                        </div>
+                        <div class="card-body">
+                            <div class="diagram-box" id="back-diagram"></div>
+                        </div>
+                        <div style="text-align: center; font-size: 0.75rem; color: #93c5fd;">탭하여 앞면으로 ↻</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="controls">
+                <button class="ctrl-btn" onclick="prevCard(event)">이전</button>
+                <button class="ctrl-btn primary" onclick="nextCard(event)">다음 카드 →</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="topics.js"></script>
+    <script>
+        let currentDeck = [];
+        let currentIndex = 0;
+        let isFlipped = false;
+
+        function initApp() {
+            if (typeof topics === 'undefined' || !topics.length) {
+                document.getElementById('domain-grid').innerHTML = '<p style="color:red; grid-column:span 2;">topics.js 로드 대기 중...</p>';
+                return;
+            }
+            
+            document.getElementById('total-badge').innerText = `총 ${topics.length}개 토픽`;
+
+            const domainCounts = {};
+            topics.forEach(t => {
+                domainCounts[t.domain] = (domainCounts[t.domain] || 0) + 1;
+            });
+
+            const grid = document.getElementById('domain-grid');
+            grid.innerHTML = '';
+
+            Object.keys(domainCounts).forEach(domain => {
+                const btn = document.createElement('div');
+                btn.className = 'domain-btn';
+                btn.onclick = () => startStudy(domain);
+                btn.innerHTML = `
+                    <div class="domain-name">${domain}</div>
+                    <div class="domain-count">${domainCounts[domain]}개 토픽</div>
+                `;
+                grid.appendChild(btn);
+            });
+        }
+
+        function startStudy(domain) {
+            if (domain === 'ALL') {
+                currentDeck = [...topics].sort(() => Math.random() - 0.5);
+            } else {
+                currentDeck = topics.filter(t => t.domain === domain).sort(() => Math.random() - 0.5);
+            }
+
+            if (currentDeck.length === 0) {
+                alert('해당 도메인에 토픽이 없습니다.');
+                return;
+            }
+
+            currentIndex = 0;
+            isFlipped = false;
+            document.getElementById('home-view').style.display = 'none';
+            document.getElementById('study-view').style.display = 'flex';
+            renderCard();
+        }
+
+        function goHome() {
+            document.getElementById('study-view').style.display = 'none';
+            document.getElementById('home-view').style.display = 'flex';
+        }
+
+        function flipCard() {
+            const card = document.getElementById('flashcard');
+            isFlipped = !isFlipped;
+            if (isFlipped) {
+                card.classList.add('is-flipped');
+            } else {
+                card.classList.remove('is-flipped');
+            }
+        }
+
+        function renderCard() {
+            const card = currentDeck[currentIndex];
+            document.getElementById('flashcard').classList.remove('is-flipped');
+            isFlipped = false;
+
+            document.getElementById('front-domain').innerText = card.domain;
+            document.getElementById('front-title').innerText = card.topic;
+            
+            document.getElementById('back-title').innerText = card.topic;
+            
+            const kwContainer = document.getElementById('back-keywords');
+            kwContainer.innerHTML = '';
+            if (card.keywords && card.keywords.length) {
+                card.keywords.forEach(kw => {
+                    const span = document.createElement('span');
+                    span.className = 'keyword-badge';
+                    span.innerText = kw;
+                    kwContainer.appendChild(span);
+                });
+            }
+
+            const diagBox = document.getElementById('back-diagram');
+            if (card.diagram) {
+                diagBox.style.display = 'block';
+                diagBox.innerText = card.diagram;
+            } else {
+                diagBox.style.display = 'none';
+            }
+
+            document.getElementById('progress-text').innerText = `${currentIndex + 1} / ${currentDeck.length}`;
+        }
+
+        function nextCard(event) {
+            event.stopPropagation();
+            if (currentIndex < currentDeck.length - 1) {
+                currentIndex++;
+                renderCard();
+            } else {
+                alert('마지막 카드입니다!');
+            }
+        }
+
+        function prevCard(event) {
+            event.stopPropagation();
+            if (currentIndex > 0) {
+                currentIndex--;
+                renderCard();
+            } else {
+                alert('첫 번째 카드입니다!');
+            }
+        }
+
+        window.onload = initApp;
+    </script>
 </body>
 </html>
