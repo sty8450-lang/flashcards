@@ -818,17 +818,28 @@ const topics = [
     mnemonic: "상·점·비·환 / 예·회·발·복",
     definition: "자원 점유 프로세스가 서로 상대 자원 요청해 멈춘 상태",
     keywords: [
-      "상호배제 · 점유대기 · 비선점 · 환형대기 (상점비환)",
-      "예방 · 회피 · 발견 · 복구 (예회발복)",
-      "자원할당 그래프 & Wait-For 그래프",
+      "4대 조건: 상호배제 · 점유와 대기 · 비선점 · 환형구조 (상점비환)",
+      "4대 처리방안: 예방 · 회피 · 발견 · 복구 (예회발복)",
       "Wait-Die / Wound-Wait"
     ],
-    diagram: `[4대 필요충분조건: ①상호배제 + ②점유와 대기 + ③비선점 + ④환형대기] (모두 성립 시 무한 대기 발생!)
-➔ 해결: 예방(4조건 중 1개 부정) / 회피(안전상태만 할당) / 발견(사이클 탐지) / 복구(프로세스 종료·자원 선점)`,
+    diagram: `<img src="deadlock_concept.png" alt="교착상태 개념도"><img src="deadlock_conditions.png" alt="교착상태 4대 조건별 개념도">`,
     tableRows: [
-      { major: "발생 4대 조건", minor: "상 · 점 · 비 · 환", desc: "① 상호배제(자원 독점) ② 점유와 대기(자원 보유한 채 타 자원 요청) ③ 비선점(강제 빼앗기 불가) ④ 환형대기(프로세스들이 원형 고리로 서로의 자원 대기) — 4가지 동시 만족 시에만 발생" },
-      { major: "사전 차단", minor: "예방(Prevention) & 회피(Avoidance)", desc: "• 예방: 4대 조건 중 하나를 원천 부정 (예: 모든 자원 일괄 요청, 자원 일련번호 순서 할당 → 자원 활용률 저하)\n• 회피: 교착상태 가능성이 있는 불안전 상태를 피하고 안전 상태만 허용 (은행가 알고리즘, 타임스탬프 기반 Wait-Die / Wound-Wait)" },
-      { major: "사후 처리", minor: "발견(Detection) & 복구(Recovery)", desc: "• 발견: 자원할당 그래프(단일 인스턴스는 대기 그래프 Cycle 여부, 다중 인스턴스는 그래프 소거법)로 주기적 탐지\n• 복구: 교착 프로세스 강제 종료(Kill) 또는 희생자(Victim) 선정 후 자원 강제 선점·롤백" }
+      { major: "발생 4대 조건\n(상·점·비·환)", minor: "상호배제", desc: "• 개념도: P1 ⇄ R(동시성제어) ⇄ P2\n• 프로세스 간 배타적 점유권 관리 미흡" },
+      { major: "", minor: "점유와 대기", desc: "• 개념도: P1 ─(점유)→ R ─(대기)→ P2 ─(요청)→ R ─(할당)→ P1\n• 자원 점유와 자원 요청 대기 조건" },
+      { major: "", minor: "비선점", desc: "• 개념도: P1 ─(점유)→ R ─(대기)→ P2(낮은우선순위) ─(요청)→ R ─(할당)→ P1\n• CPU 비선점형 조건 / 우선순위 조절" },
+      { major: "", minor: "환형구조", desc: "• 개념도: P1 → R → P2 → R → P1\n• 프로세스, 자원 간 환형구조" },
+      { major: "예방", minor: "LockTime", desc: "Lock Timeout 조절" },
+      { major: "", minor: "실행순서", desc: "실행순서 지정" },
+      { major: "", minor: "우선순위", desc: "프로세스 우선순위" },
+      { major: "회피", minor: "은행가", desc: "은행가 알고리즘" },
+      { major: "", minor: "Wait-Die", desc: "고참 프로세스가 후임 Kill" },
+      { major: "", minor: "Wound-Wait", desc: "후임 자원 선점" },
+      { major: "발견", minor: "데드락 log", desc: "log 기록 저장" },
+      { major: "", minor: "Alarm", desc: "Deadlock 알람" },
+      { major: "", minor: "성능모니터링", desc: "모니터링 항목" },
+      { major: "복구", minor: "강제 Kill", desc: "둘 중 하나 Kill" },
+      { major: "", minor: "자원해제", desc: "해제 처리" },
+      { major: "", minor: "프로세스 Kill", desc: "프로세스 Kill" }
     ]
   },
   {
