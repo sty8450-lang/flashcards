@@ -1191,7 +1191,7 @@ const topics = [
   },
 
   // =========================================================================
-  // 3. DB (데이터베이스 - 노션 서브노트 및 핵심 암기 포인트 전수 반영)
+  // 3. DB (데이터베이스 - 노션 서브노트 개념도 이미지 및 개별 소분류 전수 반영)
   // =========================================================================
   {
     domain: "DB",
@@ -1203,14 +1203,18 @@ const topics = [
       "고립성(Isolation) · 영속성(Durability)",
       "All or Nothing (COMMIT / ROLLBACK)"
     ],
-    diagram: `[트랜잭션 시작] ──▶ [연산 및 업무규칙 검증] ──(성공)──▶ [COMMIT: 변경 영구 확정]
-                                              └──(실패/오류)──▶ [ROLLBACK: 변경 전부 취소]`,
+    diagram: `<img src="db_tx_acid.png" alt="트랜잭션 ACID 개념도"><img src="db_tx_state.png" alt="트랜잭션 상태전이도">`,
     tableRows: [
       { major: "핵심 정의", minor: "논리적 작업 단위", desc: "여러 데이터 연산을 하나의 논리적 작업으로 묶어 전부 성공 시 확정(Commit)하고 실패 시 전부 취소(Rollback)하는 처리 단위" },
       { major: "ACID 특성\n(원·일·고·영)", minor: "원자성 (Atomicity)", desc: "트랜잭션 연산이 모두 반영되거나 모두 취소되어야 하는 특성 (구현: Undo 로그, Rollback·회복 처리)" },
       { major: "", minor: "일관성 (Consistency)", desc: "트랜잭션 실행 전후에 무결성 제약조건과 업무 규칙을 만족하는 상태로 전이 (구현: 무결성 제약조건, 트리거)" },
       { major: "", minor: "고립성 (Isolation)", desc: "동시 실행 중인 트랜잭션들이 선택한 격리수준에 따라 서로 간섭하지 않도록 제어 (구현: 잠금, MVCC, 충돌 검증)" },
-      { major: "", minor: "영속성 (Durability)", desc: "성공적으로 커밋된 결과는 시스템 장애 발생 후에도 영구 보존 (구현: WAL 로그 선기록, 재시작 REDO 회복)" }
+      { major: "", minor: "영속성 (Durability)", desc: "성공적으로 커밋된 결과는 시스템 장애 발생 후에도 영구 보존 (구현: WAL 로그 선기록, 재시작 REDO 회복)" },
+      { major: "상태 전이", minor: "활동 (Active)", desc: "트랜잭션이 시작되어 연산을 정상적으로 실행 중인 초기 상태" },
+      { major: "", minor: "부분 완료 (Partially Committed)", desc: "마지막 연산까지 실행을 마치고 최종 COMMIT 기록만을 남겨둔 상태" },
+      { major: "", minor: "완료 (Committed)", desc: "모든 변경 사항이 영구 반영되고 트랜잭션이 성공적으로 종료된 상태" },
+      { major: "", minor: "실패 (Failed)", desc: "논리적 오류나 시스템 장애로 인해 트랜잭션의 정상 실행이 더 이상 불가능한 중단 상태" },
+      { major: "", minor: "철회 (Aborted)", desc: "트랜잭션이 실패하여 Rollback 연산을 통해 시작 이전 상태로 완전히 복원된 상태" }
     ]
   },
   {
@@ -1223,14 +1227,14 @@ const topics = [
       "Repeatable Read · Serializable (RRRS)",
       "Dirty Read · Non-repeatable · Phantom (DNP)"
     ],
-    diagram: `[동시성 ↑] 0. Read Uncommitted ➔ 1. Read Committed ➔ 2. Repeatable Read ➔ 3. Serializable [일관성 ↑]`,
+    diagram: `<img src="db_isolation_graph.png" alt="트랜잭션 격리수준 개념도"><img src="db_isolation_rel.png" alt="격리수준과 이상현상 관계">`,
     tableRows: [
       { major: "낮을 때 문제점\n(DNP / 부·비·가)", minor: "Dirty Read (부정 읽기)", desc: "다른 트랜잭션의 미커밋(Uncommitted) 변경 값을 읽는 현상" },
       { major: "", minor: "Non-repeatable Read (비반복 읽기)", desc: "한 트랜잭션 내 같은 행을 다시 읽을 때 타 트랜잭션의 커밋으로 값이 달라지는 현상" },
       { major: "", minor: "Phantom Read (가상 읽기)", desc: "같은 조건으로 재조회할 때 타 트랜잭션의 삽입/삭제로 결과 행 집합이 달라지는 현상" },
-      { major: "격리수준 4단계\n(RRRS)", minor: "0. Read Uncommitted", desc: "미커밋 변경 읽기 허용 (Dirty · Non-repeatable · Phantom 모두 허용 가능)" },
-      { major: "", minor: "1. Read Committed", desc: "커밋된 데이터만 읽기 허용 → Dirty Read 방지 (Non-repeatable · Phantom 허용 가능)" },
-      { major: "", minor: "2. Repeatable Read", desc: "트랜잭션 내 동일 행 재조회 값 보장 → Dirty · Non-repeatable 방지 (표준상 Phantom 허용 가능)" },
+      { major: "격리수준 4단계\n(RRRS)", minor: "0. Read Uncommitted", desc: "미커밋 변경 읽기 허용 (Dirty · Non-repeatable · Phantom 모두 발생 가능)" },
+      { major: "", minor: "1. Read Committed", desc: "커밋된 데이터만 읽기 허용 → Dirty Read 방지 (Non-repeatable · Phantom 발생 가능)" },
+      { major: "", minor: "2. Repeatable Read", desc: "트랜잭션 내 동일 행 재조회 값 보장 → Dirty · Non-repeatable 방지 (표준상 Phantom 발생 가능)" },
       { major: "", minor: "3. Serializable", desc: "직렬 실행과 동등한 격리 보장 → 모든 읽기 이상 및 직렬화 이상(Write Skew 등) 완벽 방지" }
     ]
   },
@@ -1244,16 +1248,16 @@ const topics = [
       "기법: 락킹 · 2PL · 낙관적검증 · 타임스탬프 · MVCC",
       "낙관적 검증 절차: 읽기(Read) → 검증(Validate) → 쓰기(Write)"
     ],
-    diagram: `[병행제어 미적용] ➔ 갱신 손실(Lost Update) · 현황파악 오류(Dirty Read) · 모순성 · 연쇄 복귀 발생!
-[병행제어 5대 기법] ➔ 락킹(S/X) · 2PL · 낙관적 검증(읽검쓰) · 타임스탬프 오더링 · 다중버전(MVCC)`,
+    diagram: `<img src="db_cc_def.png" alt="병행제어 개념도"><img src="db_cc_problems.png" alt="병행제어 미적용 문제점"><img src="db_cc_methods.png" alt="병행제어 기법">`,
     tableRows: [
       { major: "부재 시 문제점\n(갱·현·모·연)", minor: "갱신 손실 (Lost Update)", desc: "두 트랜잭션이 동시에 같은 데이터를 갱신할 때 이전 갱신을 덮어써 변경이 소실되는 현상" },
       { major: "", minor: "현황파악 오류 (Dirty Read)", desc: "롤백될 수 있는 타 트랜잭션의 미확정 변경값을 읽는 현상" },
       { major: "", minor: "모순성 (Inconsistent Analysis)", desc: "여러 데이터를 서로 다른 시점의 불일치 상태로 읽어 집계·분석 결과가 왜곡되는 현상" },
       { major: "", minor: "연쇄 복귀 (Cascading Rollback)", desc: "취소된 트랜잭션의 미커밋 값을 읽은 다른 트랜잭션들까지 연쇄적으로 롤백되는 현상" },
-      { major: "병행제어 기법\n(락·2·낙·타·다)", minor: "락킹 (Locking) & 2PL", desc: "공유(S)·배타(X) 잠금 호환성과 확장·축소 2단계 규약으로 충돌 직렬가능성 확보" },
+      { major: "병행제어 기법\n(락·2·낙·타·다)", minor: "락킹 (Locking)", desc: "공유 잠금(S-Lock)과 배타 잠금(X-Lock)의 호환성을 이용해 데이터 접근을 직렬화하고 잠금 단위에 따라 동시성 조절" },
+      { major: "", minor: "2단계 잠금 규약 (2PL)", desc: "잠금 획득만 허용하는 확장 단계와 해제만 허용하는 축소 단계를 분리하여 충돌 직렬가능성 보장" },
       { major: "", minor: "낙관적 검증 (읽·검·쓰)", desc: "잠금 없이 ①읽기(개인 작업공간 수정) → ②검증(Validation) → ③쓰기(Write) 수행, 충돌 시 재시작" },
-      { major: "", minor: "타임스탬프 오더링", desc: "트랜잭션 시작 시각(Timestamp) 순서에 따라 충돌 연산의 실행 순서를 직렬화" },
+      { major: "", minor: "타임스탬프 오더링", desc: "트랜잭션 시작 시각(Timestamp) 순서에 따라 충돌 연산의 실행 순서를 직렬화 (교착상태 없음)" },
       { major: "", minor: "다중버전 제어 (MVCC)", desc: "변경 전후 버전 스냅샷을 유지해 읽기와 쓰기 간 상호 차단을 제거" }
     ]
   },
@@ -1267,11 +1271,11 @@ const topics = [
       "Basic · Strict · Rigorous · Conservative 2PL",
       "충돌 직렬가능성 보장 & 연쇄 복귀/교착 방지"
     ],
-    diagram: `[확장 단계 (Growing: 잠금 획득만 허용)] ──▶ ★ 잠금점(Lock Point) ──▶ [축소 단계 (Shrinking: 첫 잠금 해제 후 새 잠금 획득 금지)]`,
+    diagram: "db_2pl.png",
     tableRows: [
       { major: "동작 단계\n(확·축)", minor: "확장 단계 (Growing Phase)", desc: "트랜잭션이 새로운 잠금(Lock)을 획득할 수만 있고, 기존 잠금 해제는 금지되는 단계" },
-      { major: "", minor: "축소 단계 (Shrinking Phase)", desc: "잠금점 이후 보유 잠금을 해제할 수만 있고, 새로운 잠금 획득은 절대 금지되는 단계" },
-      { major: "4대 변형 기법", minor: "Basic 2PL", desc: "확장·축소 단계 분리 기본형 → 충돌 직렬가능성 보장, 단 교착상태(Deadlock) 및 연쇄 복귀 가능" },
+      { major: "", minor: "축소 단계 (Shrinking Phase)", desc: "잠금점(Lock Point) 이후 보유 잠금을 해제할 수만 있고, 새로운 잠금 획득은 절대 금지되는 단계" },
+      { major: "4대 변형 기법\n(Ba·St·Ri·Co)", minor: "Basic 2PL", desc: "확장·축소 단계 분리 기본형 → 충돌 직렬가능성 보장, 단 교착상태(Deadlock) 및 연쇄 복귀 가능" },
       { major: "", minor: "Strict 2PL", desc: "배타 잠금(X-Lock)을 COMMIT/ABORT 시점까지 유지 → 연쇄 취소(Cascading Rollback) 완벽 방지 (상용 DBMS 표준)" },
       { major: "", minor: "Rigorous 2PL", desc: "공유(S)·배타(X) 모든 잠금을 COMMIT/ABORT까지 유지 → 커밋 순서 그대로 직렬화 보장" },
       { major: "", minor: "Conservative (Static) 2PL", desc: "트랜잭션 시작 전에 필요한 모든 잠금을 일괄 확보 → 교착상태(Deadlock) 원천 방지" }
@@ -1287,12 +1291,14 @@ const topics = [
       "읽기·쓰기 상호 차단(Blocking) 해소",
       "오래된 버전 정리 (Vacuum / Undo Purge)"
     ],
-    diagram: `[T2: X=120 갱신 (새 버전 v2 생성)] & [T1(기존 스냅샷): 잠금 대기 없이 Undo/버전 저장소의 이전 버전 v1(X=100) 즉시 조회!]`,
+    diagram: "db_mvcc.png",
     tableRows: [
-      { major: "핵심 원리\n(버·스·가)", minor: "다중 버전 (Multi-Version)", desc: "데이터 변경 시 제자리 덮어쓰기 대신 변경 전후의 버전을 함께 유지" },
-      { major: "", minor: "스냅샷 · 가시성 (Visibility)", desc: "트랜잭션의 격리수준과 읽기 시점(스냅샷)에 따라 조회 가능한 버전을 선택하여 일관된 읽기 보장" },
-      { major: "동시성 특성", minor: "읽기·쓰기 경합 감소", desc: "일반 읽기(SELECT)는 잠금을 걸지 않아 쓰기 작업과 상호 차단되지 않으나, 동일 행 동시 쓰기 충돌은 별도 잠금/검증으로 제어" },
-      { major: "운영 관리", minor: "버전 정리 & 장기 거래", desc: "더 이상 어떤 스냅샷에서도 참조하지 않는 구버전 공간 회수(Vacuum/Purge) 및 장기 트랜잭션 버전 누적 부담 관리 필수" }
+      { major: "핵심 원리\n(버·스·가)", minor: "다중 버전 (Multi-Version)", desc: "데이터 변경 시 제자리 덮어쓰기 대신 변경 전후의 버전을 Undo 세그먼트나 별도 튜플로 함께 유지" },
+      { major: "", minor: "스냅샷 (Snapshot)", desc: "트랜잭션 또는 질의 시작 시점의 데이터베이스 기준 시점을 포착하여 일관된 읽기 기준점 설정" },
+      { major: "", minor: "가시성 판단 (Visibility)", desc: "트랜잭션 ID(XID)나 SCN과 격리수준 규칙을 대조하여 현재 스냅샷에서 볼 수 있는 버전만 선택 반환" },
+      { major: "동시성 및 운영", minor: "읽기·쓰기 비차단", desc: "일반 읽기(SELECT)는 잠금을 걸지 않아 쓰기 작업과 상호 차단(Blocking)되지 않음" },
+      { major: "", minor: "쓰기·쓰기 충돌 제어", desc: "동일 행에 대한 동시 쓰기(갱신) 충돌은 여전히 행 잠금(Row Lock) 또는 낙관적 검증으로 제어" },
+      { major: "", minor: "구버전 정리 (Vacuum/Purge)", desc: "더 이상 어떤 활성 스냅샷에서도 참조하지 않는 오래된 버전 공간을 회수하여 저장공간 팽창 방지" }
     ]
   },
   {
@@ -1305,15 +1311,18 @@ const topics = [
       "STEAL(→UNDO) · NO-FORCE(→REDO)",
       "WAL(로그 선기록) & ARIES (Analysis → Redo → Undo)"
     ],
-    diagram: `• 버퍼 정책: STEAL(미커밋 디스크 기록 허용 ➔ UNDO 필수) + NO-FORCE(커밋 시 디스크 기록 유예 ➔ REDO 필수)
-• ARIES 3단계: ① Analysis(분석: 오염페이지·활성거래 파악) ➔ ② Redo(재현: 전체 이력 복원) ➔ ③ Undo(취소: 미완료 거래 역순 취소)`,
+    diagram: `<img src="db_recovery_def.png" alt="데이터베이스 회복 개념도"><img src="db_recovery_ckpt.png" alt="체크포인트 회복 개념도">`,
     tableRows: [
-      { major: "버퍼 관리 정책", minor: "STEAL ↔ NO-STEAL", desc: "• STEAL: 미커밋 변경 페이지도 디스크에 기록 허용 → 원자성 보장 위해 UNDO 필요\n• NO-STEAL: 미커밋 변경 디스크 기록 금지 → UNDO 불필요" },
-      { major: "", minor: "FORCE ↔ NO-FORCE", desc: "• FORCE: 커밋 시 변경 페이지 즉시 디스크 강제 기록 → REDO 불필요 (I/O 부담 큼)\n• NO-FORCE: 커밋 시 디스크 기록 유예 허용 → 영속성 보장 위해 REDO 필요" },
-      { major: "회복 3대 기법\n(로·체·그)", minor: "로그 기반 & WAL", desc: "데이터 페이지 기록 전에 변경 로그를 먼저 안정 저장소에 영구 기록(WAL: Write-Ahead Logging)" },
+      { major: "버퍼 관리 정책", minor: "STEAL 정책", desc: "미커밋 트랜잭션이 수정한 버퍼 페이지도 디스크에 기록 허용 → 원자성 보장 위해 UNDO 필수" },
+      { major: "", minor: "NO-STEAL 정책", desc: "미커밋 변경 페이지의 디스크 기록을 금지 → UNDO는 불필요하나 메모리 버퍼 제약 큼" },
+      { major: "", minor: "FORCE 정책", desc: "커밋 시 변경된 모든 페이지를 즉시 디스크에 강제 반영 → REDO 불필요하나 랜덤 I/O 부담 극심" },
+      { major: "", minor: "NO-FORCE 정책", desc: "커밋 시 로그만 기록하고 데이터 페이지 디스크 반영은 유예 허용 → 영속성 보장 위해 REDO 필수" },
+      { major: "회복 3대 기법\n(로·체·그)", minor: "로그 기반 회복 (WAL)", desc: "데이터 페이지 기록 전에 변경 로그를 먼저 안정 저장소에 영구 기록(WAL: Write-Ahead Logging)" },
       { major: "", minor: "체크포인트 (Checkpoint)", desc: "주기적으로 메모리 변경분을 디스크에 동기화하고 로그에 표시하여 장애 회복 시 탐색·재수행 범위를 단축" },
       { major: "", minor: "그림자 페이지 (Shadow Paging)", desc: "원본(그림자) 페이지를 보존하고 새 페이지에 기록 후 포인터만 전환하여 로그 없이 원자성 지원" },
-      { major: "ARIES 알고리즘\n(분·재·취)", minor: "Analysis → Redo → Undo", desc: "① Analysis(회복 시작점·활성 거래·오염 페이지 재구성) → ② Redo(미완료 포함 필요한 변경 이력 전부 재현) → ③ Undo(미완료 거래 역순 취소 및 보상로그 CLR 기록)" }
+      { major: "ARIES 알고리즘\n(분·재·취)", minor: "1단계: Analysis (분석)", desc: "체크포인트부터 로그를 스캔해 회복 시작점(Smallest RecLSN), 오염 페이지(DPT), 활성 트랜잭션(ATT) 파악" },
+      { major: "", minor: "2단계: Redo (재현)", desc: "미완료 거래를 포함해 기록된 모든 변경 이력을 그대로 재수행(Repeating History)하여 장애 직전 상태 복원" },
+      { major: "", minor: "3단계: Undo (취소)", desc: "장애 시점 미완료(Loser) 거래들의 변경을 로그 역순으로 취소하고 보상 로그(CLR)를 기록" }
     ]
   },
   {
@@ -1326,8 +1335,7 @@ const topics = [
       "선언적 제약 · 절차적 처리 · 트랜잭션 관리 (선절트)",
       "참조무결성 옵션: RESTRICT · CASCADE · SET NULL · SET DEFAULT"
     ],
-    diagram: `[6대 무결성: 개체(PK) · 키(UNIQUE) · 도메인(CHECK/타입) · NULL(NOT NULL) · 참조(FK) · 사용자정의(업무규칙)]
-➔ 유지 기법(선절트): ① 선언적 제약(DDL) + ② 절차적 처리(트리거·SP) + ③ 트랜잭션 관리(동시성·회복)`,
+    diagram: `<img src="db_integrity.png" alt="무결성 제약조건 개념도"><img src="db_ref_integrity.png" alt="참조 무결성 개념도">`,
     tableRows: [
       { major: "6대 무결성 제약\n(개·키·도·널·참·사)", minor: "개체 무결성 (Entity)", desc: "기본키(PRIMARY KEY)를 구성하는 속성은 유일해야 하며 NULL을 가질 수 없음" },
       { major: "", minor: "키 무결성 (Key)", desc: "릴레이션 내 지정한 후보키/대체키 속성 집합의 중복 금지 (UNIQUE)" },
@@ -1335,7 +1343,9 @@ const topics = [
       { major: "", minor: "NULL 무결성", desc: "필수 입력 속성의 NULL 값 허용 금지 (NOT NULL)" },
       { major: "", minor: "참조 무결성 (Referential)", desc: "자식 외래키(FK) 값은 부모 참조키에 존재하거나 NULL이어야 함 (RESTRICT, CASCADE, SET NULL, SET DEFAULT)" },
       { major: "", minor: "사용자 정의 무결성", desc: "특정 도메인 업무 규칙 및 상태 전이 조건 충족 (CHECK, 트리거, 업무 로직)" },
-      { major: "유지 기법\n(선·절·트)", minor: "선언적 · 절차적 · 트랜잭션", desc: "• 선언적 제약: PK, FK, UNIQUE, CHECK, NOT NULL을 DDL로 선언\n• 절차적 처리: 트리거, 저장 프로시저로 복합 업무 규칙 검증\n• 트랜잭션 관리: 병행제어·회복으로 동시 실행 및 장애 시 일관성 유지" }
+      { major: "유지 기법\n(선·절·트)", minor: "선언적 제약조건", desc: "테이블 생성/변경 시 PK, FK, UNIQUE, CHECK, NOT NULL을 DDL로 선언하여 DBMS가 자동 강제" },
+      { major: "", minor: "절차적 제약 처리", desc: "트리거(Trigger)나 저장 프로시저(Stored Procedure)를 통해 복합 연산 및 다중 테이블 업무 규칙 검증" },
+      { major: "", minor: "트랜잭션 관리", desc: "ACID 기반 병행제어와 회복 기법을 통해 동시 실행 및 장애 상황에서도 데이터 일관성을 유지" }
     ]
   },
   {
@@ -1348,12 +1358,10 @@ const topics = [
       "적용 대상: 집합 제약 ↔ 튜플 제약",
       "검사 시점: 즉시 제약 ↔ 지연 제약"
     ],
-    diagram: `• 상태변화 축 : [상태 제약 (특정 시점 정적 규칙)] ↔ [과도 제약 (변경 전후 전이 규칙)]
-• 적용대상 축 : [집합 제약 (다수 튜플 간 규칙)] ↔ [튜플 제약 (개별 행 내부 규칙)]
-• 검사시점 축 : [즉시 제약 (명령문 종료 시 검사)] ↔ [지연 제약 (트랜잭션 COMMIT 시점 검사)]`,
+    diagram: "db_rel_integrity.png",
     tableRows: [
       { major: "상태 변화 기준\n(상·과)", minor: "상태 제약 (State)", desc: "한 시점의 데이터베이스 상태가 정적으로 만족해야 하는 규칙 (예: 급여 > 0)" },
-      { major: "", minor: "과도 제약 (Transition)", desc: "데이터 변경 전 상태와 변경 후 상태 사이의 전이 과정에서 만족해야 할 규칙 (예: 급여는 삭감될 수 없음, 기혼→미혼 변경 불가)" },
+      { major: "", minor: "과도 제약 (Transition)", desc: "데이터 변경 전 상태와 변경 후 상태 사이의 전이 과정에서 만족해야 할 규칙 (예: 급여 삭감 불가, 기혼→미혼 변경 불가)" },
       { major: "적용 대상 기준\n(집·튜)", minor: "집합 제약 (Set)", desc: "여러 튜플의 집합 전체에 걸쳐 적용되는 규칙 (예: 기본키 유일성, 부서별 인원 상한)" },
       { major: "", minor: "튜플 제약 (Tuple)", desc: "개별 튜플(행) 하나 내부의 속성값 또는 속성 간 조건만 검사하는 규칙 (예: 종료일 >= 시작일)" },
       { major: "검사 시점 기준\n(즉·지)", minor: "즉시 제약 (Immediate)", desc: "DML 명령문 수행 종료 즉시 제약 위반 여부를 검사" },
@@ -1370,13 +1378,16 @@ const topics = [
       "식별 관계(자식 PK에 포함) vs 비식별 관계(일반 FK)",
       "데이터 독립성: 외·개·내 / 논·물"
     ],
-    diagram: `[요구분석] ➔ [1. 개념 모델링 (핵심 엔터티·관계·상위 ERD)] ➔ [2. 논리 모델링 (속성·키·정규화·이력)] ➔ [3. 물리 모델링 (DBMS 자료형·인덱스·반정규화)] ➔ [검증]`,
+    diagram: `<img src="db_modeling.png" alt="데이터 모델링 개념도"><img src="db_modeling_rel.png" alt="식별·비식별 관계 개념도">`,
     tableRows: [
-      { major: "모델링 단계\n(요·개·논·물·검)", minor: "개념 모델링", desc: "업무 주제영역 정의, 핵심 엔터티(Entity)와 관계 도출, 상위 개념 ERD 작성" },
-      { major: "", minor: "논리 모델링", desc: "속성·식별자(Key)·관계 상세화, 정규화(Normalization) 및 이력 관리 정의 (특정 DBMS에 독립적)" },
-      { major: "", minor: "물리 모델링", desc: "대상 DBMS 특성에 맞춘 테이블·컬럼 자료형, 인덱스, 파티셔닝, 성능 향상을 위한 반정규화 수행" },
-      { major: "관계 유형 비교", minor: "식별 관계 vs 비식별 관계", desc: "• 식별 관계(실선): 부모의 기본키(PK)가 자식 엔터티의 PK 일부로 포함되는 강한 종속 관계\n• 비식별 관계(점선): 부모의 PK가 자식의 일반 속성(FK)으로만 포함되는 관계" },
-      { major: "3단계 스키마\n(외·개·내 / 논·물)", minor: "외부 · 개념 · 내부 스키마", desc: "• 외부(사용자 뷰) ↔ 개념(조직 전체 논리 구조: 논리적 독립성) ↔ 내부(물리적 저장 구조: 물리적 독립성)" }
+      { major: "모델링 단계\n(요·개·논·물·검)", minor: "개념 데이터 모델링", desc: "업무 주제영역 정의, 핵심 엔터티(Entity)와 관계 도출, 상위 개념 ERD 작성" },
+      { major: "", minor: "논리 데이터 모델링", desc: "속성·식별자(Key)·관계 상세화, 정규화(Normalization) 및 이력 관리 정의 (특정 DBMS에 독립적)" },
+      { major: "", minor: "물리 데이터 모델링", desc: "대상 DBMS 특성에 맞춘 테이블·컬럼 자료형, 인덱스, 파티셔닝, 성능 향상을 위한 반정규화 수행" },
+      { major: "관계 유형 비교", minor: "식별 관계 (Identifying)", desc: "부모 엔터티의 기본키(PK)가 자식 엔터티의 PK 일부로 포함되는 강한 종속 관계 (ERD 실선 표기)" },
+      { major: "", minor: "비식별 관계 (Non-Identifying)", desc: "부모 엔터티의 기본키(PK)가 자식 엔터티의 일반 속성(FK)으로만 포함되는 약한 참조 관계 (ERD 점선 표기)" },
+      { major: "3단계 스키마\n(외·개·내)", minor: "외부 스키마 (External)", desc: "개별 사용자나 응용프로그램 관점의 개인화된 논리적 데이터 뷰(View) 정의" },
+      { major: "", minor: "개념 스키마 (Conceptual)", desc: "조직 전체의 통합된 논리적 데이터 구조와 관계·제약조건 정의 (외부↔개념 사상: 논리적 독립성)" },
+      { major: "", minor: "내부 스키마 (Internal)", desc: "실제 저장장치에 기록되는 파일 구조, 인덱스, 블록 배치 정의 (개념↔내부 사상: 물리적 독립성)" }
     ]
   },
   {
@@ -1389,13 +1400,14 @@ const topics = [
       "유일성 → 최소성 → 대표성 (유최대)",
       "대체키 · 외래키"
     ],
-    diagram: `[결정자 도출] ──(유일성 검증)──▶ [슈퍼키 선정] ──(최소성 검증)──▶ [후보키 선정] ──(엔터티 대표성)──▶ [기본키(PK) 결정] (나머지 후보키 = 대체키)`,
+    diagram: "db_key.png",
     tableRows: [
       { major: "도출 절차\n(결·슈·후·기\n/ 유·최·대)", minor: "1. 결정자 (Determinant)", desc: "함수 종속 관계(X → Y)에서 다른 속성의 값을 유일하게 결정하는 속성 집합 도출" },
       { major: "", minor: "2. 슈퍼키 (Super Key)", desc: "[유일성 만족] 릴레이션 내 모든 튜플을 유일하게 식별할 수 있는 속성 집합" },
       { major: "", minor: "3. 후보키 (Candidate Key)", desc: "[유일성 + 최소성 만족] 슈퍼키 중에서 꼭 필요한 최소한의 속성만으로 구성된 키" },
       { major: "", minor: "4. 기본키 (Primary Key)", desc: "[유일성 + 최소성 + 대표성] 후보키 중 엔터티를 대표하도록 최종 선정된 키 (NULL 불가, 중복 불가)" },
-      { major: "연관 키", minor: "대체키 & 외래키", desc: "• 대체키(Alternate Key): 기본키로 선택되지 못한 나머지 후보키\n• 외래키(Foreign Key): 타 릴레이션의 기본키를 참조하여 관계를 맺는 속성" }
+      { major: "연관 키", minor: "대체키 (Alternate Key)", desc: "후보키 중에서 기본키(PK)로 선택되지 못한 나머지 후보키 (UNIQUE 제약 설정)" },
+      { major: "", minor: "외래키 (Foreign Key)", desc: "타 릴레이션의 기본키(PK)를 참조하여 릴레이션 간 관계를 맺고 참조 무결성을 유지하는 속성" }
     ]
   },
   {
@@ -1408,13 +1420,18 @@ const topics = [
       "목적: 삽입 · 갱신 · 삭제 이상 현상 제거 (삽갱삭)",
       "단계: 도메인원자값(1NF) · 부분(2NF) · 이행(3NF) · 결정자(BCNF)"
     ],
-    diagram: `[비정규 릴레이션] ─(도: 원자값)─▶ [1NF] ─(부: 부분종속 제거)─▶ [2NF] ─(이: 이행종속 제거)─▶ [3NF] ─(결: 결정자=슈퍼키)─▶ [BCNF]`,
+    diagram: `<img src="db_norm_fd.png" alt="함수종속성 개념도"><img src="db_norm_steps.png" alt="정규화 단계 개념도">`,
     tableRows: [
-      { major: "핵심 원칙 & 목적\n(무·중·분 / 삽·갱·삭)", minor: "무손실 · 중복제거 · 분리", desc: "원본 정보의 무손실 조인 보장, 불필요한 데이터 중복 제거, 독립된 관계성의 분리 원칙을 통해 삽입·갱신·삭제 이상(Anomaly) 방지" },
-      { major: "정규화 단계\n(도·부·이·결)", minor: "제1정규형 (1NF: 도)", desc: "릴레이션에 속한 모든 속성의 도메인이 더 이상 쪼갤 수 없는 원자값(Atomic Value)만으로 구성 (반복 그룹 분리)" },
-      { major: "", minor: "제2정규형 (2NF: 부)", desc: "1NF를 만족하고, 기본키의 진부분집합에 종속되는 '부분 함수 종속'을 제거하여 완전 함수 종속 달성" },
-      { major: "", minor: "제3정규형 (3NF: 이)", desc: "2NF를 만족하고, 기본키가 아닌 일반 속성이 다른 일반 속성을 거쳐 종속되는 '이행 함수 종속(X→Y→Z)'을 제거" },
-      { major: "", minor: "BCNF (결)", desc: "3NF를 강화하여 모든 비자명 함수 종속(X→Y)의 결정자(X)가 반드시 후보키(슈퍼키)가 되도록 분해" }
+      { major: "정규화 3원칙\n(무·중·분)", minor: "무손실 조인 (Lossless Join)", desc: "분해된 릴레이션들을 다시 자연 조인했을 때 허위 튜플 없이 원래 릴레이션이 완벽히 복원되어야 하는 원칙" },
+      { major: "", minor: "데이터 중복 제거", desc: "동일한 사실 데이터가 여러 튜플에 반복 저장되는 중복성을 제거하여 저장공간 낭비와 불일치 방지" },
+      { major: "", minor: "독립 관계성 분리", desc: "서로 독립적인 함수 종속 관계(하나의 릴레이션에 하나의 주제)를 별도 릴레이션으로 분리" },
+      { major: "이상 현상 방지\n(삽·갱·삭)", minor: "삽입 이상 (Insertion Anomaly)", desc: "새 데이터를 삽입할 때 의도하지 않은 불필요한 속성값까지 함께 입력해야 하는 현상 방지" },
+      { major: "", minor: "갱신 이상 (Update Anomaly)", desc: "중복된 데이터 중 일부만 수정되어 데이터 간 모순(불일치)이 발생하는 현상 방지" },
+      { major: "", minor: "삭제 이상 (Deletion Anomaly)", desc: "특정 튜플을 삭제할 때 꼭 보존해야 할 다른 유용한 정보까지 함께 연쇄 소실되는 현상 방지" },
+      { major: "정규화 단계\n(도·부·이·결)", minor: "제1정규형 (1NF: 도메인 원자값)", desc: "릴레이션에 속한 모든 속성의 도메인이 더 이상 쪼갤 수 없는 원자값(Atomic Value)만으로 구성 (반복 그룹 분리)" },
+      { major: "", minor: "제2정규형 (2NF: 부분종속 제거)", desc: "1NF를 만족하고, 기본키의 진부분집합에 종속되는 '부분 함수 종속'을 제거하여 완전 함수 종속 달성" },
+      { major: "", minor: "제3정규형 (3NF: 이행종속 제거)", desc: "2NF를 만족하고, 기본키가 아닌 일반 속성이 다른 일반 속성을 거쳐 종속되는 '이행 함수 종속(X→Y→Z)'을 제거" },
+      { major: "", minor: "BCNF (결정자 후보키)", desc: "3NF를 강화하여 모든 비자명 함수 종속(X→Y)의 결정자(X)가 반드시 후보키(슈퍼키)가 되도록 분해" }
     ]
   },
   {
@@ -1427,13 +1444,12 @@ const topics = [
       "제5정규형(5NF / PJNF): 조인 종속(JD) 제거",
       "허위 튜플(Spurious Tuple) 없는 무손실 복원"
     ],
-    diagram: `• 4NF (다치 종속 제거): [사원 ↠ 자격, 사원 ↠ 언어 (독립 다중값)] ➔ [사원-자격] + [사원-언어] 2개 릴레이션으로 분리!
-• 5NF (조인 종속 제거): [공급(S,P,J)] ➔ [SP] ⋈ [SJ] ⋈ [PJ] 3개 투영 조인 시 허위 튜플 없이 원본 완벽 복원!`,
+    diagram: `<img src="db_4nf_before.png" alt="4NF 정규화 전"><img src="db_4nf_after.png" alt="4NF 정규화 후"><img src="db_5nf.png" alt="5NF 조인종속 분해">`,
     tableRows: [
-      { major: "제4정규형 (4NF)\n(다치 종속 제거)", minor: "판정 기준 및 원인", desc: "하나의 릴레이션에 두 개 이상의 독립적인 다치 종속(X ↠ Y, X ↠ Z)이 존재할 때 카티션 곱 형태의 중복 발생" },
-      { major: "", minor: "분해 방법 (사원·자격·언어)", desc: "모든 비자명 다치 종속 X ↠ Y에서 X가 슈퍼키가 되도록 독립된 두 다중값 집합을 [사원-자격], [사원-언어]로 각각 분해" },
-      { major: "제5정규형 (5NF)\n(조인 종속 제거)", minor: "판정 기준 및 원인", desc: "모든 비자명 조인 종속(JD)이 후보키를 통해서만 성립하는 정규형 (다자간 대칭적 순환 제약)" },
-      { major: "", minor: "분해 방법 (공급자·부품·현장)", desc: "공급(S,P,J)을 SP·SJ만 조인하면 허위 튜플이 생기나 PJ까지 3자 조인(SP⋈SJ⋈PJ)하면 허위 튜플 없이 복원되는 종속성 분리" }
+      { major: "제4정규형 (4NF)\n(다치 종속 제거)", minor: "다치 종속 (MVD, X ↠ Y)", desc: "하나의 릴레이션에 두 개 이상의 독립적인 다중값 종속(X ↠ Y, X ↠ Z)이 공존하여 카티션 곱 형태의 중복이 발생하는 현상" },
+      { major: "", minor: "4NF 분해 (독립 집합 분리)", desc: "모든 비자명 다치 종속에서 결정자 X가 슈퍼키가 되도록 독립된 두 다중값 집합을 [사원-자격], [사원-언어]로 각각 분리" },
+      { major: "제5정규형 (5NF)\n(조인 종속 제거)", minor: "조인 종속 (JD)", desc: "릴레이션을 여러 투영(Projection)으로 쪼갠 뒤 모두 조인해야만 원본이 복원되는 다자간 대칭적 순환 제약" },
+      { major: "", minor: "5NF 분해 (무손실 투영 조인)", desc: "모든 비자명 조인 종속이 후보키를 통해서만 성립하도록 분해 (SP·SJ·PJ 3자 조인 시 허위 튜플 없이 완벽 복원)" }
     ]
   },
   {
@@ -1446,12 +1462,18 @@ const topics = [
       "유형: 테이블(병합·분할·추가) · 컬럼(중복·파생·이력) · 관계(중복)",
       "성능 이익과 정합성 동기화 비용 검증"
     ],
-    diagram: `[1. 반정규화 대상 선정 (대량 범위·과다 조인)] ➔ [2. 다른 방법 우선 검토 (인덱스·뷰·클러스터링·SQL)] ➔ [3. 반정규화 적용 (테·컬·관)]`,
+    diagram: `<img src="db_denorm1.png" alt="반정규화 개념도"><img src="db_denorm2.png" alt="반정규화 절차">`,
     tableRows: [
-      { major: "적용 절차\n(대·다·반)", minor: "대상선정 → 대안검토 → 적용", desc: "① 고빈도 조인·대량 조회 병목 대상 선정 → ② 구조 변경 전 인덱스·SQL·캐시 등 다른 방법 먼저 검토 → ③ 반정규화 적용 및 정합성 유지 방안 수립" },
-      { major: "주요 유형\n(테·컬·관)", minor: "테이블 반정규화", desc: "• 테이블 병합(1:1, 1:M, 슈퍼/서브타입 통합)\n• 테이블 분할(수평/수직 분할)\n• 테이블 추가(중복·통계/요약·이력·부분 테이블 추가)" },
-      { major: "", minor: "컬럼(속성) 반정규화", desc: "• 중복 컬럼 추가(조인 감소 목적)\n• 파생(계산) 컬럼 추가(총액 등 연산 결과 미리 저장)\n• 이력 테이블 기능 컬럼, PK에 의한 단순화 컬럼, 응용시스템 오작동 대비 컬럼" },
-      { major: "", minor: "관계 반정규화", desc: "• 중복 관계 추가: 데이터 무결성을 해치지 않으면서 다단계 조인 경로를 단축하기 위해 직접 참조 관계(FK)를 추가" }
+      { major: "적용 절차\n(대·다·반)", minor: "1. 반정규화 대상 선정", desc: "대량 범위 자주 처리, 과다한 테이블 조인, 통계/집계 병목 등 성능 저하 대상을 식별" },
+      { major: "", minor: "2. 다른 방법 우선 검토", desc: "모델 구조를 깨기 전에 뷰(View), 클러스터링, 인덱스 조정, 응용 SQL 튜닝으로 해결 가능한지 먼저 검토" },
+      { major: "", minor: "3. 반정규화 적용", desc: "테이블·컬럼·관계 반정규화를 수행하고 트리거·배치 등 데이터 정합성 유지 방안을 함께 설계" },
+      { major: "테이블 반정규화", minor: "테이블 병합", desc: "조인 빈도가 높은 1:1 관계, 1:M 관계, 슈퍼/서브타입 테이블을 하나로 통합" },
+      { major: "", minor: "테이블 분할", desc: "업무 활용 특성에 따라 행 단위 수평 분할 또는 열 단위 수직 분할 수행" },
+      { major: "", minor: "테이블 추가", desc: "원격 조인 회피용 중복 테이블, 집계용 통계 테이블, 이력 테이블, 자주 쓰는 부분 테이블 추가" },
+      { major: "컬럼·관계 반정규화", minor: "중복 컬럼 추가", desc: "조인 횟수를 줄이기 위해 참조 테이블의 자주 조회되는 컬럼을 자식 테이블에 중복 배치" },
+      { major: "", minor: "파생 컬럼 추가", desc: "총금액, 할인액 등 실시간 연산 부하가 큰 계산 결과값을 미리 컬럼으로 저장" },
+      { major: "", minor: "이력 기능 컬럼 추가", desc: "대량 이력 테이블에서 최신 여부(Y/N)나 종료일자 등 최근 값 빠른 탐색용 컬럼 추가" },
+      { major: "", minor: "중복 관계 (FK) 추가", desc: "데이터 무결성을 해치지 않으면서 다단계 조인 경로를 단축하기 위해 직접 참조 관계(FK)를 추가" }
     ]
   },
   {
@@ -1464,21 +1486,22 @@ const topics = [
       "Create(생성) · Read(조회) · Update(갱신) · Delete(삭제)",
       "생명주기 누락 점검 & 단위 프로세스 응집도 검증"
     ],
-    diagram: `           [고객]   [주문]   [주문항목]
-[고객등록]    C       -         -
-[주문생성]    R       C         C
-[주문취소]    -       U         U    (상태 변경은 U, 물리 삭제만 D)`,
+    diagram: `<img src="db_crud.png" alt="CRUD Matrix 개념도"><img src="db_crud_check.png" alt="CRUD Matrix 점검표">`,
     tableRows: [
-      { major: "작성 절차\n(요·데·프·매)", minor: "4단계 도출 과정", desc: "① 요구분석 → ② 데이터 모델링(엔터티 도출) → ③ 프로세스 모델링(단위 프로세스 도출) → ④ 상관 매트릭스(C·R·U·D) 작성 및 검증" },
-      { major: "검증 및 활용", minor: "생명주기 정합성 점검", desc: "데이터의 생성(C)·조회(R)·갱신(U)·삭제/보존(D) 경로 누락 여부와 다수 프로세스의 중복 갱신 충돌 가능성을 점검" },
-      { major: "", minor: "변경 영향도 & 응집도", desc: "• 데이터 구조 변경 시 영향받는 애플리케이션 프로세스 즉시 식별\n• 주문 취소처럼 상태값 변경인 경우 D가 아닌 U로 기록" }
+      { major: "작성 절차\n(요·데·프·매)", minor: "1. 요구사항 분석", desc: "업무 요구사항을 수집하여 시스템이 처리해야 할 기능과 데이터 범위를 정의" },
+      { major: "", minor: "2. 데이터 모델링", desc: "업무에서 관리할 핵심 엔터티(Entity)와 테이블 목록을 도출" },
+      { major: "", minor: "3. 프로세스 모델링", desc: "업무 기능을 수행하는 단위 프로세스(트랜잭션/화면/API)를 도출" },
+      { major: "", minor: "4. 상관 매트릭스 작성", desc: "행(프로세스)과 열(엔터티) 교차점에 C(생성)·R(조회)·U(갱신)·D(삭제) 권한과 액션을 매핑" },
+      { major: "검증 및 활용", minor: "생명주기 정합성 점검", desc: "C가 없는 엔터티, R/U/D가 전혀 없는 불필요 엔터티 등 데이터 생명주기 누락 여부를 점검" },
+      { major: "", minor: "단위 프로세스 응집도 검증", desc: "아무 엔터티도 건드리지 않거나 과도하게 많은 엔터티를 수정하는 프로세스를 식별해 분할·통합" },
+      { major: "", minor: "변경 영향도 분석", desc: "테이블이나 컬럼 구조 변경 시 영향을 받는 애플리케이션 프로세스를 즉시 추적" }
     ]
   },
   {
     domain: "DB",
     topic: "인덱스 (Index & 클러스터드·논클러스터드)",
     mnemonic: "트·해·비 / 함·조·도",
-    definition: "검색 속도 향상 위해 키와 주소 쌍을 구성한 자료구조",
+    definition: "검색 속도 향상 위해 키와 주소를 정렬 저장한 자료구조",
     keywords: [
       "형태별: 트리 · 해시 · 비트맵 (트해비)",
       "목적별: 함수기반 · 조인 · 도메인 (함조도)",
@@ -1486,10 +1509,14 @@ const topics = [
     ],
     diagram: `<img src="db_index.png" alt="인덱스 개념도"><img src="db_clustered_index.png" alt="클러스터드 vs 논클러스터드 인덱스">`,
     tableRows: [
-      { major: "인덱스 유형\n(트·해·비\n/ 함·조·도)", minor: "형태별 (트리 · 해시 · 비트맵)", desc: "• 트리 기반: B-Tree, B+Tree 등 균형 트리 자료구조\n• 해시 기반: 해시 테이블 사용 (등치 = 검색 O(1) 특화)\n• 비트맵: 낮은 카디널리티(성별 등) 컬럼을 0과 1 비트열로 저장" },
-      { major: "", minor: "목적별 (함수 · 조인 · 도메인)", desc: "• 함수 기반(FBI): 컬럼 연산/함수 결과를 인덱싱\n• 조인 인덱스: 조인 결과를 사전 인덱싱\n• 도메인 인덱스: 비정형·공간 등 사용자 정의 구조 인덱싱" },
-      { major: "구조 비교", minor: "클러스터드 인덱스", desc: "인덱스 구조와 실제 테이블의 물리적 데이터 저장 순서가 일치하는 인덱스 (테이블당 단 1개만 생성 가능, 범위 검색 초고속)" },
-      { major: "", minor: "논클러스터드 인덱스", desc: "인덱스 구조가 별도로 존재하고 리프 노드에 실제 데이터의 위치 포인터(ROWID)만 저장하는 인덱스 (테이블당 여러 개 생성 가능)" }
+      { major: "형태별 유형\n(트·해·비)", minor: "트리 기반 인덱스", desc: "B-Tree, B+Tree 등 균형 트리 구조로 등치(=) 및 범위(BETWEEN, >, <) 검색 모두 우수" },
+      { major: "", minor: "해시 기반 인덱스", desc: "컬럼 값에 해시 함수를 적용해 O(1) 단건 등치(=) 검색에 특화 (부등호 범위 검색은 불가)" },
+      { major: "", minor: "비트맵 인덱스", desc: "성별·상태코드 등 카디널리티(분포도)가 낮은 컬럼을 0과 1 비트열로 압축 저장 (DW 다중 조건 집계에 유리)" },
+      { major: "목적별 유형\n(함·조·도)", minor: "함수 기반 인덱스 (FBI)", desc: "컬럼에 연산식이나 함수(UPPER, SUBSTR 등)를 적용한 결과값 자체를 인덱싱" },
+      { major: "", minor: "조인 인덱스 (Join Index)", desc: "두 개 이상 테이블의 조인 결과를 사전 인덱싱하여 조인 탐색 비용 절감" },
+      { major: "", minor: "도메인 인덱스", desc: "전문(Full-text)·공간(GIS)·비정형 데이터 등 애플리케이션 특화 사용자 정의 인덱스" },
+      { major: "구조 비교", minor: "클러스터드 인덱스", desc: "인덱스 정렬 순서대로 실제 테이블 데이터가 물리적으로 정렬 저장됨 (테이블당 1개만 생성, 리프 노드=데이터 페이지)" },
+      { major: "", minor: "논클러스터드 인덱스", desc: "데이터 정렬과 무관하게 별도 인덱스 공간을 두고 리프 노드에 데이터 주소(ROWID)만 저장 (테이블당 여러 개 생성 가능)" }
     ]
   },
   {
@@ -1502,15 +1529,14 @@ const topics = [
       "균형 다진 탐색 트리 O(log N)",
       "모든 노드에 키와 데이터 포인터 저장"
     ],
-    diagram: `        [ 루트 노드 (키 + 데이터 포인터) ]
-           ↙                        ↘
-[ 브랜치 노드 (키 + 포인터) ]   [ 브랜치 노드 (키 + 포인터) ]
-           ↓                        ↓
-      [ 리프 노드 ]            [ 리프 노드 ] (모든 노드가 실제 데이터 주소 보유)`,
+    diagram: "db_btree.png",
     tableRows: [
-      { major: "핵심 구조", minor: "Balanced Tree", desc: "루트로부터 모든 리프 노드까지의 거리를 일정하게 유지(균형 트리)하여 항상 O(log N)의 탐색 성능을 보장하는 인덱스 구조" },
-      { major: "데이터 저장", minor: "전 노드 데이터 보유", desc: "루트, 브랜치(내부), 리프 모든 노드에 인덱스 키값과 실제 테이블 레코드를 가리키는 데이터(ROWID/포인터)를 함께 저장" },
-      { major: "장단점", minor: "등치 탐색 vs 범위 탐색", desc: "• 강점: 상위 노드에서 원하는 키를 찾으면 리프까지 내려가지 않고 즉시 탐색 종료 가능\n• 한계: 노드에 데이터가 포함되어 팬아웃(Fan-out)이 작고, 부등호 범위 검색 시 트리 전체를 중위 순회해야 함" }
+      { major: "노드 구성\n(루·브·리)", minor: "루트 노드 (Root Node)", desc: "트리 최상단에서 탐색이 시작되는 노드로, 하위 브랜치 포인터와 키·데이터 주소를 보유" },
+      { major: "", minor: "브랜치 노드 (Branch Node)", desc: "루트와 리프 사이에서 탐색 경로를 분기하는 중간 내부 노드" },
+      { major: "", minor: "리프 노드 (Leaf Node)", desc: "트리 최하단 노드로, 모든 리프 노드가 동일한 깊이(Level)에 위치하여 균형 유지" },
+      { major: "구조적 특성", minor: "전 노드 데이터 포인터 보유", desc: "루트·브랜치·리프 모든 노드에 인덱스 키값과 실제 테이블 레코드 주소(ROWID/포인터)를 함께 저장" },
+      { major: "", minor: "단건 탐색 강점", desc: "상위 노드에서 찾는 키를 만나면 리프까지 내려가지 않고 즉시 탐색 종료 가능" },
+      { major: "", minor: "범위 탐색 한계", desc: "노드에 데이터가 함께 들어있어 팬아웃(Fan-out)이 작고, 부등호 범위 검색 시 트리를 상하로 중위 순회해야 함" }
     ]
   },
   {
@@ -1523,15 +1549,13 @@ const topics = [
       "리프 노드 양방향 연결 리스트",
       "높은 팬아웃 (Fan-out) & 범위 검색 최적화"
     ],
-    diagram: `        [ 루트 노드 (오직 길 안내 키만 보유) ]
-           ↙                            ↘
-  [ 브랜치 노드 (키만 보유) ]      [ 브랜치 노드 (키만 보유) ]
-     ↓                                  ↓
-[ 리프 노드(키 + 데이터) ] ⇄ [ 리프 노드(키 + 데이터) ] (양방향 연결 리스트로 순차 범위 스캔 고속화)`,
+    diagram: "db_bplustree.png",
     tableRows: [
-      { major: "핵심 구조", minor: "탐색 키와 데이터 분리", desc: "루트·브랜치(내부 노드)에는 경로 탐색을 위한 가이드 키만 보관하고, 오직 최하단 리프 노드에만 실제 데이터(또는 주소)를 저장하는 RDBMS 표준 인덱스" },
-      { major: "핵심 강점 1", minor: "높은 팬아웃 (Fan-out)", desc: "내부 노드에 데이터가 없어 한 블록(Page)에 훨씬 더 많은 자식 노드 포인터를 담아 트리 높이를 낮게 유지 (디스크 I/O 횟수 절감)" },
-      { major: "핵심 강점 2", minor: "범위 검색 (Range Scan)", desc: "리프 노드끼리 양방향 연결 리스트(Doubly Linked List)로 연결되어 있어 시작점만 찾으면 부등호(BETWEEN, >, <) 및 정렬 순차 스캔이 초고속으로 수행됨" }
+      { major: "노드 분리 구조\n(내·리 분리)", minor: "내부 노드 (Index Set)", desc: "루트·브랜치 노드에는 실제 데이터 포인터 없이 오직 리프 노드로 찾아가는 경로 안내 키(Separator Key)만 저장" },
+      { major: "", minor: "리프 노드 (Sequence Set)", desc: "오직 최하단 리프 노드에만 모든 인덱스 키와 실제 데이터(또는 ROWID 주소)를 정렬 상태로 저장" },
+      { major: "핵심 강점", minor: "높은 팬아웃 (Fan-out)", desc: "내부 노드에 데이터가 없어 한 블록에 더 많은 자식 포인터를 담아 트리 높이를 낮추고 디스크 I/O 횟수 절감" },
+      { major: "", minor: "양방향 연결 리스트", desc: "리프 노드끼리 양방향 연결 리스트(Doubly Linked List)로 이어져 있어 이전·다음 블록 순차 이동 가능" },
+      { major: "", minor: "범위 검색 (Range Scan)", desc: "시작 키만 수직 탐색으로 찾으면 리프 연결 리스트를 따라 부등호(BETWEEN, >, <) 및 ORDER BY 스캔을 초고속 수행" }
     ]
   },
   {
@@ -1566,10 +1590,14 @@ const topics = [
     ],
     diagram: "db_optimizer.png",
     tableRows: [
-      { major: "SQL 처리 과정", minor: "구문분석 → 실행 → 인출", desc: "① 구문분석(Syntax·Semantic·Shared Pool 확인) → ② 실행(옵티마이저 실행계획 수립 → Row Source 생성 → SQL 실행) → ③ 인출(Fetch)" },
-      { major: "옵티마이저 구조\n(변·추·생)", minor: "변환 · 추정 · 계획생성", desc: "① Query Transformer(동등한 효율적 쿼리로 변환) → ② Estimator(통계 기반 선택도·카디널리티·비용 추정) → ③ Plan Generator(최저 비용 후보 계획 선택)" },
-      { major: "유형 비교", minor: "RBO (규칙 기반)", desc: "미리 정해진 우선순위 규칙(인덱스 유무, 연산자 등)만으로 실행계획 선택 (통계정보 미활용, 예측은 쉬우나 대용량 효율 저하)" },
-      { major: "", minor: "CBO (비용 기반)", desc: "테이블·인덱스 통계정보(건수, 분포도, 히스토그램)와 비용 모델로 최소 I/O·CPU 비용 실행계획 선택 (현대 DBMS 표준)" }
+      { major: "SQL 처리 과정", minor: "1. 구문분석 (Parsing)", desc: "문법(Syntax)·의미(Semantic) 검증 후 Shared Pool 내 기존 실행계획 존재 여부(Soft/Hard Parse) 확인" },
+      { major: "", minor: "2. 실행 (Execution)", desc: "옵티마이저가 실행계획을 수립하고 Row Source Generator가 실행 가능한 프로시저를 생성해 블록 I/O 수행" },
+      { major: "", minor: "3. 인출 (Fetch)", desc: "실행 결과 집합에서 데이터를 읽어 사용자 애플리케이션으로 반환" },
+      { major: "옵티마이저 구조\n(변·추·생)", minor: "Query Transformer (변환기)", desc: "뷰 병합, 서브쿼리 언네스팅, 조건절 푸시다운 등 SQL을 의미가 동일한 더 효율적인 형태로 재작성" },
+      { major: "", minor: "Estimator (비용 추정기)", desc: "데이터 딕셔너리 통계정보(건수, 분포도, 히스토그램)를 바탕으로 선택도·카디널리티·I/O 및 CPU 비용 산출" },
+      { major: "", minor: "Plan Generator (계획 생성기)", desc: "다양한 접근 경로·조인 순서·조인 방법 후보군 중 총비용(Cost)이 가장 낮은 최적 실행계획 선택" },
+      { major: "유형 비교", minor: "RBO (규칙 기반)", desc: "미리 정해진 우선순위 규칙(ROWID > Unique Index > Range Scan > Full Scan 등)만으로 실행계획 결정" },
+      { major: "", minor: "CBO (비용 기반)", desc: "테이블·인덱스 통계정보와 시스템 자원 비용 모델을 계산해 최소 비용 실행계획 선택 (현대 DBMS 표준)" }
     ]
   },
   {
@@ -1581,38 +1609,48 @@ const topics = [
       "조인 방식(네소해): Nested Loop · Sort Merge · Hash Join",
       "인덱스 스캔(랜풀유스디패): Range · Full · Unique · Skip · Descending · Fast Full"
     ],
-    diagram: `• 조인 3대 방식 (네·소·해) : Nested Loop(소량·인덱스) / Sort Merge(정렬 후 병합·비동등) / Hash Join(해시테이블·대용량 동등조인)
-• 인덱스 스캔 (랜·풀·유·스·디·패) : Range · Full · Unique · Skip(선두열 생략) · Descending · Fast Full(멀티블록 I/O)`,
+    diagram: "db_index_scan.png",
     tableRows: [
       { major: "조인 수행 방식\n(네·소·해)", minor: "Nested Loop (NL 조인)", desc: "선행(Driving) 집합의 각 행마다 후행 테이블의 인덱스를 통해 반복 탐색 (소량 데이터 온라인 트랜잭션에 유리)" },
       { major: "", minor: "Sort Merge (소트 머지)", desc: "양쪽 집합을 조인 키 기준으로 각각 정렬한 뒤 순차 스캔하며 병합 (인덱스 없거나 비동등 조인 시 활용)" },
       { major: "", minor: "Hash Join (해시 조인)", desc: "작은 집합(Build Input)으로 메모리 해시 테이블을 생성하고 큰 집합(Probe Input)을 스캔하며 탐색 (대용량 동등 조인 최적)" },
-      { major: "인덱스 스캔\n(랜·풀·유·스·디·패)", minor: "Range · Unique · Full", desc: "• Range Scan: 조건에 맞는 키 범위를 순차 탐색\n• Unique Scan: 유일 인덱스 동등 조건 단건 탐색\n• Full Scan: 인덱스 전체를 키 순서로 단일 블록 스캔" },
-      { major: "", minor: "Skip · Desc · Fast Full", desc: "• Skip Scan: 복합 인덱스에서 선두 컬럼 조건 없이도 후행 컬럼 검색에 활용\n• Fast Full Scan: 인덱스 세그먼트 전체를 멀티블록 I/O로 고속 스캔 (정렬 순서 미보장)" }
+      { major: "인덱스 스캔\n(랜·풀·유·스·디·패)", minor: "Index Range Scan", desc: "루트에서 리프까지 수직 탐색 후 필요한 범위만 수평 스캔하는 가장 일반적인 방식 (결과 정렬 보장)" },
+      { major: "", minor: "Index Full Scan", desc: "수직 탐색 없이 리프 블록 전체를 처음부터 끝까지 Single Block Read로 수평 스캔 (최적 선두 인덱스 없을 때)" },
+      { major: "", minor: "Index Unique Scan", desc: "Unique 인덱스를 동등(=) 조건으로 검색할 때 수직 탐색만으로 단 1건의 데이터를 즉시 추출" },
+      { major: "", minor: "Index Skip Scan", desc: "복합 인덱스에서 선두 컬럼 조건이 없어도 선두 컬럼의 Distinct 값이 적을 때 필요한 블록만 골라 스캔" },
+      { major: "", minor: "Index Range Scan Descending", desc: "인덱스 리프 블록을 뒤에서부터 역순으로 스캔하여 내림차순(ORDER BY DESC) 정렬 연산을 생략" },
+      { major: "", minor: "Index Fast Full Scan", desc: "인덱스 트리 구조를 무시하고 세그먼트 전체를 Multi-Block Read로 고속 스캔 (결과 정렬은 보장 안 됨)" }
     ]
   },
   {
     domain: "DB",
     topic: "데이터베이스 튜닝 (DB Tuning)",
     mnemonic: "설·D·S / 처·처·응·로",
-    definition: "응답시간 단축 위해 설계·DB·SQL 최적화하는 기법",
+    definition: "처리량 증대와 응답 단축 위해 설계·DB·SQL 최적화",
     keywords: [
       "3대 영역(설DS): 설계(모델링) 튜닝 · DBMS 튜닝 · SQL 튜닝",
       "성능 지표(처처응로): 처리능력 · 처리시간 · 응답시간 · 로드시간"
     ],
-    diagram: `[1단계: DB 설계 튜닝 (반정규화·파티셔닝·인덱스 설계)] ➔ [2단계: DBMS 환경 튜닝 (버퍼캐시·Redo·체크포인트)] ➔ [3단계: SQL 튜닝 (실행계획·조인·힌트)]`,
+    diagram: `<img src="db_tuning.png" alt="DB 튜닝 3단계 개념도"><img src="db_hint_types.png" alt="옵티마이저 힌트 유형">`,
     tableRows: [
-      { major: "3대 튜닝 영역\n(설·D·S)", minor: "설계(모델링) 튜닝", desc: "반정규화(과다 조인 제거), 테이블 분할(파티셔닝), 데이터 타입 최적화, 식별자 및 인덱스 전략 수립" },
-      { major: "", minor: "DBMS 환경 튜닝", desc: "메모리(버퍼 캐시, Shared Pool) 크기 최적화, Redo Log 및 체크포인트 주기 설정, 디스크 I/O 분산" },
-      { major: "", minor: "SQL 튜닝", desc: "비효율 SQL 실행계획 개선, 옵티마이저 힌트 적용, 조인 순서·방식(NL/Sort/Hash) 최적화, 인덱스 억제 요인 제거" },
-      { major: "성능 평가 지표\n(처·처·응·로)", minor: "처리량 · 처리/응답/로드시간", desc: "• 처리능력(Throughput): 단위 시간당 완료 트랜잭션 수\n• 처리시간 / 응답시간: 요청부터 결과 반환까지 소요 시간\n• 로드시간: 대량 데이터 적재 소요 시간" }
+      { major: "3대 튜닝 영역\n(설·D·S)", minor: "DB 설계 (모델링) 튜닝", desc: "반정규화, 파티셔닝, 이력테이블 관리, 인덱스 키 구성, FK 잠금 회피, 테이블스페이스 분리 등 구조적 개선" },
+      { major: "", minor: "DBMS 환경 튜닝", desc: "Buffer Cache·Shared Pool 등 메모리 최적화, Redo Log·체크포인트 설정, CPU/디스크 I/O 경합 최소화" },
+      { major: "", minor: "SQL 튜닝", desc: "비효율 실행계획 개선, 옵티마이저 힌트 적용, 조인 순서·방식 최적화, 인덱스 억제 요인(컬럼 변형) 제거" },
+      { major: "옵티마이저 힌트", minor: "최적화 목표 힌트", desc: "ALL_ROWS(전체 리소스 최소화 비용 기반), FIRST_ROWS(첫 행 최단 응답), RULE(규칙 기반 실행)" },
+      { major: "", minor: "접근 방법 힌트", desc: "FULL(전체 테이블 스캔), INDEX(인덱스 스캔), INDEX_FFS(Fast Full Scan), HASH(해시 스캔)" },
+      { major: "", minor: "조인 순서 힌트", desc: "ORDERED(FROM절 기술 순서대로 조인), LEADING(지정한 테이블을 선행 드라이빙으로 강제)" },
+      { major: "", minor: "조인 방법 힌트", desc: "USE_NL(Nested Loop 조인), USE_MERGE(Sort Merge 조인), USE_HASH(Hash 조인 강제)" },
+      { major: "성능 평가 지표\n(처·처·응·로)", minor: "처리능력 (Throughput)", desc: "단위 시간당 시스템이 완료하는 트랜잭션 또는 질의 처리 건수 (TPS)" },
+      { major: "", minor: "처리시간 (Elapsed Time)", desc: "트랜잭션이나 배치 작업이 시작되어 완전히 종료될 때까지 서버에서 소요된 총 시간" },
+      { major: "", minor: "응답시간 (Response Time)", desc: "사용자가 질의를 요청한 시점부터 첫 결과 화면을 반환받기까지 체감하는 대기 시간" },
+      { major: "", minor: "로드시간 (Load Time)", desc: "대량의 데이터를 추출·변환하여 데이터베이스에 적재하는 데 소요되는 시간" }
     ]
   },
   {
     domain: "DB",
     topic: "파티셔닝 (DB Partitioning)",
     mnemonic: "레·리·해·복 (수평·수직)",
-    definition: "조회 성능과 관리성 위해 대용량 테이블을 분할하는 기법",
+    definition: "성능과 관리성 위해 대용량 테이블을 나누는 분할 기법",
     keywords: [
       "유형(레리해복): Range(범위) · List(목록) · Hash(해시) · Composite(복합)",
       "방법: 수평 분할(행 분리) vs 수직 분할(열 분리)",
@@ -1620,31 +1658,33 @@ const topics = [
     ],
     diagram: "db_partitioning.png",
     tableRows: [
-      { major: "4대 분할 유형\n(레·리·해·복)", minor: "Range (범위 분할)", desc: "날짜(월별·연도별)나 숫자 구간 등 연속된 값의 범위를 기준으로 분할 (이력 데이터 관리에 최적)" },
-      { major: "", minor: "List (목록 분할)", desc: "국가 코드, 지역명, 부서 등 지정된 이산값 목록 집합을 기준으로 분할" },
-      { major: "", minor: "Hash (해시 분할)", desc: "파티션 키에 해시 함수를 적용한 결과값으로 데이터를 균등 분산 배치 (특정 구간 데이터 쏠림 방지)" },
-      { major: "", minor: "Composite (복합 분할)", desc: "Range-Hash, Range-List 등 2가지 분할 방식을 결합하여 대분류 후 세부 분할 수행" },
-      { major: "최적화 원리", minor: "파티션 프루닝 (Pruning)", desc: "옵티마이저가 SQL 조건절(WHERE)의 분할 키를 분석해 필요한 파티션만 읽고 나머지 파티션은 스캔에서 아예 제외하는 핵심 기법" }
+      { major: "4대 분할 유형\n(레·리·해·복)", minor: "Range 파티셔닝 (범위)", desc: "날짜(월별·연도별)나 숫자 구간 등 연속된 값의 범위를 기준으로 분할 (이력 데이터 보관·삭제에 최적)" },
+      { major: "", minor: "List 파티셔닝 (목록)", desc: "국가 코드, 지역명, 부서 등 지정된 이산값 목록 집합을 기준으로 분할" },
+      { major: "", minor: "Hash 파티셔닝 (해시)", desc: "파티션 키에 해시 함수를 적용한 결과값으로 데이터를 균등 분산 배치 (특정 구간 데이터 쏠림 방지)" },
+      { major: "", minor: "Composite 파티셔닝 (복합)", desc: "Range-Hash, Range-List 등 2가지 분할 방식을 결합하여 대분류 후 세부 분할 수행" },
+      { major: "분할 방향", minor: "수평 분할 (Horizontal)", desc: "동일 스키마를 유지한 채 행(Row) 단위로 파티션을 나누어 대용량 테이블 스캔 범위를 축소" },
+      { major: "", minor: "수직 분할 (Vertical)", desc: "자주 쓰는 핵심 컬럼과 대형(LOB)/저빈도 컬럼을 열(Column) 단위로 분리하여 행 길이 및 I/O 절감" },
+      { major: "최적화 원리", minor: "파티션 프루닝 (Pruning)", desc: "옵티마이저가 SQL 조건절(WHERE)의 분할 키를 분석해 필요한 파티션만 읽고 나머지 파티션은 스캔에서 아예 제외" }
     ]
   },
   {
     domain: "DB",
     topic: "샤딩 (Sharding)",
     mnemonic: "호·레·키·디 (범위·해시·디렉토리)",
-    definition: "대용량 부하 분산 위해 다중 DB에 수평 분할하는 기법",
+    definition: "대용량 부하 분산 위해 독립 다중 DB에 수평분할 기법",
     keywords: [
       "물리적으로 독립된 다중 DB 서버에 수평 분할 저장",
       "분할 방식: 범위(Range) · 키/해시(Modular) · 디렉토리(Lookup)",
       "핵심 요소: Shard ID · Shard Key · 마스터(라우팅) 노드"
     ],
-    diagram: `[애플리케이션 / 라우터 (Shard Key 판별)] ──┬──▶ [Shard DB 1 (ID: 1~1000)]
-                                         ├──▶ [Shard DB 2 (ID: 1001~2000)]
-                                         └──▶ [Shard DB 3 (ID: 2001~3000)]`,
+    diagram: "db_sharding.png",
     tableRows: [
       { major: "분할 방식\n(레·키·디)", minor: "범위 샤딩 (Range)", desc: "샤드 키의 구간(범위) 기준으로 샤드 배정 → 범위 조회에 유리하나 특정 샤드로 트래픽이 몰리는 핫스팟(쏠림) 주의" },
-      { major: "", minor: "키/해시 샤딩 (Hash)", desc: "샤드 키의 해시 함수 결과값으로 분산 → 부하 분산은 균등하나 범위 조회 시 여러 샤드를 방문해야 하며 노드 증설 시 재해싱(Consistent Hashing) 필요" },
-      { major: "", minor: "디렉토리 샤딩 (Directory)", desc: "별도의 매핑(Lookup) 테이블을 두어 데이터가 저장된 샤드 위치를 조회 → 유연성이 높으나 디렉토리 서버가 단일 장애점(SPOF)/병목 가능" },
-      { major: "핵심 구성요소", minor: "Shard Key · ID · 라우터", desc: "• Shard Key: 데이터를 어느 샤드에 배치할지 결정하는 기준 필드\n• Shard ID: 개별 물리 샤드 DB 식별자\n• 라우팅 노드: 질의를 분석해 대상 샤드로 전달 및 결과 취합" }
+      { major: "", minor: "모듈러/해시 샤딩 (Hash)", desc: "샤드 키의 해시 함수 결과값으로 분산 → 부하 분산은 균등하나 범위 조회 시 여러 샤드를 방문해야 하며 노드 증설 시 재해싱 필요" },
+      { major: "", minor: "디렉토리 샤딩 (Directory)", desc: "별도의 매핑(Lookup) 테이블을 두어 데이터가 저장된 샤드 위치를 조회 → 유연성이 높으나 디렉토리 서버가 단일 장애점(SPOF) 가능" },
+      { major: "핵심 구성요소", minor: "Shard Key (샤드 키)", desc: "데이터를 어느 물리 샤드에 배치할지 결정하는 기준 컬럼/필드" },
+      { major: "", minor: "Shard ID (샤드 식별자)", desc: "수평 분할된 데이터가 저장되는 개별 물리 데이터베이스 노드 식별자" },
+      { major: "", minor: "라우팅(마스터) 노드", desc: "애플리케이션 질의의 샤드 키를 분석해 대상 샤드 DB로 라우팅하고 결과를 병합 반환하는 중개 계층" }
     ]
   },
   {
@@ -1659,10 +1699,18 @@ const topics = [
     ],
     diagram: `<img src="db_distdb.png" alt="분산DB 개념도"><img src="db_2pc.png" alt="2PC 개념도">`,
     tableRows: [
-      { major: "분산 DB 투명성\n(위·복·병·분·장·지)", minor: "위치 · 복제 · 분할 투명성", desc: "• 위치 투명성: 데이터의 물리적 저장 위치를 몰라도 논리 명칭만으로 접근\n• 복제 투명성: 데이터가 여러 노드에 복제되어 있는지 의식할 필요 없음\n• 분할 투명성: 하나의 릴레이션이 여러 단편으로 분할 저장됨을 의식하지 않음" },
-      { major: "", minor: "병행 · 장애 · 지역사상", desc: "• 병행 투명성: 다수 분산 트랜잭션 동시 수행 시 결과 일관성 보장\n• 장애 투명성: 특정 노드/회선 장애 시에도 무결성 및 업무 지속 보장" },
-      { major: "분산 적용 기법\n(요·복·분·위)", minor: "요약 · 복제 · 분할 · 위치", desc: "요약 분산(집계 결과 배치), 복제 분산(동일 데이터 복사본 배치), 분할 분산(수평·수직 조각 배치), 위치 분산(업무 위치별 배치)" },
-      { major: "2PC (2단계 커밋)", minor: "Prepare → Commit 단계", desc: "• 1단계(Prepare): 조정자(Coordinator)가 모든 참여 노드에 커밋 가능 여부를 묻고 투표 수렴\n• 2단계(Commit): 전원 Yes면 Global Commit, 하나라도 No면 Global Abort 전파 (단점: 블로킹·지연 발생)" }
+      { major: "분산 DB 투명성\n(위·복·병·분·장·지)", minor: "위치 투명성 (Location)", desc: "접근하려는 데이터의 물리적 저장 위치를 몰라도 논리적인 명칭만으로 접근 가능" },
+      { major: "", minor: "복제 투명성 (Replication)", desc: "동일 데이터가 여러 노드에 복제되어 있는지 여부를 사용자가 의식할 필요 없음" },
+      { major: "", minor: "병행 투명성 (Concurrency)", desc: "다수의 분산 트랜잭션이 동시에 수행되더라도 결과의 일관성이 유지됨" },
+      { major: "", minor: "분할 투명성 (Fragmentation)", desc: "하나의 논리적 릴레이션이 여러 단편(Fragment)으로 분할 저장됨을 의식할 필요 없음" },
+      { major: "", minor: "장애 투명성 (Failure)", desc: "특정 지역 노드나 통신 회선에 장애가 발생해도 트랜잭션의 원자성과 무결성 보장" },
+      { major: "", minor: "지역사상 투명성 (Local Mapping)", desc: "각 지역 시스템의 로컬 DBMS와 물리적 명칭에 무관하게 접근 가능" },
+      { major: "분산 적용 기법\n(요·복·분·위)", minor: "요약 분산 (Summarization)", desc: "지역 또는 서버별로 집계·요약된 데이터를 본사/중앙 노드에 합산 배치" },
+      { major: "", minor: "복제 분산 (Replication)", desc: "동일 데이터의 복사본을 여러 원격 노드에 중복 배치하여 조회 성능 및 가용성 향상" },
+      { major: "", minor: "분할 분산 (Fragmentation)", desc: "테이블을 수평 또는 수직 조각으로 나누어 서로 다른 물리 노드에 분산 배치" },
+      { major: "", minor: "위치 분산 (Location)", desc: "동일 스키마를 유지하되 데이터가 발생·활용되는 지사/지역 위치별로 DB를 분리 배치" },
+      { major: "2PC (2단계 커밋)", minor: "1단계: Prepare (준비)", desc: "조정자(Coordinator)가 모든 참여 노드에 커밋 가능 여부를 묻고 각 참여자가 WAL 기록 후 Yes/No 투표" },
+      { major: "", minor: "2단계: Commit / Abort", desc: "전원 Yes면 Global Commit, 단 하나라도 No나 타임아웃이면 Global Abort를 전파하여 원자성 보장" }
     ]
   },
   {
@@ -1677,10 +1725,19 @@ const topics = [
     ],
     diagram: "db_nosql_types.png",
     tableRows: [
-      { major: "BASE 속성", minor: "가용성 · 유연상태 · 최종일관성", desc: "• Basically Available: 일부 장애 시에도 기본 가용성(응답) 보장\n• Soft-state: 외부 입력 없이도 노드 간 상태가 일시적으로 다를 수 있음\n• Eventually Consistent: 일정 시간 경과 후 결국 데이터 일관성 수렴" },
-      { major: "4대 유형\n(키·컬·도·그)", minor: "Key-Value · Column · Doc · Graph", desc: "• Key-Value: 해시 기반 고속 조회 (Redis, DynamoDB)\n• Column-Family: 대용량 컬럼 묶음 분산 저장 (Cassandra, HBase)\n• Document: JSON/XML 문서 트리 구조 저장 (MongoDB)\n• Graph: 노드·엣지 관계망 탐색 (Neo4j)" },
-      { major: "모델링 절차\n(도·쿼·패·기·후·선)", minor: "쿼리 중심 역방향 설계", desc: "① 도메인 모델 파악 → ② 쿼리 결과 디자인 → ③ 패턴 이용 데이터 모델링 → ④ 기능 최적화(Secondary Index) → ⑤ 후보 선정/부하테스트 → ⑥ 선정 모델·HW 최적화" },
-      { major: "모델링 패턴\n(비·통·조·아·인·복)", minor: "중복 허용 & 단일 I/O 지향", desc: "비정규화(중복 저장), 테이블 통합(Aggregation), Join 처리(App-side Join), Atomic Aggregation(단일 테이블 통합), 인덱스 테이블 생성, 복합 키 테이블" }
+      { major: "BASE 속성", minor: "Basically Available (기본 가용성)", desc: "일부 노드 장애 시에도 시스템 전체가 멈추지 않고 언제나 응답을 반환하는 가용성 최우선 특성" },
+      { major: "", minor: "Soft-state (유연 상태)", desc: "외부의 추가 입력이 없더라도 분산 복제 전파 과정에 따라 노드의 상태가 시간에 따라 변할 수 있음" },
+      { major: "", minor: "Eventually Consistent (최종 일관성)", desc: "일시적인 불일치를 허용하되 일정 시간이 지나면 모든 복제본이 결국 동일한 값으로 수렴" },
+      { major: "4대 유형\n(키·컬·도·그)", minor: "Key-Value Store", desc: "고유 Key와 Value 쌍의 단순 해시 구조로 초고속 조회 지원 (Redis, DynamoDB)" },
+      { major: "", minor: "Column-Family Store", desc: "로우 키 아래 대용량 컬럼 묶음(Column Family)을 분산 저장해 시계열·대량 쓰기에 강점 (HBase, Cassandra)" },
+      { major: "", minor: "Document Store", desc: "JSON, BSON, XML 등 계층적 문서(Document) 트리 구조로 저장하고 내부 필드 질의 지원 (MongoDB)" },
+      { major: "", minor: "Graph Store", desc: "노드(Node), 엣지(Edge), 속성으로 개체 간 관계망과 최단경로·추천을 고속 탐색 (Neo4j)" },
+      { major: "모델링 패턴\n(비·통·조·아·인·복)", minor: "비정규화 (Denormalization)", desc: "읽기 시 조인을 제거하기 위해 동일 데이터를 여러 문서/컬럼에 중복 저장" },
+      { major: "", minor: "테이블 통합 (Aggregation)", desc: "중첩 문서(Embedded Document)나 유연한 스키마를 활용해 연관 엔터티를 단일 레코드로 병합" },
+      { major: "", minor: "애플리케이션 조인 (App Join)", desc: "DBMS 차원의 조인 연산 대신 애플리케이션 계층에서 다중 조회 결과를 결합" },
+      { major: "", minor: "원자적 집계 (Atomic Aggregation)", desc: "트랜잭션 보장을 위해 함께 갱신되어야 하는 데이터들을 단일 문서/행 단위로 묶어 배치" },
+      { major: "", minor: "인덱스 테이블 (Index Table)", desc: "기본키(Row Key) 외의 조회 조건을 빠르게 검색하기 위해 별도의 역색인 매핑 테이블을 생성" },
+      { major: "", minor: "복합 키 (Composite Key)", desc: "구분자(Delimiter)를 사용해 여러 속성을 하나의 키 문자열로 결합하여 범위·계층 검색 지원" }
     ]
   },
   {
@@ -1695,16 +1752,22 @@ const topics = [
     ],
     diagram: `<img src="db_cap.png" alt="CAP 이론"><img src="db_pacelc.png" alt="PACELC 이론">`,
     tableRows: [
-      { major: "CAP 이론\n(C · A · P)", minor: "3대 요소와 핵심 명제", desc: "• C(Consistency): 모든 노드가 최신 쓰기 결과를 동일하게 반환 (선형화 가능성)\n• A(Availability): 정상 노드가 모든 요청에 대해 성공 응답 반환\n• P(Partition Tolerance): 노드 간 네트워크 단절 시에도 시스템 동작 지속\n➔ 네트워크 분할(P) 발생 시 C와 A를 동시에 완벽 보장할 수 없음" },
-      { major: "PACELC 이론\n(CAP 한계 보완)", minor: "If P → A/C, Else → L/C", desc: "네트워크 분할(P) 시에는 가용성(A)과 일관성(C)이 상충하지만, 정상 통신(Else) 상황에서도 지연시간(Latency, L)과 일관성(C) 간의 트레이드오프가 존재함을 규명" },
-      { major: "DBMS 분류", minor: "PA/EL · PC/EC 등", desc: "• PA/EL: 장애 시 가용성(A), 정상 시 저지연(L) 우선 (DynamoDB, Cassandra)\n• PC/EC: 장애 시 일관성(C), 정상 시에도 일관성(C) 우선 (HBase, Spanner, RDBMS)\n• PA/EC: 장애 시 가용성, 정상 시 일관성 (MongoDB 설정별)" }
+      { major: "CAP 이론\n(C · A · P)", minor: "일관성 (Consistency)", desc: "모든 노드가 같은 시점에 동일한 최신 쓰기 데이터를 조회할 수 있어야 하는 속성 (선형화 가능성)" },
+      { major: "", minor: "가용성 (Availability)", desc: "일부 노드에 장애가 나더라도 정상 노드는 모든 요청에 대해 에러 없이 유효한 응답을 반환해야 하는 속성" },
+      { major: "", minor: "분할 내성 (Partition Tolerance)", desc: "노드 간 네트워크가 단절되어 메시지가 유실되더라도 시스템이 계속 동작해야 하는 속성 (네트워크 분할 시 C와 A 동시 만족 불가)" },
+      { major: "PACELC 이론\n(CAP 한계 보완)", minor: "If P (네트워크 분할 시)", desc: "네트워크 분할(Partition) 발생 시 가용성(A)과 일관성(C) 중 무엇을 우선할지 선택" },
+      { major: "", minor: "Else (정상 동작 시)", desc: "네트워크가 정상(Else)일 때도 복제 동기화에 따른 지연시간(Latency, L)과 일관성(Consistency, C) 간 트레이드오프 선택" },
+      { major: "DBMS 분류", minor: "PA/EL 유형", desc: "장애 시 가용성(A), 정상 시 저지연(L) 우선 (DynamoDB, Cassandra)" },
+      { major: "", minor: "PC/EC 유형", desc: "장애 시 일관성(C), 정상 시에도 일관성(C) 우선 (HBase, Google Spanner, 전통 RDBMS)" },
+      { major: "", minor: "PA/EC 유형", desc: "장애 시에는 가용성(A)을 택하고, 정상 통신 시에는 일관성(C)을 우선 보장 (MongoDB 등 설정별)" },
+      { major: "", minor: "PC/EL 유형", desc: "장애 시에는 일관성(C)을 택하고, 정상 통신 시에는 빠른 응답 지연시간(L)을 우선 보장 (PNUTS 등)" }
     ]
   },
   {
     domain: "DB",
     topic: "벡터 데이터베이스 (Vector Database: HNSW · IVF)",
     mnemonic: "임·유 / HNSW(계층그래프) · IVF(클러스터역색인)",
-    definition: "유사도 검색 위해 고차원 임베딩 벡터를 탐색하는 DB",
+    definition: "의미 유사도 검색 위해 고차원 임베딩 저장·탐색 DB",
     keywords: [
       "고차원 벡터 임베딩 & 근사 최근접 이웃(ANN) 검색",
       "HNSW (계층적 스몰월드 그래프 기반 탐색)",
@@ -1712,87 +1775,103 @@ const topics = [
     ],
     diagram: `<img src="db_vectordb.png" alt="벡터DB 구성도"><img src="db_hnsw.png" alt="HNSW 개념도"><img src="db_ivf.png" alt="IVF 개념도">`,
     tableRows: [
-      { major: "핵심 아키텍처", minor: "임베딩 변환 & 벡터 저장소", desc: "비정형 데이터(텍스트·이미지)를 임베딩 모델로 고차원 실수 배열(벡터)로 변환·저장하고, 코사인 유사도·유클리드 거리 기반 의미 유사도 검색 수행 (RAG 핵심 인프라)" },
-      { major: "HNSW 알고리즘", minor: "계층적 그래프 기반 ANN", desc: "• 색인: 최대 계층 L부터 최하위 Layer 0까지 다계층 스몰월드 그래프 구성\n• 검색: 최상위 희소 계층에서 큰 보폭으로 진입점을 찾은 뒤 하위 밀집 계층(Layer 0)으로 내려오며 최근접 벡터 고속 탐색" },
-      { major: "IVF 알고리즘", minor: "클러스터 역파일 색인", desc: "• 색인: K-Means 알고리즘으로 벡터 공간을 K개의 보로노이 클러스터(중심점)로 분할 후 버킷 할당\n• 검색: 질의 벡터와 가장 가까운 중심점 클러스터만 선택해 내부 벡터들과 거리 계산 (탐색 범위 대폭 축소)" }
+      { major: "핵심 아키텍처", minor: "벡터 임베딩 (Embedding)", desc: "텍스트·이미지·오디오 등 비정형 데이터를 딥러닝 임베딩 모델로 고차원 실수 배열(벡터)로 변환해 저장" },
+      { major: "", minor: "유사도 거리 측정", desc: "코사인 유사도(Cosine Similarity), 유클리드 거리(L2), 내적(Inner Product)으로 벡터 간 문맥 유사도 계산" },
+      { major: "", minor: "근사 최근접 이웃 (ANN)", desc: "전수 조사(KNN)의 연산 병목을 해결하기 위해 약간의 정확도를 타협하고 탐색 속도를 비약적으로 높이는 색인 기법" },
+      { major: "대표 색인 기법", minor: "HNSW (계층적 그래프)", desc: "상위 희소 계층에서 큰 보폭으로 진입점을 찾은 뒤 하위 밀집 계층(Layer 0)으로 내려오며 탐색하는 다계층 스몰월드 그래프" },
+      { major: "", minor: "IVF (역파일 클러스터 색인)", desc: "K-Means로 벡터 공간을 보로노이 셀(클러스터 중심점)로 분할하고 질의와 가까운 클러스터 버킷만 탐색" },
+      { major: "", minor: "PQ (Product Quantization)", desc: "고차원 벡터를 여러 저차원 서브벡터로 쪼개어 코드북 대표값으로 양자화함으로써 메모리 사용량을 대폭 압축" }
     ]
   },
   {
     domain: "DB",
     topic: "하이브리드 검색 (Hybrid Search & RRF)",
     mnemonic: "어·의·결·리 (BM25 + Dense + RRF)",
-    definition: "검색 정확도 향상 위해 키워드·벡터를 결합한 검색 기법",
+    definition: "정확도·재현율 향상 위해 키워드와 벡터 결합한 검색",
     keywords: [
       "어휘 검색(Sparse: BM25/역색인) + 의미 검색(Dense: 벡터/ANN)",
       "점수 융합(Rank Fusion): RRF(순위 역수 합산) · 가중 선형 결합",
       "2단계 파이프라인: Hybrid Retrieval → Cross-Encoder Reranker"
     ],
-    diagram: `[사용자 질의] ──┬──▶ [Sparse 어휘 검색 (BM25 역색인: 고유명사·코드 강점)] ──┐
-                └──▶ [Dense 의미 검색 (HNSW 벡터: 동의어·문맥 강점)]   ──┴──▶ [RRF 순위 융합] ──▶ [Cross-Encoder 리랭커]`,
+    diagram: "db_hybrid.png",
     tableRows: [
-      { major: "상호 보완 원리", minor: "키워드(BM25) + 벡터(ANN)", desc: "• 어휘 검색(BM25): 고유명사·품번·에러코드 정확 일치에 강하나 동의어·문맥 파악 불가\n• 의미 검색(Vector): 문맥·의도 파악에 강하나 정확한 키워드 매칭에 취약\n➔ 두 검색을 병렬 수행하여 정밀도(Precision)와 재현율(Recall) 동시 달성" },
-      { major: "결과 융합 기법\n(Rank Fusion)", minor: "RRF (상호 순위 융합)", desc: "서로 스케일이 다른 BM25 점수와 코사인 유사도를 정규화 없이 오직 순위(Rank)의 역수 합산 공식 ∑ 1/(k + rank) (통상 k=60)으로 강건하게 통합" },
-      { major: "", minor: "가중 선형 결합 & 리랭커", desc: "• 가중합: Min-Max 정규화 후 α·Dense + (1-α)·BM25 결합\n• 리랭킹: 융합된 상위 후보군을 Cross-Encoder로 정밀 재순위화하여 RAG 환각 최소화" }
+      { major: "병렬 검색 결합\n(어·의 결합)", minor: "어휘 검색 (Sparse: BM25)", desc: "역색인 기반으로 고유명사·법령조항·모델번호·에러코드의 정확한 키워드 매칭에 강점 (동의어·문맥 파악은 한계)" },
+      { major: "", minor: "의미 검색 (Dense: Vector)", desc: "밀집 임베딩 벡터 기반으로 표현이 달라도 문맥과 의도가 유사한 문서를 찾아내어 재현율(Recall) 향상" },
+      { major: "점수 융합 및 정제\n(결·리)", minor: "RRF (상호 순위 융합)", desc: "스케일이 다른 두 검색 점수를 정규화 없이 오직 순위(Rank)의 역수 합산 공식 ∑ 1/(k + rank)로 강건하게 통합" },
+      { major: "", minor: "가중 선형 결합", desc: "Min-Max 또는 Z-Score 정규화 후 가중치 α를 곱해 α·Dense + (1-α)·BM25 점수를 합산" },
+      { major: "", minor: "Cross-Encoder 리랭커", desc: "1차 하이브리드 검색 상위 후보군(Top-K)을 질의와 문서 쌍으로 정밀 교차 인코딩해 최종 순위를 재정렬" }
     ]
   },
   {
     domain: "DB",
     topic: "공간 데이터베이스 (Spatial DB)",
     mnemonic: "위·집·거·면 (Contains·Intersects·Union)",
-    definition: "점·선·면 공간 객체의 위상·거리 연산을 처리하는 DB",
+    definition: "점·선·다각형 공간 객체 저장 및 위상·거리 연산 DB",
     keywords: [
       "공간 객체: Point(점) · LineString(선) · Polygon(다각형)",
       "공간 연산자: 위상(Contains·Intersects·Touches·Disjoint) · 집합(Union·Intersection) · 거리/면적"
     ],
-    diagram: `[공간 데이터 모델 (Point · Line · Polygon)] + [공간 색인 (R-Tree / Quad-Tree)] ➔ [공간 연산자 (위상 · 집합 · 거리 · 면적 질의)]`,
+    diagram: "db_spatial.png",
     tableRows: [
-      { major: "위상 연산자\n(Topological)", minor: "Contains · Intersects · Touches · Disjoint", desc: "• Contains(A,B): 객체 A가 B를 완전히 포함하는지 판별\n• Intersects(A,B): 두 객체가 서로 교차·중첩하는지 판별\n• Touches(A,B): 경계면에서만 접촉하는지 판별\n• Disjoint(A,B): 완전히 분리되어 있는지 판별" },
-      { major: "집합 연산자", minor: "Union · Intersection · Difference", desc: "• Union(A,B): 두 공간 객체를 하나로 합집합 결합\n• Intersection(A,B): 두 객체가 겹치는 교집합 영역만 추출\n• Difference(A,B): A에서 B와 겹치는 영역을 제외한 차집합 추출" },
-      { major: "거리·기하 연산", minor: "Distance · Area · Length", desc: "• Distance(A,B): 두 객체 간 최단 거리 계산 (반경 탐색)\n• Area(A) / Length(A): 다각형의 면적 및 선형 객체의 길이 계산" }
+      { major: "위상 연산자\n(Topological)", minor: "Contains (포함)", desc: "기하 객체 A가 기하 객체 B를 내부에 완전히 포함하는지 여부를 판별" },
+      { major: "", minor: "Intersects (교차)", desc: "두 공간 객체가 한 점이라도 겹치거나 교차하는 영역이 존재하는지 판별" },
+      { major: "", minor: "Touches (접촉)", desc: "두 공간 객체의 내부는 겹치지 않고 오직 경계선(Boundary)에서만 맞닿아 있는지 판별" },
+      { major: "", minor: "Disjoint (분리)", desc: "두 공간 객체가 접점이나 겹침 없이 공간적으로 완전히 떨어져 있는지 판별" },
+      { major: "집합 연산자", minor: "Union (합집합)", desc: "두 공간 객체의 영역을 하나로 합친 새로운 기하 객체를 반환" },
+      { major: "", minor: "Intersection (교집합)", desc: "두 공간 객체가 서로 공통으로 겹치는 교집합 영역만 추출하여 반환" },
+      { major: "", minor: "Difference (차집합)", desc: "객체 A 영역에서 객체 B와 겹치는 영역을 뺀 나머지 기하 객체를 반환" },
+      { major: "거리·기하 연산", minor: "Distance (최단 거리)", desc: "두 공간 객체 사이의 최단 거리를 계산 (반경 N km 이내 탐색 등에 활용)" },
+      { major: "", minor: "Area (면적 계산)", desc: "다각형(Polygon) 공간 객체가 차지하는 내부 영역의 넓이를 계산" },
+      { major: "", minor: "Length (길이 계산)", desc: "선형 객체(LineString)의 총 길이나 다각형 외곽선 둘레(Perimeter)를 계산" }
     ]
   },
   {
     domain: "DB",
     topic: "데이터 레이크와 레이크하우스",
     mnemonic: "브·실·골 (메달리온) / Delta·Iceberg·Hudi",
-    definition: "원천 데이터 저장소에 ACID 트랜잭션 결합한 아키텍처",
+    definition: "원천 데이터 저비용 저장과 ACID 결합한 아키텍처",
     keywords: [
       "데이터 레이크: Schema-on-Read · ELT · 오브젝트 스토리지(S3)",
       "레이크하우스: 레이크(저비용·유연성) + DW(ACID·Time Travel·거버넌스)",
       "메달리온 아키텍처: 브론즈(원천) → 실버(정제/SSOT) → 골드(비즈니스 집계)"
     ],
-    diagram: `[원천 데이터] ──▶ [Bronze (Raw 원시 보존)] ──▶ [Silver (결측·중복 정제, 표준화 SSOT)] ──▶ [Gold (비즈니스 KPI 집계)]
-(기반 오픈 테이블 포맷: Delta Lake · Apache Iceberg · Apache Hudi ➔ S3 위에서 ACID 트랜잭션 & 타임 트래블 지원)`,
+    diagram: `<img src="db_datalake1.png" alt="데이터 레이크 개념도"><img src="db_datalake2.png" alt="DW vs 데이터 레이크 비교">`,
     tableRows: [
-      { major: "DW vs 레이크", minor: "Schema-on-Write vs Read", desc: "• DW: 저장 시 스키마 강제(Schema-on-Write), ETL, 정형 데이터 중심, 고비용\n• 데이터 레이크: 조회 시 스키마 부여(Schema-on-Read), ELT, 정형·반정형·비정형 원본을 저비용 오브젝트 스토리지(Parquet/ORC)에 저장" },
-      { major: "레이크하우스", minor: "단일 플랫폼 통합 & 오픈포맷", desc: "저비용 오브젝트 스토리지 위에 오픈 테이블 포맷(Delta Lake, Apache Iceberg, Apache Hudi) 메타데이터 계층을 얹어 ACID 트랜잭션, 타임 트래블, 스키마 진화를 지원" },
-      { major: "메달리온 파이프라인\n(브·실·골)", minor: "Bronze → Silver → Gold", desc: "• 브론즈(Bronze): 원천 데이터를 변경 없이 그대로 보존\n• 실버(Silver): 품질 검증·중복 제거·표준화로 단일 진실 공급원(SSOT) 구축\n• 골드(Gold): BI·대시보드용 도메인별 요약 집계" }
+      { major: "아키텍처 비교", minor: "데이터 웨어하우스 (DW)", desc: "저장 시 스키마 강제(Schema-on-Write), ETL 전처리, 정형 데이터 중심의 BI 분석 특화 저장소" },
+      { major: "", minor: "데이터 레이크 (Data Lake)", desc: "조회 시 스키마 부여(Schema-on-Read), ELT, 정형·반정형·비정형 원본을 저비용 오브젝트 스토리지에 보존" },
+      { major: "", minor: "데이터 레이크하우스", desc: "오브젝트 스토리지 위에 오픈 테이블 포맷(Delta Lake, Iceberg, Hudi)을 얹어 ACID 트랜잭션과 타임 트래블을 지원" },
+      { major: "메달리온 아키텍처\n(브·실·골)", minor: "브론즈 (Bronze 계층)", desc: "외부 원천 시스템에서 수집된 Raw 데이터를 스키마 변형 없이 있는 그대로 보존하는 영역" },
+      { major: "", minor: "실버 (Silver 계층)", desc: "결측치·중복 제거, 데이터 품질 검증 및 표준화를 거쳐 전사 단일 진실 공급원(SSOT)을 구성하는 정제 영역" },
+      { major: "", minor: "골드 (Gold 계층)", desc: "부서별 BI 리포팅, KPI 대시보드, AI 피처 스토어 활용을 위해 비즈니스 목적에 맞게 집계·요약한 영역" }
     ]
   },
   {
     domain: "DB",
     topic: "데이터 늪 (Data Swamp)과 데이터 메시",
     mnemonic: "카·품·리·거 / 도·제·셀·거",
-    definition: "거버넌스 부재로 방치된 레이크 현상과 도메인 분산 체계",
+    definition: "거버넌스 부재로 방치된 레이크와 도메인 분산 관리 체계",
     keywords: [
       "데이터 늪(Data Swamp): 메타데이터·정제·계보·거버넌스 부재",
       "해결책(카품리거): 데이터 카탈로그 · 품질관리(DQM) · 리니지 · 거버넌스",
       "데이터 메시 4원칙(도제셀거): 도메인 소유권 · 제품으로서 데이터 · 셀프서비스 플랫폼 · 연합 거버넌스"
     ],
-    diagram: `[데이터 레이크 방치 (메타데이터·계보 부재)] ➔ [데이터 늪(Data Swamp) 전락!]
-➔ 해결: ① 카탈로그·리니지(데이터 패브릭) + ② 도메인별 품질 책임 분산화(데이터 메시: 도·제·셀·거)`,
+    diagram: `<img src="db_dataswamp.png" alt="데이터 늪 개념도"><img src="db_datamesh.png" alt="데이터 메시 아키텍처">`,
     tableRows: [
-      { major: "데이터 늪 원인·해결\n(카·품·리·거)", minor: "메타데이터 → 데이터 카탈로그", desc: "데이터 이름·소유자·설명 부재로 탐색 불가 → 자동 태그 및 메타데이터 검색 포털(Data Catalog) 구축 (기술·구조·관리 메타데이터: 기구관)" },
-      { major: "", minor: "정제·계보 → DQM & 리니지", desc: "• 정제 생략 → 수집 단계 데이터 품질관리(DQM) 파이프라인 자동화\n• 출처·변형 추적 불가 → 데이터 계보(Data Lineage) 시각화 도입" },
-      { major: "데이터 메시 4원칙\n(도·제·셀·거)", minor: "도메인 소유권 & 데이터 제품", desc: "• 도메인 소유권: 중앙 IT가 아닌 각 업무 도메인이 자기 데이터의 소유·품질을 책임\n• 제품으로서 데이터(Data as a Product): 타 도메인이 신뢰·활용할 수 있는 데이터 제품 제공" },
-      { major: "", minor: "셀프서비스 & 연합 거버넌스", desc: "• 셀프서비스 데이터 플랫폼: 도메인이 공통 인프라를 자율적으로 활용\n• 연합형 전산 거버넌스: 표준·보안·상호운용성 정책을 공통 합의로 자동 집행" }
+      { major: "데이터 늪 해결책\n(카·품·리·거)", minor: "데이터 카탈로그 (메타데이터)", desc: "기술·비즈니스·운영 메타데이터를 자동 수집·태깅하여 전사 데이터 검색 및 탐색 포털 구축" },
+      { major: "", minor: "데이터 품질관리 (DQM)", desc: "수집·정제 파이프라인에 스키마 검증, 이상치 탐지, 프로파일링 규칙을 자동화하여 쓰레기 데이터 유입 차단" },
+      { major: "", minor: "데이터 리니지 (계보 추적)", desc: "데이터의 원천 출처부터 변환·이동·집계 전 과정을 시각적으로 추적하여 신뢰성과 변경 영향도 확보" },
+      { major: "", minor: "데이터 거버넌스", desc: "데이터 스튜어드 지정, 접근권한 통제, 보존주기(TTL) 정책으로 방치 데이터를 체계적 관리" },
+      { major: "데이터 메시 4원칙\n(도·제·셀·거)", minor: "도메인 중심 소유권", desc: "중앙 IT 조직이 아닌 데이터를 가장 잘 아는 각 비즈니스 도메인 팀이 데이터의 소유와 품질을 직접 책임" },
+      { major: "", minor: "제품으로서의 데이터", desc: "타 도메인 소비자가 쉽게 발견·이해·신뢰·활용할 수 있도록 데이터를 완결된 제품(Data as a Product)으로 제공" },
+      { major: "", minor: "셀프서비스 데이터 플랫폼", desc: "도메인 팀이 인프라 구축 부담 없이 자율적으로 데이터 파이프라인을 생성·운영할 수 있는 공통 플랫폼 제공" },
+      { major: "", minor: "연합형 전산 거버넌스", desc: "도메인 자율성을 존중하되 전사 표준·보안·상호운용성 정책은 연합 거버넌스 합의를 통해 자동 집행" }
     ]
   },
   {
     domain: "DB",
     topic: "데이터 거버넌스 (Data Governance)",
     mnemonic: "원·조·프 / 표·구·흐·품·베·보",
-    definition: "전사 데이터의 원칙·조직·프로세스를 통합 관리하는 체계",
+    definition: "전사 데이터 가치 창출 위해 원칙·조직·절차 관리 체계",
     keywords: [
       "구성 3요소(원조프): 원칙(Principle) · 조직(Organization) · 프로세스(Process)",
       "관리 영역(표구흐품베보): 표준 · 구조 · 흐름 · 품질 · 데이터베이스 · 보안",
@@ -1800,26 +1879,40 @@ const topics = [
     ],
     diagram: "db_governance.png",
     tableRows: [
-      { major: "핵심 3요소\n(원·조·프)", minor: "원칙 · 조직 · 프로세스", desc: "• 원칙: 데이터를 유지·관리하기 위한 지침 (보안, 품질기준, 변경관리)\n• 조직: 데이터를 운영·관리하는 역할과 책임 (CDO, 데이터 스튜어드, DA, DBA)\n• 프로세스: 데이터 관리 활동 및 작업 절차·모니터링 체계" },
-      { major: "관리 6대 영역\n(표·구·흐·품·베·보)", minor: "표준 · 구조 · 흐름 · 품질 · DB · 보안", desc: "전사 데이터 표준(용어·도메인), 데이터 구조(모델·아키텍처), 데이터 흐름(리니지·연계), 데이터 품질(DQM), 데이터베이스 운영, 데이터 보안 및 컴플라이언스 통제" }
+      { major: "핵심 3요소\n(원·조·프)", minor: "원칙 (Principle)", desc: "전사 데이터를 유지·관리하기 위한 지침과 규정 (보안 지침, 품질 기준, 변경관리 정책)" },
+      { major: "", minor: "조직 (Organization)", desc: "데이터를 운영·관리하는 역할과 책임 체계 (CDO, 데이터 거버넌스 위원회, 데이터 스튜어드, DA, DBA)" },
+      { major: "", minor: "프로세스 (Process)", desc: "데이터 표준화, 품질 진단·개선, 메타데이터 현행화 등 관리 활동의 작업 절차 및 모니터링 체계" },
+      { major: "관리 6대 영역\n(표·구·흐·품·베·보)", minor: "데이터 표준 관리", desc: "전사 공통 표준단어, 표준용어, 표준도메인, 표준코드 정의 및 준수 통제" },
+      { major: "", minor: "데이터 구조 관리", desc: "전사 데이터 아키텍처(EA/DA), 주제영역, 개념·논리·물리 데이터 모델의 일관성 관리" },
+      { major: "", minor: "데이터 흐름 관리", desc: "시스템 간 데이터 연계(EAI/CDC/ETL) 및 데이터 계보(Lineage) 추적 관리" },
+      { major: "", minor: "데이터 품질 관리", desc: "데이터 값과 구조의 정합성 프로파일링, 업무규칙(BR) 검증, 오류 데이터 개선 활동" },
+      { major: "", minor: "데이터베이스 관리", desc: "물리 DB 생성·운영, 공간 관리, 백업·회복 및 성능 튜닝" },
+      { major: "", minor: "데이터 보안 관리", desc: "접근 권한 통제, 개인정보 암호화·비식별화, 감사 로그 및 법규 컴플라이언스 준수" }
     ]
   },
   {
     domain: "DB",
     topic: "데이터 품질관리 (DQM)와 데이터 표준화",
     mnemonic: "데·구·프 / 용·단·도·코 / 명·정·형·규",
-    definition: "데이터 정합성 확보 위해 값·구조·절차를 관리하는 체계",
+    definition: "데이터 정합성 위해 값·구조·프로세스 진단·개선 체계",
     keywords: [
       "DQM 관리 대상(데구프): 데이터 값 · 데이터 구조 · 데이터 관리 프로세스",
       "데이터 표준화 요소(용단도코): 표준용어 · 표준단어 · 표준도메인 · 표준코드",
       "표준화 원칙(명정형규): 명칭 · 정의 · 형식 · 규칙"
     ],
-    diagram: `• DQM 3대 관리 대상 (데·구·프): [데이터 값(정확성·완전성)] + [데이터 구조(개·논·물 모델)] + [관리 프로세스(표준·품질·보안)]
-• 데이터 표준화 체계 (용·단·도·코): [표준단어] 조합 ➔ [표준용어] + [표준도메인(타입·길이)] + [표준코드]`,
+    diagram: `<img src="db_dqm.png" alt="데이터 품질관리 프레임워크"><img src="db_standard.png" alt="데이터 표준화 구성요소"><img src="db_mdm.png" alt="MDM 구성도">`,
     tableRows: [
-      { major: "DQM 관리 대상\n(데·구·프)", minor: "값 · 구조 · 관리 프로세스", desc: "• 데이터 값(데): 누락·오류·중복·불일치 등 저장 값의 품질 관리 (DQC-V)\n• 데이터 구조(구): 모델·속성·관계·제약조건의 적정성 관리\n• 관리 프로세스(프): 생성·변경·운영 과정과 책임·절차 관리 (DQC-M)" },
-      { major: "데이터 표준화\n(용·단·도·코)", minor: "용어 · 단어 · 도메인 · 코드", desc: "• 표준용어(용): 업무 데이터 항목의 공통 이름과 의미\n• 표준단어(단): 용어를 조합하는 기본 단위와 영문명·약어\n• 표준도메인(도): 같은 특성 값의 자료형·길이·허용 범위\n• 표준코드(코): 분류 값과 의미를 공통 체계로 정의" },
-      { major: "표준화 4요소\n(명·정·형·규)", minor: "명칭 · 정의 · 형식 · 규칙", desc: "데이터 항목의 이름(명칭)을 맞추고, 의미(정의)를 명확히 하며, 표현 타입·길이(형식)와 허용 조건(규칙)을 전사적으로 통일" }
+      { major: "DQM 관리 대상\n(데·구·프)", minor: "데이터 값 (Value)", desc: "결측·오류·중복·불일치 등 실제 저장된 데이터 내용의 정확성·완전성·유효성 관리" },
+      { major: "", minor: "데이터 구조 (Structure)", desc: "데이터 모델, 엔터티·속성·식별자·관계 및 무결성 제약조건 설계의 적정성 관리" },
+      { major: "", minor: "관리 프로세스 (Process)", desc: "데이터 생성·변경·유통·폐기 전 과정의 표준 준수와 책임·절차 관리" },
+      { major: "데이터 표준화\n(용·단·도·코)", minor: "표준 용어 (Term)", desc: "업무에서 사용하는 데이터 항목(컬럼/속성)의 전사 공통 한글명·영문명과 업무적 정의" },
+      { major: "", minor: "표준 단어 (Word)", desc: "표준 용어를 조합하기 위한 최소 의미 단위의 단어 사전과 영문 정식명·약어 정의" },
+      { major: "", minor: "표준 도메인 (Domain)", desc: "성격이 유사한 데이터 항목들을 그룹화하여 데이터 타입, 길이, 소수점, 허용 범위를 일괄 지정" },
+      { major: "", minor: "표준 코드 (Code)", desc: "여러 시스템에서 공통 참조하는 분류 코드값과 코드 의미를 단일 체계로 통합 정의" },
+      { major: "표준화 4원칙\n(명·정·형·규)", minor: "명칭 (Name)", desc: "동일한 데이터는 전사적으로 동일한 한글·영문 명칭을 사용하도록 통일 (동의어·동음이의어 배제)" },
+      { major: "", minor: "정의 (Definition)", desc: "누구나 동일하게 이해할 수 있도록 데이터 항목의 업무적 의미와 범위를 명확히 기술" },
+      { major: "", minor: "형식 (Format)", desc: "데이터 타입, 길이, 소수점 자리수, 표현 포맷을 표준 도메인 기준으로 일관되게 지정" },
+      { major: "", minor: "규칙 (Rule)", desc: "허용 가능한 값의 범위, 필수 입력 여부(NOT NULL), 기본값, 참조 코드 규칙을 통일" }
     ]
   },
   {
@@ -1832,30 +1925,34 @@ const topics = [
       "데이터 내용 인증(1년): 정형·비정형 / Simple·Normal·Complex / Class A·B·C",
       "데이터 관리체계 인증(3년): ISO/IEC 33020 기반 / 성숙도 Lv2 ~ Lv5"
     ],
-    diagram: `[데이터산업법 제20조 DQ 인증] ──┬──▶ [1. 데이터 내용 인증 (유효 1년): ISO 25024·5259-2 기반 ➔ Class A · B · C]
-                                └──▶ [2. 데이터 관리체계 인증 (유효 3년): ISO 33020 기반 ➔ 성숙도 Level 2 ~ 5]`,
+    diagram: "db_dq_cert.png",
     tableRows: [
-      { major: "제도 개요", minor: "데이터산업법 제20조", desc: "데이터 내용의 오류 여부 및 품질 관리체계를 심사하여 품질 수준을 국가가 공인·보증함으로써 데이터 유통 및 거래 신뢰성을 확보하는 제도" },
-      { major: "데이터 내용 인증", minor: "정형·비정형 / Class A·B·C", desc: "• 유효기간: 1년 (ISO/IEC 25024, 5259-2 기반)\n• 대상 및 유형: 정형·비정형 데이터 (Simple, Normal, Complex 유형)\n• 인증 등급: 정합률 기준 Class A, Class B, Class C 부여" },
-      { major: "데이터 관리체계 인증", minor: "ISO 33020 / Level 2~5", desc: "• 유효기간: 3년 (데이터 프로젝트 관리, 데이터 측정 영역, 프로세스 개선 심사)\n• 성숙도 등급: Lv2(실무적 관리), Lv3(프로젝트 수행), Lv4(정량적 관리), Lv5(지속적 개선)" }
+      { major: "데이터 내용 인증", minor: "인증 대상 및 유형", desc: "정형 데이터 및 비정형(텍스트·이미지 등) 데이터 대상 (구조 복잡도에 따라 Simple, Normal, Complex 분류)" },
+      { major: "", minor: "심사 기준 및 유효기간", desc: "ISO/IEC 25024 및 AI 데이터 품질 표준(ISO/IEC 5259-2) 기반 정합성 심사, 유효기간 1년" },
+      { major: "", minor: "인증 등급 (Class A·B·C)", desc: "데이터 정합률 측정 결과에 따라 Class A(최우수), Class B(우수), Class C(보통) 등급 부여" },
+      { major: "데이터 관리체계 인증", minor: "심사 기준 및 유효기간", desc: "ISO/IEC 33020 기반 데이터 프로젝트 관리·측정·프로세스 개선 심사, 유효기간 3년" },
+      { major: "", minor: "성숙도 등급 (Level 2~5)", desc: "Level 2(실무적 관리) → Level 3(표준 프로세스 수행) → Level 4(정량적 관리) → Level 5(지속적 최적화)" }
     ]
   },
   {
     domain: "DB",
     topic: "데이터 가치평가 (Data Valuation)",
     mnemonic: "시·수·원 (시장·수익·원가) / 품·권·시·경",
-    definition: "데이터 자산화 위해 시장·수익·원가로 가치 매기는 기법",
+    definition: "데이터 자산화 위해 시장·수익·원가로 가치를 산정 기법",
     keywords: [
       "데이터산업법 제14조 근거 무형자산 가치 산정",
       "3대 평가 방법론(시수원): 시장접근법 · 수익접근법 · 원가접근법",
       "4대 평가 요인(품권시경): 데이터 특성(품질) · 법적특성(권리) · 시장환경 · 사업성(경제)"
     ],
-    diagram: `[4대 평가 요인: 품질 · 권리 · 시장 · 경제성] ──▶ [3대 평가 방법론 (시·수·원): 시장접근법(거래사례) / 수익접근법(미래현금흐름) / 원가접근법(재생산원가)]`,
+    diagram: "db_valuation.png",
     tableRows: [
-      { major: "4대 평가 요인\n(품·권·시·경)", minor: "품질 · 권리 · 시장 · 경제성", desc: "① 데이터 특성(정확성·완전성·유용성·갱신주기) ② 법적 특성(소유권·라이선스·개인정보) ③ 시장 환경(수요 규모·희소성) ④ 사업성 역량(창출 경제 가치)" },
-      { major: "3대 평가 기법\n(시·수·원)", minor: "시장접근법 (Market)", desc: "유사한 데이터의 실제 시장 거래사례가 존재할 때 비교하여 가치를 산정" },
-      { major: "", minor: "수익접근법 (Income)", desc: "해당 데이터를 활용해 미래에 창출할 것으로 기대되는 수익(현금흐름)을 현재가치로 할인하여 산정" },
-      { major: "", minor: "원가접근법 (Cost)", desc: "거래사례나 미래 수익 추정이 어려울 때, 동일·유사 데이터를 재생산하거나 대체하는 데 투입된 원가를 기준으로 산정" }
+      { major: "4대 평가 요인\n(품·권·시·경)", minor: "데이터 특성 (품질)", desc: "데이터의 정확성, 완전성, 최신성(갱신주기), 규모 및 결합 활용 유용성 평가" },
+      { major: "", minor: "법적 특성 (권리)", desc: "데이터 소유권, 지식재산권, 라이선스 범위, 개인정보 적법성 등 권리 안정성 평가" },
+      { major: "", minor: "시장 환경", desc: "데이터가 속한 산업 분야의 시장 규모, 거래 활성화 수준, 데이터의 희소성 및 대체 가능성 평가" },
+      { major: "", minor: "사업성 역량 (경제성)", desc: "데이터를 활용한 비즈니스 모델의 매출 기여도, 원가 절감 효과, 경제적 수명 평가" },
+      { major: "3대 평가 기법\n(시·수·원)", minor: "시장접근법 (Market)", desc: "유사한 데이터의 실제 시장 거래사례가 존재할 때 비교 지표를 보정하여 가치를 산정" },
+      { major: "", minor: "수익접근법 (Income)", desc: "해당 데이터를 활용해 미래에 창출할 것으로 기대되는 현금흐름(수익)을 현재가치로 할인하여 산정" },
+      { major: "", minor: "원가접근법 (Cost)", desc: "거래사례나 미래 수익 추정이 어려울 때, 동일 데이터를 재생산·대체하는 데 투입된 원가를 기준으로 산정" }
     ]
   },
   {
@@ -1868,89 +1965,103 @@ const topics = [
       "핵심 기술: IDS-RAM · IDS Connector · Broker · DID/VC · DAPS",
       "데이터 주권 & 소버린 AI (데이터 레지던시 · PET · 차분프라이버시)"
     ],
-    diagram: `[데이터 제공자 (Connector)] ──(사용정책·주권 통제 / DAPS 인증)──▶ [중개자(Broker: 메타데이터 카탈로그)] ──▶ [데이터 소비자 (Connector)]
-(원본 데이터는 중앙에 모으지 않고 각자의 공간에 둔 채 안전한 연동으로 공유: GAIA-X · Catena-X · K-Data Space)`,
+    diagram: "db_dataspace.png",
     tableRows: [
-      { major: "데이터 스페이스\n(주·분·연)", minor: "주권 · 분산 · 연합 거버넌스", desc: "• 데이터 주권 보장: 제공자가 접근권한·사용목적·유효기간을 직접 제어\n• 분산형 아키텍처: 데이터를 중앙에 복제하지 않고 각자 공간에서 커넥터로 연동\n• 연합 거버넌스: 참여자 간 공통 신뢰·계약 체계 구축" },
-      { major: "핵심 기술 요소", minor: "IDS-RAM · 커넥터 · DID/VC", desc: "• IDS Connector: 데이터 변환·보안 전송 및 사용정책 강제 실행\n• Broker(중개자): 메타데이터 카탈로그 제공\n• DID / VC & DAPS: 탈중앙 신원증명 및 동적 보안 토큰 인증\n• IDS-RAM: 5계층(비즈니스·기능·프로세스·정보·시스템) 참조 아키텍처" },
-      { major: "데이터 주권 &\n소버린 AI", minor: "국경 내 통제 & 자립형 AI", desc: "데이터가 생성된 국가의 법규에 따라 통제·보호(데이터 레지던시, PET, 차분프라이버시)되며, 자국 데이터·인프라로 독립 운영하는 소버린 AI의 핵심 기반" }
+      { major: "데이터 스페이스\n3대 특징 (주·분·연)", minor: "데이터 주권 보장", desc: "데이터 제공자가 자기 데이터의 접근권한, 사용목적, 유효기간, 재배포 금지 정책을 직접 통제" },
+      { major: "", minor: "분산형 아키텍처", desc: "원본 데이터를 중앙 저장소에 복제·집중시키지 않고 각 참여자의 공간에 둔 채 P2P 커넥터로 안전 연동" },
+      { major: "", minor: "연합 거버넌스", desc: "참여 기업·기관 간 공통 데이터 표준, 신원 인증, 스마트 계약 기반 신뢰 생태계(GAIA-X, Catena-X) 구축" },
+      { major: "핵심 기술 요소", minor: "IDS Connector (커넥터)", desc: "참여자 경계에서 데이터를 송수신하고 데이터 사용 정책(Usage Control)을 강제 실행하는 게이트웨이" },
+      { major: "", minor: "Metadata Broker (중개자)", desc: "원본 데이터는 보관하지 않고 참여자들이 등록한 데이터 카탈로그 검색 및 매칭만 중개" },
+      { major: "", minor: "DAPS & DID / VC", desc: "탈중앙 신원증명(DID/VC)과 동적 속성 프로비저닝(DAPS)을 통해 참여자 및 커넥터의 신뢰성 인증" },
+      { major: "", minor: "IDS-RAM 참조 아키텍처", desc: "비즈니스 · 기능 · 프로세스 · 정보 · 시스템 5계층과 보안·거버넌스 3관점으로 구성된 국제 표준 모델" }
     ]
   },
   {
     domain: "DB",
     topic: "개인정보 안심구역과 데이터 안심구역",
     mnemonic: "개·보·위(가명정보) vs 과·기·부(미개방데이터)",
-    definition: "민감·미개방 데이터를 안전한 보안 환경서 분석하는 제도",
+    definition: "민감·미개방 데이터를 안전 보안 환경에서 분석하는 제도",
     keywords: [
       "개인정보 안심구역: 개인정보보호위원회 지정 · 가명/민감정보 · 폐쇄망",
       "데이터 안심구역: 과기정통부 지정(데이터산업법) · 미개방 공공/민간 데이터"
     ],
-    diagram: `• 개인정보 안심구역 (개인정보보호위원회) : [가명정보·민감 개인정보 결합·실증] + [폐쇄망·망분리·PET 보안환경]
-• 데이터 안심구역 (과학기술정보통신부)   : [미개방 공공·민간 핵심 데이터 분석] + [고성능 AI 분석 인프라 제공]`,
+    diagram: `<img src="db_safezone1.png" alt="데이터 안심구역 개념도"><img src="db_safezone2.png" alt="데이터 안심구역 기능 구성도">`,
     tableRows: [
-      { major: "개인정보 안심구역", minor: "개인정보보호위원회 운영", desc: "• 목적: 유연한 개인정보·가명정보 활용 및 안전한 실증 환경 지원\n• 대상 데이터: 가명정보, 민감정보 등 개인정보 (PET 기술 적용)\n• 보안 환경: 폐쇄망 기반, 물리적·논리적 망분리, 다중 인증, 반출 엄격 통제" },
-      { major: "데이터 안심구역", minor: "과학기술정보통신부 운영", desc: "• 목적: 외부에 공개하기 어려운 미개방 공공·민간 데이터를 안전하게 분석·활용하여 데이터 산업 및 AI 서비스 개발 지원\n• 보안 환경: 클라우드 포함 안전한 보안 통제 공간 및 고성능 분석 인프라 제공" }
+      { major: "개인정보 안심구역", minor: "운영 근거 및 기관", desc: "개인정보보호위원회가 지정·운영하며 가명정보 처리·결합 및 유연한 개인정보 실증 환경을 지원" },
+      { major: "", minor: "대상 데이터 및 보안", desc: "가명정보·민감 개인정보를 대상으로 물리적·논리적 망분리(폐쇄망), 다중 인증, PET 기술 및 반출 심사 적용" },
+      { major: "데이터 안심구역", minor: "운영 근거 및 기관", desc: "데이터산업법( 및 데이터기본법)에 의거 과학기술정보통신부 등이 지정하는 미개방 데이터 안전 분석 공간" },
+      { major: "", minor: "핵심 제공 기능", desc: "미개방 데이터 안전 분석환경 제공, AI 분석도구·GPU 자원 지원, 이용자 반입자료와의 연계 및 분석결과 반출 지원" },
+      { major: "", minor: "기술적 지정요건", desc: "보안대책이 구비된 물리적 시설·공간 확보, 데이터 분석 시스템 구축 및 정보보호 대책 수립·시행" },
+      { major: "", minor: "운영적 지정요건", desc: "운영책임자·보안책임자 선임을 포함한 4인 이상 전담 조직 구성 및 운영계획·데이터 반출입 통제 정책 수립" }
     ]
   },
   {
     domain: "DB",
     topic: "합성데이터 (Synthetic Data)",
     mnemonic: "통·딥·물 / 충·다·보 (충실도·다양성·보안성)",
-    definition: "개인정보 보호 위해 알고리즘이 인공 생성한 모사 데이터",
+    definition: "개인정보 보호와 불균형 해소 위해 알고리즘 생성 데이터",
     keywords: [
       "생성 기법(통딥물): 통계/규칙(SMOTE) · 딥러닝(GAN/VAE/Diffusion) · 물리 시뮬레이션(디지털트윈)",
       "품질 평가 3기준(충다보): 충실도(Fidelity) · 다양성(Diversity) · 보안성(Privacy)",
       "한계점: 모델 붕괴(Model Collapse) · 원천 편향 증폭"
     ],
-    diagram: `[생성 3기법: ①통계(SMOTE) · ②딥러닝(CTGAN·Diffusion) · ③물리엔진(디지털트윈)] ──▶ [품질검증(충·다·보): 충실도 · 다양성 · 보안성(차분프라이버시)]`,
+    diagram: `<img src="db_synthetic1.png" alt="합성데이터 개념도"><img src="db_synthetic2.png" alt="합성데이터 생성 메커니즘">`,
     tableRows: [
-      { major: "생성 메커니즘\n(통·딥·물)", minor: "통계 · 딥러닝 · 시뮬레이션", desc: "• 통계/규칙 기반: 몬테카를로, SMOTE(소수 클래스 KNN 보간 오버샘플링)\n• 딥러닝 생성형: GAN(CTGAN), VAE, Diffusion 모델\n• 물리 시뮬레이션: 3D 디지털 트윈·게임엔진으로 자율주행 악천후 등 엣지 케이스 생성" },
-      { major: "품질 평가 3기준\n(충·다·보)", minor: "충실도 · 다양성 · 보안성", desc: "• 충실도(Fidelity): 원천 데이터의 통계적 분포·특성 일치도 (KS-검정, FID)\n• 다양성(Diversity): 모드 붕괴 없이 전체 분포 공간을 포괄하는지 검증\n• 보안성(Privacy): 원본 개인 식별 정보 재식별·역추적 방지 (차분 프라이버시 결합)" },
-      { major: "한계 및 과제", minor: "모델 붕괴 & 편향 증폭", desc: "• 모델 붕괴(Model Collapse): 합성데이터로만 반복 재학습 시 독창성 소멸 및 성능 저하\n• 원천 데이터의 편향(Bias)이 생성 과정에서 증폭될 위험 관리 필요" }
+      { major: "생성 메커니즘\n(통·딥·물)", minor: "통계 · 규칙 기반", desc: "몬테카를로 시뮬레이션, 베이지안 네트워크, SMOTE(소수 클래스 KNN 보간 오버샘플링) 등 분포 기반 생성" },
+      { major: "", minor: "딥러닝 생성형 모델", desc: "GAN(CTGAN), VAE, Diffusion 모델, LLM 등을 활용해 고차원 정형·비정형 데이터의 잠재 분포 학습 후 생성" },
+      { major: "", minor: "물리 시뮬레이션 기반", desc: "3D 게임엔진·디지털 트윈 가상환경에서 자율주행 악천후·사고나 제조 결함 등 희귀 엣지 케이스 생성" },
+      { major: "품질 평가 3기준\n(충·다·보)", minor: "충실도 (Fidelity)", desc: "원천 데이터의 통계적 분포·상관관계·속성 특성을 얼마나 사실적으로 모사했는지 평가 (KS-검정, FID)" },
+      { major: "", minor: "다양성 (Diversity)", desc: "특정 패턴에만 치우치는 모드 붕괴(Mode Collapse) 없이 원천 데이터 분포 공간 전체를 고르게 포괄하는지 검증" },
+      { major: "", minor: "보안성 (Privacy)", desc: "원본 데이터 복제 여부(DCR)와 멤버십 추론 공격 방어력을 검증하고 차분 프라이버시(DP)로 재식별 차단" },
+      { major: "한계 및 과제", minor: "모델 붕괴 (Model Collapse)", desc: "합성데이터로만 반복 재학습할 경우 희귀 분포 꼬리가 소실되고 생성 품질이 점진적으로 퇴화하는 현상" },
+      { major: "", minor: "원천 편향 (Bias) 증폭", desc: "원본 학습 데이터에 내재된 통계적 편향이 합성 생성 과정에서 오히려 확대 재생산될 위험" }
     ]
   },
   {
     domain: "DB",
     topic: "데이터 마이닝 (정형·비정형 · 텍스트 · 오피니언)",
     mnemonic: "수·저·처·분·시 / 비·데·준·모·평·전 / 표·분·수·모·평",
-    definition: "대규모 데이터서 숨겨진 패턴과 유의미한 지식 도출 기법",
+    definition: "대규모 데이터에서 숨겨진 패턴과 유용한 지식 도출 기법",
     keywords: [
       "절차: 수·저·처·분·시 / KDD(선택→전처리→변환→마이닝→평가)",
       "방법론: CRISP-DM(비데준모평전) · SEMMA(표분수모평)",
       "텍스트 마이닝(토픽·지식 추출, TF-IDF·LDA) vs 오피니언 마이닝(주관적 감성·호불호, ABSA)"
     ],
-    diagram: `• 정형 마이닝 (RDBMS): 분류 · 군집 · 연관 · 회귀 (피처 엔지니어링 기반)
-• 비정형 마이닝 (NoSQL/Vector): [텍스트 마이닝 (형태소→TF-IDF/임베딩→LDA 토픽·NER)] & [오피니언 마이닝 (감성사전·ABSA 긍/부정 평판)]`,
+    diagram: "db_mining.png",
     tableRows: [
-      { major: "표준 방법론", minor: "CRISP-DM & SEMMA", desc: "• CRISP-DM (비데준모평전): 비즈니스 이해 → 데이터 이해 → 데이터 준비 → 모델링 → 평가 → 전개\n• SEMMA (표분수모평): Sample(표본) → Explore(탐색) → Modify(수정) → Model(모델링) → Assess(평가)" },
-      { major: "정형 vs 비정형", minor: "스키마 기반 vs 임베딩 기반", desc: "• 정형 데이터 마이닝: 정형 테이블 대상 분류(의사결정나무·SVM), 군집(K-Means), 연관(Apriori), 회귀 수행 (과적합 방지로 L1/L2 규제)\n• 비정형 데이터 마이닝: 텍스트·SNS·멀티미디어를 토큰화·임베딩 변환 후 패턴 추출" },
-      { major: "특화 기법 비교", minor: "텍스트 vs 오피니언 마이닝", desc: "• 텍스트 마이닝: 자연어 처리(NLP), TF-IDF, LDA(토픽 모델링), 개체명 인식(NER)으로 문서의 객관적 주제·지식 도출\n• 오피니언 마이닝: 리뷰·VoC 내 주관적 의견·감성(긍정/부정/중립)을 감성사전 및 속성 기반(ABSA)으로 정량화" }
+      { major: "표준 방법론", minor: "KDD 프로세스", desc: "데이터 선택(Selection) → 전처리(Preprocessing) → 변환(Transformation) → 데이터 마이닝 → 해석/평가" },
+      { major: "", minor: "CRISP-DM (비·데·준·모·평·전)", desc: "비즈니스 이해 → 데이터 이해 → 데이터 준비 → 모델링 → 평가 → 전개 (6단계 순환형 표준 방법론)" },
+      { major: "", minor: "SEMMA (표·분·수·모·평)", desc: "Sample(표본추출) → Explore(탐색) → Modify(변형) → Model(모델링) → Assess(검증/평가) (SAS 주도 통계 중심)" },
+      { major: "데이터 유형별", minor: "정형 데이터 마이닝", desc: "RDBMS/DW 정형 테이블을 대상으로 분류(의사결정나무·SVM), 군집(K-Means), 연관(Apriori), 회귀 분석 수행" },
+      { major: "", minor: "비정형 데이터 마이닝", desc: "텍스트·웹·SNS·멀티미디어를 토큰화·임베딩 변환하여 숨겨진 문맥 패턴과 관계를 추출" },
+      { major: "특화 기법 비교", minor: "텍스트 마이닝 (Text)", desc: "형태소 분석, TF-IDF, LDA 토픽 모델링, 개체명 인식(NER)을 통해 비정형 문서에서 객관적 주제와 사실 지식 추출" },
+      { major: "", minor: "오피니언 마이닝 (Opinion)", desc: "리뷰·SNS·VoC 텍스트에서 감성사전 및 속성 기반 감성분석(ABSA)으로 주관적 호불호(긍정·부정·중립) 평판 정량화" }
     ]
   },
   {
     domain: "DB",
     topic: "연관규칙 분석 (Association Analysis)",
     mnemonic: "지·신·향 (P(A∩B) · P(B|A) · Lift)",
-    definition: "항목 간 동시 구매 연관성을 지·신·향으로 찾는 기법",
+    definition: "항목 간 동시 발생 관계를 지·신·향으로 분석하는 기법",
     keywords: [
       "장바구니 분석 (Market Basket Analysis)",
       "지지도(Support) · 신뢰도(Confidence) · 향상도(Lift)",
       "Apriori (후보군 가지치기) · FP-Growth (FP-Tree 기반)"
     ],
-    diagram: `• 지지도(Support) = P(A∩B) [동시 구매 비율]  |  신뢰도(Confidence) = P(A∩B) / P(A) [A 구매 시 B 조건부 확률]
-• 향상도(Lift) = P(B|A) / P(B) = P(A∩B) / (P(A)×P(B)) ➔ [Lift > 1: 양의 상관(유효 규칙) / Lift = 1: 독립 / Lift < 1: 음의 상관]`,
+    diagram: "db_assoc.png",
     tableRows: [
       { major: "3대 평가 지표\n(지·신·향)", minor: "지지도 (Support)", desc: "전체 거래 중에서 항목 A와 항목 B가 동시에 포함된 거래의 비율: P(A ∩ B)" },
       { major: "", minor: "신뢰도 (Confidence)", desc: "항목 A를 포함한 거래 중에서 항목 B도 함께 포함될 조건부 확률: P(A ∩ B) / P(A) = P(B | A)" },
-      { major: "", minor: "향상도 (Lift)", desc: "A와 B가 독립일 때 대비 두 항목이 함께 나타나는 비율: P(A ∩ B) / (P(A) × P(B))\n• Lift > 1(양의 연관), Lift = 1(독립), Lift < 1(음의 연관)" },
-      { major: "대표 알고리즘", minor: "Apriori & FP-Growth", desc: "• Apriori: 최소 지지도(Min Support) 기반 빈발 항목집합 선별(가지치기), 반복 DB 스캔 부담\n• FP-Growth: DB를 단 2회만 스캔하여 FP-Tree를 구성한 뒤 후보 생성 없이 고속 마이닝" }
+      { major: "", minor: "향상도 (Lift)", desc: "A와 B가 독립일 때 대비 두 항목이 함께 나타나는 비율: P(A ∩ B) / (P(A) × P(B)) (Lift > 1: 양의 상관)" },
+      { major: "대표 알고리즘", minor: "Apriori 알고리즘", desc: "최소 지지도(Min Support)를 만족하는 빈발 항목집합만 확장(가지치기)하나, 후보군 생성 및 반복 DB 스캔 부담 발생" },
+      { major: "", minor: "FP-Growth 알고리즘", desc: "DB를 단 2회만 스캔하여 빈발 패턴 트리(FP-Tree)에 압축 저장한 뒤 후보 항목집합 생성 없이 고속 마이닝" }
     ]
   },
   {
     domain: "DB",
     topic: "군집분석 (Cluster Analysis)",
     mnemonic: "분·계·밀 (분할중심 · 계층적 · 밀도기반)",
-    definition: "비지도학습으로 데이터 간 유사성 측정해 그룹화하는 기법",
+    definition: "레이블 없는 데이터 유사성을 측정해 그룹으로 묶는 기법",
     keywords: [
       "비지도학습 (내적 유사도 극대화 · 외적 유사도 극소화)",
       "분할중심(K-Means · K-Medoids)",
@@ -1958,9 +2069,12 @@ const topics = [
     ],
     diagram: "db_clustering.png",
     tableRows: [
-      { major: "분할 중심 군집\n(분)", minor: "K-Means & K-Medoids", desc: "• K-Means: 사전 지정한 K개 군집의 평균(Centroid) 중심점을 반복 갱신 (구형 군집에 적합, 이상치에 민감)\n• K-Medoids (PAM, CLARA): 평균 대신 실제 객체(Medoid)를 중심으로 삼아 이상치(Outlier)에 강건" },
-      { major: "계층적 군집\n(계)", minor: "순차적 병합 & 분할", desc: "군집 개수 K를 미리 정하지 않고 덴드로그램(Dendrogram) 트리를 형성하며 클래스 간 순차 병합(Agglomerative) 또는 순차 분할(Divisive) 수행" },
-      { major: "밀도 기반 군집\n(밀)", minor: "DBSCAN & DENCLUE", desc: "• DBSCAN: 반경(Epsilon) 내 최소 점 개수(MinPts) 기준으로 고밀도 영역을 연결 (기하학적 비구형 군집 발굴 및 노이즈 분리 강점)\n• DENCLUE: 커널 밀도 추정(KDE) 함수의 극댓값 기반 군집화" }
+      { major: "분할 중심 군집\n(분)", minor: "K-Means 군집화", desc: "사전 지정한 K개 군집의 평균(Centroid) 중심점을 반복 갱신 (속도가 빠르고 구형 군집에 적합하나 이상치에 민감)" },
+      { major: "", minor: "K-Medoids (PAM · CLARA)", desc: "평균값 대신 군집 내 실제 존재하는 대표 객체(Medoid)를 중심으로 삼아 이상치(Outlier)와 노이즈에 강건" },
+      { major: "계층적 군집\n(계)", minor: "응집형 (Agglomerative)", desc: "각 데이터를 개별 군집으로 시작해 가장 가까운 군집끼리 순차 병합하며 덴드로그램(Dendrogram) 형성 (Bottom-Up)" },
+      { major: "", minor: "분할형 (Divisive)", desc: "전체 데이터를 하나의 큰 군집으로 시작해 유사도가 낮은 하위 군집으로 순차 분할 (Top-Down)" },
+      { major: "밀도 기반 군집\n(밀)", minor: "DBSCAN", desc: "반경(Epsilon) 내 최소 점 개수(MinPts) 기준으로 고밀도 영역을 연결 (비구형 기하학적 군집 발굴 및 노이즈 분리 강점)" },
+      { major: "", minor: "DENCLUE", desc: "데이터 공간 전체에 커널 밀도 추정(KDE) 확률 밀도 함수를 적용해 국소 극댓값(Attractor) 기반으로 군집화" }
     ]
   },
 
