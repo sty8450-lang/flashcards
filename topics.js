@@ -6,6 +6,8 @@
  * {
  *   domain: "도메인명",
  *   topic: "토픽 제목",
+ *   mnemonic: "핵심 두음 키워드",
+ *   definition: "25~30자 핵심 정의 ([목적] + [핵심 키워드] + [종결어])",
  *   keywords: ["핵심 키워드1", "핵심 키워드2", ...],
  *   diagram: "상단 다이어그램 / 개념도 텍스트",
  *   tableRows: [
@@ -21,6 +23,8 @@ const topics = [
   {
     domain: "AI",
     topic: "검색 증강 생성 (RAG)",
+    mnemonic: "파·청·임·벡 / 검·리·프·생",
+    definition: "환각 완화 위해 외부 벡터DB 문서를 결합하는 기술",
     keywords: [
       "환각 현상 완화",
       "청킹 & 임베딩",
@@ -42,6 +46,8 @@ const topics = [
   {
     domain: "AI",
     topic: "트랜스포머 (Transformer)",
+    mnemonic: "위·셀·피·인·디",
+    definition: "장기 의존성 해결 위해 어텐션으로 병렬 처리하는 신경망",
     keywords: [
       "병렬 연산 처리",
       "위치 인코딩 (Positional Encoding)",
@@ -64,6 +70,8 @@ const topics = [
   {
     domain: "AI",
     topic: "어텐션 메커니즘 (Self-Attention)",
+    mnemonic: "질·키·값 (Q·K·V)",
+    definition: "문맥 파악 위해 질의·키·값 내적으로 중요도 구한 기법",
     keywords: [
       "Query · Key · Value (Q·K·V)",
       "스케일드 닷 프로덕트",
@@ -87,6 +95,8 @@ const topics = [
   {
     domain: "CAOS",
     topic: "캐시 일관성 (Cache Coherency)",
+    mnemonic: "공·변·버·디 / 스·디·메",
+    definition: "데이터 불일치 방지 위해 멀티코어 캐시 값 맞추는 기술",
     keywords: [
       "멀티코어 캐시 불일치",
       "스누핑 (버스 감시)",
@@ -108,6 +118,8 @@ const topics = [
   {
     domain: "CAOS",
     topic: "MESI 프로토콜",
+    mnemonic: "메·시 (M·E·S·I)",
+    definition: "캐시 일관성 유지 위해 4가지 상태로 제어하는 프로토콜",
     keywords: [
       "수정(M) · 배타(E) · 공유(S) · 무효(I)",
       "상태 전이 프로토콜",
@@ -127,6 +139,8 @@ const topics = [
   {
     domain: "CAOS",
     topic: "가상 메모리 (Virtual Memory)",
+    mnemonic: "할·배·인·교",
+    definition: "주기억장치 부족 해결 위해 보조기억장치를 할당하는 공간",
     keywords: [
       "논리 주소 vs 물리 주소",
       "요구 페이징 (Demand Paging)",
@@ -145,6 +159,8 @@ const topics = [
   {
     domain: "CAOS",
     topic: "페이징 (Paging)",
+    mnemonic: "고·페·내·외",
+    definition: "외부 단편화 해결 위해 고정 크기 블록으로 나누는 기법",
     keywords: [
       "고정 크기 블록 분할",
       "페이지 (Page) & 프레임 (Frame)",
@@ -161,6 +177,8 @@ const topics = [
   {
     domain: "CAOS",
     topic: "세그멘테이션 (Segmentation)",
+    mnemonic: "가·세·외·내",
+    definition: "내부 단편화 해결 위해 논리적 가변 크기로 나누는 기법",
     keywords: [
       "가변 크기 논리적 분할",
       "세그먼트 테이블 (Base · Limit)",
@@ -177,6 +195,8 @@ const topics = [
   {
     domain: "CAOS",
     topic: "페이지 교체 알고리즘",
+    mnemonic: "세·랜·피·옵 / L·F·N",
+    definition: "메모리 포화 시 부재율 줄이려 교체 페이지 선정 정책",
     keywords: [
       "Victim 페이지 선정",
       "FIFO & Belady의 모순",
@@ -194,6 +214,8 @@ const topics = [
   {
     domain: "CAOS",
     topic: "큐비트 (Qubit)",
+    mnemonic: "중·불·얽 / 초·포·퀀·광·중",
+    definition: "초고속 연산 위해 0과 1을 동시 중첩한 양자정보 단위",
     keywords: ["중첩(Superposition)", "얽힘(Entanglement)", "블로흐 구(Bloch Sphere)", "초전도", "포획 이온"],
     diagram: "qubit.png",
     tableRows: [
@@ -213,6 +235,8 @@ const topics = [
   {
     domain: "CAOS",
     topic: "결함허용 시스템 (FTS)",
+    mnemonic: "탐·진·복 / 셀·티·와 / N·복",
+    definition: "업무 중단 방지 위해 장치를 중복 구성한 무중단 시스템",
     keywords: [
       "Fault Tolerant System",
       "물리적 하드웨어 중복 (Lockstep)",
@@ -232,6 +256,8 @@ const topics = [
   {
     domain: "CAOS",
     topic: "고가용성 (HA)",
+    mnemonic: "핫·무·콜·컨",
+    definition: "서비스 연속성 위해 장애 시 예비 노드로 절체하는 기술",
     keywords: [
       "High Availability",
       "클러스터 Failover (30~300초)",
@@ -250,6 +276,8 @@ const topics = [
   {
     domain: "CAOS",
     topic: "가용성 Five Nines (99.999%) 달성 아키텍처",
+    mnemonic: "무·다·카·자",
+    definition: "무중단 위해 단일장애점 제거해 99.999% 보장 구조",
     keywords: [
       "가용도 = MTTF / (MTTF + MTTR)",
       "연간 다운타임 5.26분 이내",
@@ -268,6 +296,8 @@ const topics = [
   {
     domain: "CAOS",
     topic: "메모리 벽 (Memory Wall)",
+    mnemonic: "연·메·병 / 적·풀·내",
+    definition: "연산·메모리 속도 격차로 데이터 이동 병목 생기는 현상",
     keywords: [
       "폰노이만 병목 현상",
       "프로세서-메모리 속도 격차",
@@ -284,6 +314,8 @@ const topics = [
   {
     domain: "CAOS",
     topic: "CXL (Compute Express Link)",
+    mnemonic: "아·캐·멤 / 풀·티·패",
+    definition: "병목 해소 위해 PCIe 기반 캐시일관성 연결하는 기술",
     keywords: [
       "PCIe 5.0/6.0 기반 오픈 인터커넥트",
       "CXL.io · CXL.cache · CXL.mem",
@@ -302,6 +334,8 @@ const topics = [
   {
     domain: "CAOS",
     topic: "메모리 계층구조 (Memory Hierarchy)",
+    mnemonic: "레·캐·주·보 / 워·블·페",
+    definition: "접근 시간 단축 위해 속도·용량별 기억장치 배치한 구조",
     keywords: [
       "레지스터 · 캐시 · 주기억장치 · 보조기억장치",
       "속도 · 용량 · 비용 Trade-off",
@@ -318,6 +352,8 @@ const topics = [
   {
     domain: "CAOS",
     topic: "고대역 초고속 메모리 (HBM)",
+    mnemonic: "적·관·인·베",
+    definition: "대역폭 극대화 위해 TSV로 DRAM 적층한 메모리",
     keywords: [
       "High Bandwidth Memory",
       "DRAM 3D 수직 적층",
@@ -338,6 +374,8 @@ const topics = [
   {
     domain: "CAOS",
     topic: "고대역폭 플래시 (HBF)",
+    mnemonic: "낸·적·관·비",
+    definition: "대용량·고대역폭 위해 낸드 플래시를 3D 적층한 메모리",
     keywords: [
       "High Bandwidth Flash",
       "3D NAND 플래시 수직 적층",
@@ -355,6 +393,8 @@ const topics = [
   {
     domain: "CAOS",
     topic: "PIM (Processing-In-Memory)",
+    mnemonic: "HBM-PIM / 내·연·이·최",
+    definition: "데이터 이동 병목 제거 위해 메모리 내 연산기 둔 기술",
     keywords: [
       "메모리 내부 연산기(PU) 집적",
       "CPU-메모리 데이터 이동 최소화",
@@ -372,6 +412,8 @@ const topics = [
   {
     domain: "CAOS",
     topic: "뉴로모픽 칩 (Neuromorphic Chip)",
+    mnemonic: "뉴·시·스·비",
+    definition: "초저전력 병렬 연산 위해 뇌 뉴런·시냅스 모사한 반도체",
     keywords: [
       "인간 뇌 신경망(뉴런·시냅스) 모사",
       "스파이킹 신경망 (SNN)",
@@ -388,6 +430,8 @@ const topics = [
   {
     domain: "CAOS",
     topic: "NPU (Neural Processing Unit)",
+    mnemonic: "행·누·활·스",
+    definition: "인공신경망 고속 처리 위해 대규모 행렬 연산 특화된 칩",
     keywords: [
       "인공신경망(DNN/CNN/LLM) 전용 가속기",
       "MAC (곱셈·누적) 행렬 연산기",
@@ -404,6 +448,8 @@ const topics = [
   {
     domain: "CAOS",
     topic: "GPU (Graphics Processing Unit)",
+    mnemonic: "스·코·워·쿠 (SM·SP·Warp·CUDA)",
+    definition: "대규모 병렬 연산 위해 수천 개 ALU로 구성된 연산기",
     keywords: [
       "수천 개 ALU 코어 병렬 처리",
       "SM (스트리밍 멀티프로세서) · SP",
@@ -420,6 +466,8 @@ const topics = [
   {
     domain: "CAOS",
     topic: "TPU (Tensor Processing Unit)",
+    mnemonic: "시·행·레·특",
+    definition: "딥러닝 행렬 연산 가속 위해 시스톨릭 어레이 쓴 반도체",
     keywords: [
       "구글 AI 전용 맞춤형 ASIC",
       "시스톨릭 어레이 (Systolic Array)",
@@ -436,6 +484,8 @@ const topics = [
   {
     domain: "CAOS",
     topic: "ASIC (Application-Specific Integrated Circuit)",
+    mnemonic: "고·맞·초·비",
+    definition: "특정 연산 효율 극대화 위해 회로를 고정 제작한 반도체",
     keywords: [
       "주문형 반도체 (맞춤형 집적회로)",
       "회로 구조 고정 (변경 불가)",
@@ -452,6 +502,8 @@ const topics = [
   {
     domain: "CAOS",
     topic: "멀티 GPU 병렬화 기술",
+    mnemonic: "데·텐·파 / 엔·알 (DP·TP·PP)",
+    definition: "거대모델 학습 위해 데이터·모델을 GPU에 분산 기법",
     keywords: [
       "데이터 병렬화 (DP · All-Reduce)",
       "텐서 병렬화 (TP) · 파이프라인 병렬화 (PP)",
@@ -469,6 +521,8 @@ const topics = [
   {
     domain: "CAOS",
     topic: "오토 스케일링 (Auto Scaling)",
+    mnemonic: "수·수·쿨·예 (HPA·VPA)",
+    definition: "자원 효율성 위해 부하에 따라 서버 수를 증감하는 기술",
     keywords: [
       "부하 기반 탄력적 자원 증감",
       "수평 확장 (Scale-Out / HPA)",
@@ -485,6 +539,8 @@ const topics = [
   {
     domain: "CAOS",
     topic: "페이즈드 어텐션 (PagedAttention)",
+    mnemonic: "블·비·공·처",
+    definition: "추론 단편화 해결 위해 KV캐시를 블록 분할하는 기법",
     keywords: [
       "LLM 추론 KV 캐시 단편화 해결",
       "OS 가상 메모리 페이징 차용",
@@ -504,6 +560,8 @@ const topics = [
   {
     domain: "CAOS",
     topic: "운영체제 CPU 스케줄링",
+    mnemonic: "선점(R·S·멀·레) / 비선점(우·기·피·소·히)",
+    definition: "자원 효율화 위해 프로세스별 CPU 우선순위 지정 기법",
     keywords: [
       "CPU 이용률 · 처리량 극대화",
       "응답시간 · 대기시간 · 반환시간 최소화",
@@ -522,6 +580,8 @@ const topics = [
   {
     domain: "CAOS",
     topic: "RM (Rate Monotonic) 스케줄링",
+    mnemonic: "주·단·정·선",
+    definition: "실시간 마감 보장 위해 주기가 짧을수록 우선 배정 기법",
     keywords: [
       "실시간 운영체제 (RTOS) 선점형 스케줄링",
       "정적(고정) 우선순위 할당",
@@ -539,6 +599,8 @@ const topics = [
   {
     domain: "CAOS",
     topic: "다단계 큐 (MLQ, Multi-Level Queue)",
+    mnemonic: "성·분·독·불",
+    definition: "작업 성격별 처리 위해 준비 큐를 영구 분리하는 기법",
     keywords: [
       "선점형 다중 준비 큐 스케줄링",
       "성격별(전경/배경) 큐 영구 분리",
@@ -556,6 +618,8 @@ const topics = [
   {
     domain: "CAOS",
     topic: "다단계 피드백 큐 (MLFQ, Multi-Level Feedback Queue)",
+    mnemonic: "타·강·승·에",
+    definition: "기아 해소 위해 시간할당량 차등 큐 간 이동 허용 기법",
     keywords: [
       "큐 간 프로세스 동적 이동 허용",
       "하위 단계일수록 큰 타임 슬라이스 부여",
@@ -573,6 +637,8 @@ const topics = [
   {
     domain: "CAOS",
     topic: "단일 큐 멀티프로세서 스케줄링 (SQMS)",
+    mnemonic: "단·공·락·캐",
+    definition: "부하 분산 위해 모든 CPU가 단일 큐 공유 기법",
     keywords: [
       "Single-Queue Multiprocessor Scheduling",
       "단일 전역 준비 큐 공유",
@@ -590,6 +656,8 @@ const topics = [
   {
     domain: "CAOS",
     topic: "다중 큐 멀티프로세서 스케줄링 (MQMS)",
+    mnemonic: "독·무·친·훔",
+    definition: "락 경합 해소와 캐시 친화성 위해 코어별 독립 큐 방식",
     keywords: [
       "Multi-Queue Multiprocessor Scheduling",
       "코어별 독립 준비 큐 보유",
@@ -607,6 +675,8 @@ const topics = [
   {
     domain: "CAOS",
     topic: "HRN (Highest Response-ratio Next) 알고리즘",
+    mnemonic: "대·서·서 (대기+서비스/서비스)",
+    definition: "SJF 기아 보완 위해 대기시간 반영 응답률 배정 기법",
     keywords: [
       "비선점형 스케줄링",
       "SJF의 장시간 작업 기아 보완",
@@ -624,6 +694,8 @@ const topics = [
   {
     domain: "CAOS",
     topic: "기아현상 (Starvation)",
+    mnemonic: "우·대·에 (MLQ·우선순위·SJF)",
+    definition: "낮은 우선순위로 인해 프로세스가 CPU 못 받는 현상",
     keywords: [
       "특정 프로세스 무한 대기",
       "우선순위/SJF/MLQ 스케줄링 부작용",
@@ -640,6 +712,8 @@ const topics = [
   {
     domain: "CAOS",
     topic: "경쟁조건 (Race Condition)",
+    mnemonic: "프·네 / 상·진·한 / 세·뮤·램·에",
+    definition: "공유자원 동시 접근 시 순서에 따라 무결성 깨지는 현상",
     keywords: [
       "공유 자원 동시 접근 무결성 훼손",
       "실행 순서(타이밍) 의존적 결함",
@@ -657,6 +731,8 @@ const topics = [
   {
     domain: "CAOS",
     topic: "운영체제의 동기화",
+    mnemonic: "상·진·한 / 데·피·램 / 테·컴·인",
+    definition: "공유 데이터 일관성 위해 프로세스 실행 순서 제어 기법",
     keywords: [
       "임계영역 (Critical Section)",
       "3대 해결 조건: 상호배제 · 진행 · 한정대기",
@@ -675,6 +751,8 @@ const topics = [
   {
     domain: "CAOS",
     topic: "뮤텍스 (Mutex)",
+    mnemonic: "소·단·슬",
+    definition: "임계영역 보호 위해 락 소유자만 해제하는 상호배제 기법",
     keywords: [
       "상호배제 (Mutual Exclusion) 단일 잠금",
       "Lock 소유권 (Ownership) 존재",
@@ -691,6 +769,8 @@ const topics = [
   {
     domain: "CAOS",
     topic: "세마포어 (Semaphore)",
+    mnemonic: "공·점·해 (S·P·V)",
+    definition: "임계영역 통제 위해 공유변수와 P·V 연산을 쓰는 기법",
     keywords: [
       "공유 자원 카운팅 변수 (S)",
       "P 연산 (Proberen: wait · 자원 획득)",
@@ -709,6 +789,8 @@ const topics = [
   {
     domain: "CAOS",
     topic: "모니터 (Monitor)",
+    mnemonic: "캡·자·조 (wait·signal)",
+    definition: "세마포어 오류 보완 위해 자원과 함수를 캡슐화한 기법",
     keywords: [
       "고수준 프로그래밍 언어 동기화 구조",
       "공유 자원 + 접근 프로시저 캡슐화",
@@ -727,6 +809,8 @@ const topics = [
   {
     domain: "CAOS",
     topic: "교착상태 (Deadlock)",
+    mnemonic: "상·점·비·환 / 예·회·발·복",
+    definition: "자원 점유 프로세스가 서로 상대 자원 요청해 멈춘 상태",
     keywords: [
       "상호배제 · 점유대기 · 비선점 · 환형대기 (상점비환)",
       "예방 · 회피 · 발견 · 복구 (예회발복)",
@@ -744,6 +828,8 @@ const topics = [
   {
     domain: "CAOS",
     topic: "은행가 알고리즘 (Banker's Algorithm)",
+    mnemonic: "에·이·맨 (A·M·A·N)",
+    definition: "교착상태 회피 위해 안전 상태 유지할 요청만 수락 기법",
     keywords: [
       "교착상태 회피 (Deadlock Avoidance)",
       "다익스트라 고안",
@@ -762,6 +848,8 @@ const topics = [
   {
     domain: "CAOS",
     topic: "우선순위 역전 (Priority Inversion)",
+    mnemonic: "임·상·선",
+    definition: "동기화 문제로 고순위 작업이 저순위보다 늦게 되는 현상",
     keywords: [
       "선점형 RTOS 동기화 결함",
       "고순위(TH) · 중순위(TM) · 저순위(TL)",
@@ -780,6 +868,8 @@ const topics = [
   {
     domain: "CAOS",
     topic: "태스크 우선순위 상속 (Priority Inheritance)",
+    mnemonic: "상·올 (상속·올림)",
+    definition: "우선순위 역전 해결 위해 락 보유 저순위를 높이는 기법",
     keywords: [
       "우선순위 역전 (Priority Inversion) 해결",
       "우선순위 상속 프로토콜 (PIP)",
@@ -798,6 +888,8 @@ const topics = [
   {
     domain: "CAOS",
     topic: "메모리 주요 영역",
+    mnemonic: "코·데·힙·스",
+    definition: "프로세스 실행 위해 코드·데이터·힙·스택으로 나눈 구조",
     keywords: [
       "코드(Text) · 데이터(Data/BSS) · 힙(Heap) · 스택(Stack)",
       "정적 할당 vs 동적 할당 영역",
@@ -815,6 +907,8 @@ const topics = [
   {
     domain: "CAOS",
     topic: "메모리 단편화 해결 (슬랩·버디)",
+    mnemonic: "슬·버 / 재·메·통·압",
+    definition: "단편화 해결 위해 고정 블록과 2의 거듭제곱 할당 기법",
     keywords: [
       "내부 단편화 vs 외부 단편화",
       "버디 메모리 시스템 (2의 거듭제곱 분할)",
@@ -834,6 +928,8 @@ const topics = [
   {
     domain: "CAOS",
     topic: "스래싱 (Thrashing)",
+    mnemonic: "문·하·멀·워·페",
+    definition: "프로세스 과다로 페이지 부재 급증해 CPU 멈추는 현상",
     keywords: [
       "과도한 페이지 부재 (Page Fault)",
       "CPU 이용률 급락",
@@ -851,6 +947,8 @@ const topics = [
   {
     domain: "CAOS",
     topic: "메모리 누수 (Memory Leak)",
+    mnemonic: "할·미·고·탐",
+    definition: "자원 고갈 방지 위해 누수 메모리를 탐지·해제하는 기법",
     keywords: [
       "힙(Heap) 동적 메모리 미해제",
       "가용 메모리 고갈 (OOM)",
@@ -867,6 +965,8 @@ const topics = [
   {
     domain: "CAOS",
     topic: "캐시 메모리 (Cache Memory)",
+    mnemonic: "시·공·순 / 사·쓰·호·교 / 직·연·집",
+    definition: "CPU와 주기억장치 속도 차 완화 위해 둔 고속 메모리",
     keywords: [
       "CPU-주기억장치 속도 완충 (SRAM)",
       "시간 · 공간 · 순차 지역성 (시공순)",
@@ -885,6 +985,8 @@ const topics = [
   {
     domain: "CAOS",
     topic: "MMU (Memory Management Unit)",
+    mnemonic: "논·물·베·한",
+    definition: "메모리 보호 위해 논리주소를 물리주소로 변환하는 장치",
     keywords: [
       "논리(가상) 주소 → 물리 주소 실시간 변환",
       "재배치 레지스터 (Base Register)",
@@ -901,6 +1003,8 @@ const topics = [
   {
     domain: "CAOS",
     topic: "TLB (Translation Lookaside Buffer)",
+    mnemonic: "고·적·미·폴",
+    definition: "주소 변환 단축 위해 최근 페이지 매핑 저장한 캐시",
     keywords: [
       "페이지 테이블 고속 연관 캐시",
       "시간 지역성 기반 주소 변환 가속",
@@ -919,6 +1023,8 @@ const topics = [
   {
     domain: "CAOS",
     topic: "DMA (Direct Memory Access)",
+    mnemonic: "버·전·인 / 사·버",
+    definition: "CPU 개입 없이 입출력장치와 메모리가 직접 전송 기법",
     keywords: [
       "CPU 개입 없는 고속 I/O 전송",
       "PIO(프로그램 입출력) 병목 해소",
@@ -936,6 +1042,8 @@ const topics = [
   {
     domain: "CAOS",
     topic: "파이프라인 해저드 (Pipeline Hazard)",
+    mnemonic: "구·데·제 / 전·인·레·분",
+    definition: "구조·데이터·제어 문제로 파이프라인 처리 방해하는 현상",
     keywords: [
       "구조적 · 데이터 · 제어 해저드 (구데제)",
       "데이터 의존성 (RAW · WAR · WAW)",
@@ -954,6 +1062,8 @@ const topics = [
   {
     domain: "CAOS",
     topic: "병렬처리 시스템 (Parallel Processing System)",
+    mnemonic: "단·슈·스·브 / SI·SM·MI·MM",
+    definition: "연산 속도 향상 위해 복수 명령·코어를 동시 수행 체계",
     keywords: [
       "플린 분류 (SISD · SIMD · MISD · MIMD)",
       "슈퍼파이프라인 vs 슈퍼스칼라",
@@ -971,6 +1081,8 @@ const topics = [
   {
     domain: "CAOS",
     topic: "DAS (Direct Attached Storage)",
+    mnemonic: "직·케·단·독",
+    definition: "구축 단순화 위해 서버와 저장장치를 케이블 직결한 방식",
     keywords: [
       "서버-스토리지 직접 케이블 연결",
       "파일시스템 서버 호스트 직접 관리",
@@ -987,6 +1099,8 @@ const topics = [
   {
     domain: "CAOS",
     topic: "NAS (Network Attached Storage)",
+    mnemonic: "이·파·공·자",
+    definition: "네트워크 파일 공유 위해 이더넷 망에 연결된 저장 방식",
     keywords: [
       "이더넷(TCP/IP) 기반 네트워크 연결",
       "파일(File) 단위 스토리지 공유",
@@ -1003,6 +1117,8 @@ const topics = [
   {
     domain: "CAOS",
     topic: "SAN (Storage Area Network)",
+    mnemonic: "광·블·스·고",
+    definition: "초고속 블록 입출력 위해 광채널 망으로 연결한 스토리지",
     keywords: [
       "광채널(FC) / iSCSI 전용 고속 네트워크",
       "블록(Block) 단위 스토리지 할당",
@@ -1019,6 +1135,8 @@ const topics = [
   {
     domain: "CAOS",
     topic: "TPM (Trusted Platform Module)",
+    mnemonic: "신·측·밀·원",
+    definition: "무결성 검증과 암호키 보호 위해 보드에 장착한 보안 칩",
     keywords: [
       "하드웨어 기반 신뢰점 (Root of Trust)",
       "암호키 생성·안전 격리",
@@ -1036,6 +1154,8 @@ const topics = [
   {
     domain: "CAOS",
     topic: "가트너(Gartner) 전략 기술 트렌드",
+    mnemonic: "에·하·그·양·공",
+    definition: "미래 경쟁력 위해 에이전틱AI·차세대 컴퓨팅 조망 체계",
     keywords: [
       "에이전틱 AI (Agentic AI)",
       "하이브리드 컴퓨팅 (Hybrid Computing)",
@@ -1059,6 +1179,8 @@ const topics = [
   {
     domain: "DB",
     topic: "트랜잭션 고립성 수준 (Isolation Level)",
+    mnemonic: "언·커·리·시 / 오·반·유",
+    definition: "동시성과 일관성 균형 위해 트랜잭션 격리 나눈 4단계",
     keywords: [
       "Read Uncommitted (Level 0)",
       "Read Committed (Level 1)",
@@ -1079,6 +1201,8 @@ const topics = [
   {
     domain: "DB",
     topic: "B-Tree 인덱스",
+    mnemonic: "루·브·리 / 전·키·포",
+    definition: "탐색 속도 보장 위해 모든 노드에 데이터 둔 균형트리",
     keywords: [
       "루트 · 브랜치 · 리프 노드",
       "균형 이진/다진 탐색 트리 O(log N)",
@@ -1099,6 +1223,8 @@ const topics = [
   {
     domain: "DB",
     topic: "B+Tree 인덱스",
+    mnemonic: "내·리·양·범",
+    definition: "범위 검색 고속화 위해 리프 노드에 데이터 둔 인덱스",
     keywords: [
       "내부 노드(경로 키)와 리프 노드(데이터) 분리",
       "리프 노드 양방향 연결 리스트",
@@ -1123,6 +1249,8 @@ const topics = [
   {
     domain: "DS",
     topic: "쿠버네티스 (Kubernetes)",
+    mnemonic: "에·스·컨·이 / 큐·프·파",
+    definition: "컨테이너 배포·확장·복구를 자동화하는 오케스트레이션",
     keywords: [
       "마스터 노드 (Control Plane)",
       "워커 노드 (Data Plane)",
@@ -1144,6 +1272,8 @@ const topics = [
   {
     domain: "DS",
     topic: "클라우드 네이티브 (Cloud Native)",
+    mnemonic: "마·컨·씨·데",
+    definition: "클라우드 탄력성 위해 MSA·컨테이너·자동화 결합 체계",
     keywords: [
       "MSA · 컨테이너 · CI/CD · 데브옵스",
       "12-Factor App",
@@ -1167,6 +1297,8 @@ const topics = [
   {
     domain: "NW",
     topic: "HTTP/3",
+    mnemonic: "유·제·로·홀·독·연",
+    definition: "앞차막힘 해소 위해 QUIC 기반으로 동작하는 웹표준",
     keywords: [
       "QUIC 전송 계층 기반 차세대 웹 프로토콜",
       "TCP HOLB (앞차 막힘) 근본 해소",
@@ -1185,6 +1317,8 @@ const topics = [
   {
     domain: "NW",
     topic: "QUIC 프로토콜",
+    mnemonic: "유·영·일·독·연",
+    definition: "초고속 연결과 다중화 위해 UDP 위에 구현한 프로토콜",
     keywords: [
       "UDP 기반 신뢰성 전송 프로토콜",
       "0-RTT / 1-RTT 초고속 핸드셰이크",
@@ -1203,6 +1337,8 @@ const topics = [
   {
     domain: "NW",
     topic: "소프트웨어 정의 네트워크 (SDN)",
+    mnemonic: "응·제·데 / 북·남",
+    definition: "네트워크 중앙 관리 위해 제어·데이터 평면 분리한 기술",
     keywords: [
       "제어 영역(Control)과 데이터 영역(Data) 분리",
       "SDN 중앙 컨트롤러",
@@ -1224,6 +1360,8 @@ const topics = [
   {
     domain: "경영",
     topic: "전사적 아키텍처 (EA)",
+    mnemonic: "업·응·데·기·보 / 성·업·서·데·기",
+    definition: "전사 IT자원 표준화 위해 5대 아키텍처 수립하는 체계",
     keywords: [
       "정보기술아키텍처 (ITA)",
       "5대 영역: 업무·응용·데이터·기술·보안",
@@ -1242,6 +1380,8 @@ const topics = [
   {
     domain: "경영",
     topic: "정보보호 및 개인정보보호 관리체계 (ISMS-P)",
+    mnemonic: "관·보·개 101",
+    definition: "정보보호와 개인정보 보호 위해 101개 기준 심사 체계",
     keywords: [
       "관리체계 수립·운영 (16개)",
       "보호대책 요구사항 (64개)",
@@ -1264,6 +1404,8 @@ const topics = [
   {
     domain: "보안",
     topic: "제로 트러스트 보안 (Zero Trust)",
+    mnemonic: "명·최·가 / 미·지·모",
+    definition: "모든 접근을 매번 검증하고 최소 권한만 주는 보안 체계",
     keywords: [
       "Never Trust, Always Verify",
       "정책 결정 지점 (PDP: PE+PA)",
@@ -1282,6 +1424,8 @@ const topics = [
   {
     domain: "보안",
     topic: "국가 망보안체계 (N2SF)",
+    mnemonic: "기(C)·민(S)·공(O)",
+    definition: "공공 AI 활용 위해 업무 중요도 3등급 차등 보안체계",
     keywords: [
       "획일적 망분리 개선",
       "업무 중요도 3등급 (C·S·O)",
@@ -1303,6 +1447,8 @@ const topics = [
   {
     domain: "소공",
     topic: "마이크로서비스 아키텍처 (MSA)",
+    mnemonic: "독·분·자·격 / 폴·데·C",
+    definition: "독립 개발·배포 위해 단일 앱을 소규모로 분리한 구조",
     keywords: [
       "API 게이트웨이",
       "서비스 메시 (Sidecar)",
@@ -1323,6 +1469,8 @@ const topics = [
   {
     domain: "소공",
     topic: "클린 아키텍처 (Clean Architecture)",
+    mnemonic: "엔·유·어·프 / 단·역",
+    definition: "도메인 규칙 보호 위해 의존성을 안쪽으로만 향한 구조",
     keywords: [
       "관심사 분리",
       "단방향 의존성 규칙 (바깥 → 안쪽)",
@@ -1339,6 +1487,8 @@ const topics = [
   {
     domain: "소공",
     topic: "헥사고날 아키텍처 (포트 앤 어댑터)",
+    mnemonic: "인·아·포·어",
+    definition: "외부 종속 제거 위해 도메인 내외부를 포트·어댑터 연결",
     keywords: [
       "도메인 중심 육각형 구조",
       "인바운드 / 아웃바운드 포트 (Port)",
@@ -1359,6 +1509,8 @@ const topics = [
   {
     domain: "통계",
     topic: "가설검정 (Hypothesis Testing)",
+    mnemonic: "귀·대·유·기",
+    definition: "모집단 판정 위해 유의확률로 귀무가설 기각 결정 기법",
     keywords: [
       "귀무가설(H0) vs 대립가설(H1)",
       "유의수준(α) & 유의확률(p-value)",
@@ -1375,6 +1527,8 @@ const topics = [
   {
     domain: "통계",
     topic: "제1종 오류와 제2종 오류",
+    mnemonic: "귀참기1 / 대참채2",
+    definition: "가설검정 시 참인 귀무가설 기각·대립가설 놓치는 오류",
     keywords: [
       "제1종 오류 (α, 위양성 False Positive)",
       "제2종 오류 (β, 위음성 False Negative)",
@@ -1393,6 +1547,8 @@ const topics = [
   {
     domain: "통계",
     topic: "회귀분석 (Regression Analysis)",
+    mnemonic: "선·독·등·정",
+    definition: "변수 간 인과관계 규명 위해 최소제곱법 쓰는 분석 기법",
     keywords: [
       "독립변수(X) · 종속변수(Y)",
       "최소제곱법 (OLS)",
@@ -1410,6 +1566,8 @@ const topics = [
   {
     domain: "통계",
     topic: "다중공선성 (Multicollinearity)",
+    mnemonic: "상·팽·제·주·규",
+    definition: "독립변수 간 강한 상관성으로 회귀계수 분산 팽창 현상",
     keywords: [
       "독립변수 간 강한 상관관계",
       "회귀계수 분산 팽창 (불안정성)",
@@ -1430,6 +1588,8 @@ const topics = [
   {
     domain: "프관",
     topic: "기성고 관리 (EVM)",
+    mnemonic: "계·획·실 / 일·원·편·지",
+    definition: "일정·원가 측정 위해 계획·획득·실제비용 비교 기법",
     keywords: [
       "Earned Value Management",
       "계획가치(PV) · 획득가치(EV) · 실제비용(AC)",
@@ -1449,6 +1609,8 @@ const topics = [
   {
     domain: "프관",
     topic: "주공정법 (CPM)",
+    mnemonic: "전·후·여·주",
+    definition: "공사기간 산정 위해 여유시간 0인 최장 경로 도출 기법",
     keywords: [
       "Critical Path Method",
       "주공정 (Critical Path: 최장 경로)",
@@ -1467,6 +1629,8 @@ const topics = [
   {
     domain: "프관",
     topic: "크래싱 (Crashing)",
+    mnemonic: "자·투·원·단",
+    definition: "일정 단축 위해 주공정 작업에 추가 자원을 투입한 기법",
     keywords: [
       "일정 단축 기법 (Schedule Compression)",
       "주공정(Critical Path) 활동 자원 추가 투입",
@@ -1484,6 +1648,8 @@ const topics = [
   {
     domain: "프관",
     topic: "패스트 트래킹 (Fast Tracking)",
+    mnemonic: "병·중·재·단",
+    definition: "일정 단축 위해 순차 수행할 주공정 작업 병행하는 기법",
     keywords: [
       "일정 단축 기법 (Schedule Compression)",
       "순차 공정의 병행(중첩) 수행",

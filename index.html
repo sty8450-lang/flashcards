@@ -55,6 +55,7 @@
         
         .card-tag { font-size: 0.7rem; font-weight: 600; color: var(--accent); text-transform: uppercase; letter-spacing: 0.05em; }
         .card-title { font-size: 1.2rem; font-weight: 700; margin: 6px 0; line-height: 1.35; }
+        .front-mnemonic-box { display: inline-flex; align-items: center; gap: 6px; margin-top: 6px; padding: 6px 12px; background: rgba(250, 204, 21, 0.14); border: 1px solid rgba(250, 204, 21, 0.45); border-left: 3px solid #facc15; border-radius: 8px; color: #fef08a; font-size: 0.84rem; font-weight: 700; letter-spacing: 0.02em; }
         .card-body { font-size: 0.88rem; color: var(--text-secondary); line-height: 1.45; flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; padding-right: 2px; }
         .keywords-container { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 6px; }
         .keyword-badge { background: rgba(56, 189, 248, 0.15); color: var(--accent); padding: 3px 8px; border-radius: 16px; font-size: 0.72rem; font-weight: 500; }
@@ -62,6 +63,10 @@
         /* Back Section Labels */
         .back-section-label { font-size: 0.72rem; font-weight: 700; color: #93c5fd; letter-spacing: 0.03em; margin-bottom: 4px; display: flex; align-items: center; gap: 5px; }
         .back-section-label::before { content: ""; display: inline-block; width: 3px; height: 11px; background: var(--accent); border-radius: 2px; }
+
+        /* ⓪ Top Definition Callout Area */
+        .definition-wrapper { display: none; flex-direction: column; }
+        .definition-callout { background: linear-gradient(135deg, rgba(30, 58, 138, 0.55) 0%, rgba(15, 23, 42, 0.85) 100%); border: 1px solid rgba(56, 189, 248, 0.4); border-left: 4px solid var(--accent); padding: 10px 12px; border-radius: 8px; color: #f8fafc; font-size: 0.86rem; font-weight: 600; line-height: 1.45; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2); word-break: keep-all; }
 
         /* ① Top Diagram Area */
         .diagram-wrapper { display: none; flex-direction: column; }
@@ -121,6 +126,7 @@
                         <div>
                             <span class="card-tag" id="front-domain">도메인</span>
                             <div class="card-title" id="front-title">토픽 제목</div>
+                            <div class="front-mnemonic-box" id="front-mnemonic">💡 두음: -</div>
                         </div>
                         <div class="card-body" style="display: flex; align-items: center; justify-content: center; text-align: center; color: var(--text-secondary);">
                             카드를 터치하여 뒷면 확인
@@ -136,6 +142,12 @@
                         </div>
 
                         <div class="card-body">
+                            <!-- ⓪ 최상단: 1단락 핵심 정의 콜아웃 영역 -->
+                            <div class="definition-wrapper" id="definition-wrapper">
+                                <div class="back-section-label">1단락 핵심 정의 (25~30자)</div>
+                                <div class="definition-callout" id="back-definition"></div>
+                            </div>
+
                             <!-- ① 상단: 다이어그램(diagram) 영역 -->
                             <div class="diagram-wrapper" id="diagram-wrapper">
                                 <div class="back-section-label">구성도 / 핵심 개념도</div>
@@ -312,6 +324,14 @@
 
             document.getElementById('front-domain').innerText = card.domain;
             document.getElementById('front-title').innerText = card.topic;
+
+            const mnemonicEl = document.getElementById('front-mnemonic');
+            if (card.mnemonic && card.mnemonic.trim() !== '') {
+                mnemonicEl.style.display = 'inline-flex';
+                mnemonicEl.innerText = `💡 두음: ${card.mnemonic}`;
+            } else {
+                mnemonicEl.style.display = 'none';
+            }
             
             document.getElementById('back-domain').innerText = `${card.domain} · 서브노트`;
             document.getElementById('back-title').innerText = card.topic;
@@ -328,6 +348,17 @@
                 });
             } else {
                 kwContainer.style.display = 'none';
+            }
+
+            // ⓪ 최상단 1단락 핵심 정의 콜아웃 렌더링
+            const defWrapper = document.getElementById('definition-wrapper');
+            const defBox = document.getElementById('back-definition');
+            if (card.definition && card.definition.trim() !== '') {
+                defWrapper.style.display = 'flex';
+                defBox.innerText = card.definition;
+            } else {
+                defWrapper.style.display = 'none';
+                defBox.innerText = '';
             }
 
             // ① 상단 다이어그램 영역 (이미지 또는 텍스트 렌더링)
