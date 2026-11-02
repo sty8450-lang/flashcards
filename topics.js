@@ -1,5 +1,6 @@
 /**
  * 기술사 암기장 - 10대 도메인(AI, CAOS, DB, DS, NW, 경영, 보안, 소공, 통계, 프관) 표준 스키마
+ * 1교시형 단일 토픽 (1주제 = 1카드) 구조
  *
  * [토픽 객체 표준 구조]
  * {
@@ -14,7 +15,9 @@
  */
 
 const topics = [
+  // =========================================================================
   // 1. AI (인공지능)
+  // =========================================================================
   {
     domain: "AI",
     topic: "검색 증강 생성 (RAG)",
@@ -38,72 +41,154 @@ const topics = [
   },
   {
     domain: "AI",
-    topic: "트랜스포머 (Transformer) & 어텐션",
+    topic: "트랜스포머 (Transformer)",
     keywords: [
-      "셀프 어텐션 (Self-Attention)",
       "병렬 연산 처리",
       "위치 인코딩 (Positional Encoding)",
-      "멀티 헤드 어텐션",
-      "인코더(BERT) / 디코더(GPT)"
+      "인코더(BERT) 구조",
+      "디코더(GPT) 구조",
+      "장기 의존성 해결"
     ],
     diagram: `입력 문장 → [단어 임베딩 + 위치 인코딩]
   ↓
-[인코더] 멀티 헤드 셀프 어텐션(Q·K·V 연관도) → 피드포워드 신경망
+[인코더 블록 × N] (양방향 문맥 이해: BERT)
   ↓
-[디코더] 마스크드 어텐션 → 인코더-디코더 어텐션 → 확률 출력(Softmax)`,
+[디코더 블록 × N] (자기회귀 다음 토큰 생성: GPT) → 확률 출력(Softmax)`,
     tableRows: [
-      { major: "등장 배경", minor: "RNN 한계 극복", desc: "순차 처리로 인한 속도 저하와 장기 의존성(앞부분 망각) 문제를 병렬 어텐션으로 해결" },
-      { major: "핵심 원리", minor: "위치 인코딩", desc: "단어를 한꺼번에 입력받기 때문에 단어의 순서(위치) 값을 벡터에 더해줌" },
-      { major: "핵심 원리", minor: "셀프 어텐션", desc: "문장 내 단어들 간의 질의(Q)·키(K)·값(V) 내적을 통해 문맥상 중요도를 계산" },
-      { major: "발전 구조", minor: "인코더 계열", desc: "양방향 문맥 이해에 강점 (대표 모델: BERT, 문서 분류·개체명 인식)" },
-      { major: "발전 구조", minor: "디코더 계열", desc: "다음 단어 예측 및 생성에 강점 (대표 모델: GPT 시리즈, 초거대 생성형 AI)" }
+      { major: "등장 배경", minor: "RNN 한계 극복", desc: "순차 처리로 인한 학습 속도 저하와 장기 의존성(앞부분 망각) 문제를 병렬 처리 구조로 해결" },
+      { major: "입력 처리", minor: "위치 인코딩", desc: "단어를 순차적이 아닌 한꺼번에 입력받기 때문에 단어의 순서(위치) 값을 사인·코사인 벡터로 더해줌" },
+      { major: "발전 구조", minor: "인코더 계열 (BERT)", desc: "양방향 문맥 이해에 강점 (문서 분류, 개체명 인식, 질의응답)" },
+      { major: "발전 구조", minor: "디코더 계열 (GPT)", desc: "이전 토큰을 바탕으로 다음 단어 예측 및 생성에 강점 (초거대 생성형 AI)" }
+    ]
+  },
+  {
+    domain: "AI",
+    topic: "어텐션 메커니즘 (Self-Attention)",
+    keywords: [
+      "Query · Key · Value (Q·K·V)",
+      "스케일드 닷 프로덕트",
+      "멀티 헤드 어텐션",
+      "마스크드 어텐션"
+    ],
+    diagram: `입력 벡터 → [Q(질의) · K(키) · V(값) 가중치 투영]
+  ↓
+유사도 내적(Q·K^T) → 스케일링(÷√d_k) → Softmax 가중치 → V 결합 → [멀티 헤드 병합]`,
+    tableRows: [
+      { major: "핵심 원리", minor: "셀프 어텐션", desc: "문장 내 단어들 간의 질의(Q)·키(K)·값(V) 내적을 통해 문맥상 단어 간 연관도와 중요도를 계산" },
+      { major: "연산 과정", minor: "Scaled Dot-Product", desc: "Q와 K의 내적값이 커져 기울기가 소실되는 것을 막기 위해 차원수의 제곱근(√d_k)으로 나누어 정규화" },
+      { major: "확장 구조", minor: "멀티 헤드 어텐션", desc: "어텐션을 여러 개의 헤드로 병렬 수행하여 문법·의미·지시대명사 등 다양한 관점의 문맥 정보를 동시 포착" },
+      { major: "제어 기법", minor: "마스크드 어텐션", desc: "디코더 학습 시 미래 시점의 토큰을 미리 컨닝하지 못하도록 음의 무한대(-∞) 마스킹 처리" }
     ]
   },
 
+  // =========================================================================
   // 2. CAOS (컴퓨터구조·OS)
+  // =========================================================================
   {
     domain: "CAOS",
-    topic: "캐시 일관성 & MESI 프로토콜",
+    topic: "캐시 일관성 (Cache Coherency)",
     keywords: [
-      "수정(M) · 배타(E) · 공유(S) · 무효(I)",
+      "멀티코어 캐시 불일치",
       "스누핑 (버스 감시)",
-      "즉시 쓰기 / 나중 쓰기",
-      "거짓 공유 (False Sharing)",
-      "두음: 메시(MESI)"
+      "디렉터리 기반 프로토콜",
+      "거짓 공유 (False Sharing)"
     ],
-    diagram: `[코어 1 캐시]  [코어 2 캐시]  [코어 3 캐시]
-      ↕             ↕             ↕
-========== 공용 시스템 버스 (스누핑 감시) ==========
-                    ↕
-            [주기억장치 (RAM)]`,
+    diagram: `[코어 1 로컬 캐시]   [코어 2 로컬 캐시]   [코어 3 로컬 캐시]
+        ↕                    ↕                    ↕
+============= 공용 시스템 버스 (스누핑 감시 / 디렉터리 제어) =============
+                             ↕
+                     [주기억장치 (RAM)]`,
     tableRows: [
-      { major: "핵심 개념", minor: "캐시 일관성", desc: "멀티코어 환경에서 각 코어 로컬 캐시가 같은 메모리 주소를 참조할 때 최신 값을 일치시키는 기법" },
-      { major: "MESI 상태", minor: "M (수정, Modified)", desc: "현재 코어 캐시에서만 값이 변경되어 주기억장치(원본)와 다른 상태 (유일 보유)" },
-      { major: "MESI 상태", minor: "E (배타, Exclusive)", desc: "현재 코어 캐시만 단독 보유 중이며 주기억장치 원본과 값이 일치하는 상태" },
-      { major: "MESI 상태", minor: "S (공유, Shared)", desc: "여러 코어의 캐시가 동일한 데이터를 읽기 전용으로 함께 공유 중인 상태" },
-      { major: "MESI 상태", minor: "I (무효, Invalid)", desc: "다른 코어가 값을 수정하여 내 캐시 라인의 데이터가 무효화된 상태" },
-      { major: "성능 이슈", minor: "거짓 공유(False Sharing)", desc: "같은 캐시 라인 내 다른 변수를 수정할 때 캐시가 통째로 무효화되는 현상 (패딩으로 해결)" }
+      { major: "핵심 개념", minor: "캐시 일관성 정의", desc: "멀티코어 환경에서 각 코어 로컬 캐시가 동일한 메모리 주소를 참조할 때 최신 데이터 값을 일치시키는 기술" },
+      { major: "발생 원인", minor: "데이터 불일치", desc: "코어별 개별 캐시 갱신(Write-Back 등), DMA 입출력, 프로세스 코어 이주 시 구버전 데이터 참조 발생" },
+      { major: "유지 기법", minor: "스누핑 & 디렉터리", desc: "• 스누핑(Snooping): 모든 캐시 제어기가 공용 버스를 감시하며 동일 주소 수정 시 무효화/갱신 신호 전파\n• 디렉터리 기반: 중앙 디렉터리에 캐시 블록 공유 상태를 기록·추적 (대규모 코어 확장성 우수)" },
+      { major: "성능 이슈", minor: "거짓 공유 (False Sharing)", desc: "서로 다른 변수가 우연히 같은 캐시 라인에 위치해, 한 코어가 수정할 때 다른 코어 캐시까지 통째로 무효화되는 현상 (캐시 패딩으로 해결)" }
     ]
   },
   {
     domain: "CAOS",
-    topic: "가상 메모리 & 페이지 교체 알고리즘",
+    topic: "MESI 프로토콜",
     keywords: [
-      "페이징 vs 세그멘테이션",
-      "페이지 폴트 (Page Fault)",
-      "TLB (주소 변환 캐시)",
-      "스래싱 (Thrashing)",
-      "워킹셋 & LRU"
+      "수정(M) · 배타(E) · 공유(S) · 무효(I)",
+      "상태 전이 프로토콜",
+      "무효화 (Invalidate)",
+      "두음: 메시(MESI)"
     ],
-    diagram: `CPU 가상주소 요청 → [TLB 캐시 조회]
- ├─ Hit  → 물리 메모리(RAM) 즉시 접근
- └─ Miss → 페이지 테이블 조회 → (없으면 Page Fault) → 디스크에서 RAM 적재 (LRU 교체)`,
+    diagram: `[I: 무효] ──(단독 읽기 Miss)──▶ [E: 배타(원본일치)] ──(쓰기 수행)──▶ [M: 수정(Dirty)]
+   ▲                                  │ (타 코어 읽기)
+   └────(타 코어 쓰기 Invalidate)──── [S: 공유(다수 코어 읽기)]`,
     tableRows: [
-      { major: "구현 방식", minor: "페이징 (Paging)", desc: "가상·물리 메모리를 고정 크기(예: 4KB) 블록으로 분할 관리 (내부 단편화 발생)" },
-      { major: "구현 방식", minor: "세그멘테이션", desc: "코드·데이터·스택 등 논리적 의미 단위(가변 크기)로 분할 관리 (외부 단편화 발생)" },
-      { major: "교체 기법", minor: "LRU / LFU", desc: "가장 오랫동안 참조되지 않은 페이지(LRU) 또는 참조 횟수가 가장 적은 페이지(LFU) 교체" },
-      { major: "교체 기법", minor: "NUR (Clock)", desc: "참조 비트와 변형 비트 2개만 사용하여 적은 하드웨어 비용으로 LRU를 근사 구현" },
-      { major: "성능 저하", minor: "스래싱 (Thrashing)", desc: "잦은 페이지 부재로 CPU가 작업보다 디스크 교체에 시간을 다 쓰는 현상 (워킹셋으로 예방)" }
+      { major: "4대 상태", minor: "M (수정, Modified)", desc: "현재 코어 캐시에서만 값이 변경(Dirty)되어 주기억장치(원본)와 다른 상태 (유일 보유, 메모리 반영 의무)" },
+      { major: "4대 상태", minor: "E (배타, Exclusive)", desc: "현재 코어 캐시만 단독 보유 중이며 주기억장치 원본과 값이 일치(Clean)하는 상태 (버스 요청 없이 즉시 M 전이 가능)" },
+      { major: "4대 상태", minor: "S (공유, Shared)", desc: "두 개 이상 코어의 캐시가 동일한 데이터를 읽기 전용으로 함께 보유하며 주기억장치 원본과 일치하는 상태" },
+      { major: "4대 상태", minor: "I (무효, Invalid)", desc: "다른 코어가 해당 주소 값을 수정하여 내 캐시 라인의 데이터가 무효화된 상태 (참조 시 Cache Miss 발생)" }
+    ]
+  },
+  {
+    domain: "CAOS",
+    topic: "가상 메모리 (Virtual Memory)",
+    keywords: [
+      "논리 주소 vs 물리 주소",
+      "요구 페이징 (Demand Paging)",
+      "페이지 폴트 (Page Fault)",
+      "할당 · 배치 · 인출 · 교체 (할배인교)"
+    ],
+    diagram: `[프로세스 논리 주소 공간] ──(필요한 페이지 일부만 적재: 요구 페이징)──▶ [물리 메모리 (RAM)]
+                                                                           ↕ (Swap In / Out)
+                                                                  [보조기억장치 (디스크)]`,
+    tableRows: [
+      { major: "핵심 개념", minor: "가상 기억 공간", desc: "물리적 주기억장치(RAM) 용량 한계를 극복하기 위해 실행에 필요한 일부만 적재하고 나머지는 디스크에 두어 큰 메모리처럼 쓰는 기법" },
+      { major: "동작 원리", minor: "페이지 폴트 처리", desc: "참조한 페이지가 RAM에 없으면 Page Fault 트랩 발생 → 디스크에서 빈 프레임으로 적재 후 페이지 테이블 갱신" },
+      { major: "관리 정책", minor: "할당 · 배치 · 인출 · 교체", desc: "• 할당(Allocation): 연속 할당 vs 불연속 분할(페이징, 세그멘테이션)\n• 배치(Placement): First-Fit, Best-Fit, Worst-Fit, Next-Fit\n• 인출(Fetch): 요구 반입(Demand Fetch) vs 예상 반입(Pre-Fetch)\n• 교체(Replacement): 메모리 포화 시 Victim 페이지 선정" }
+    ]
+  },
+  {
+    domain: "CAOS",
+    topic: "페이징 (Paging)",
+    keywords: [
+      "고정 크기 블록 분할",
+      "페이지 (Page) & 프레임 (Frame)",
+      "페이지 테이블",
+      "내부 단편화 발생 / 외부 단편화 해결"
+    ],
+    diagram: `[가상 주소: 페이지 번호(P) | 변위(d)] ──(페이지 테이블 매핑)──▶ [물리 주소: 프레임 번호(F) | 변위(d)]`,
+    tableRows: [
+      { major: "핵심 개념", minor: "고정 분할 할당", desc: "가상 메모리는 같은 크기의 페이지(Page)로, 물리 메모리는 동일한 크기의 프레임(Frame)으로 고정 분할하여 매핑하는 기법" },
+      { major: "구성 요소", minor: "페이지 테이블", desc: "논리 페이지 번호를 물리 프레임 번호로 변환하는 매핑 테이블 (유효 비트, 수정 비트, 접근 권한 비트 포함)" },
+      { major: "장단점", minor: "단편화 특성", desc: "• 강점: 할당과 교체가 빠르고 외부 단편화(External Fragmentation)가 원천 해결됨\n• 한계: 마지막 페이지에 남는 공간인 내부 단편화(Internal Fragmentation) 발생" }
+    ]
+  },
+  {
+    domain: "CAOS",
+    topic: "세그멘테이션 (Segmentation)",
+    keywords: [
+      "가변 크기 논리적 분할",
+      "세그먼트 테이블 (Base · Limit)",
+      "보호 및 공유 용이",
+      "외부 단편화 발생 / 내부 단편화 해결"
+    ],
+    diagram: `[가상 주소: 세그먼트 번호(S) | 변위(d)] ──(d < Limit 검증 후 + Base 시작주소)──▶ [물리 메모리 주소]`,
+    tableRows: [
+      { major: "핵심 개념", minor: "가변 분할 할당", desc: "프로그램을 코드·데이터·힙·스택 등 논리적 의미 단위(세그먼트)의 가변 크기로 분할하여 메모리에 적재하는 기법" },
+      { major: "구성 요소", minor: "세그먼트 테이블", desc: "세그먼트 시작 물리 주소(Base)와 세그먼트 길이(Limit)를 보관하며, 변위가 Limit를 넘으면 트랩(Segmentation Fault) 발생" },
+      { major: "장단점", minor: "공유 및 단편화", desc: "• 강점: 내부 단편화가 없으며 의미 단위별 읽기/쓰기/실행 보호 및 프로세스 간 코드 공유가 매우 용이\n• 한계: 다양한 크기의 세그먼트 입출입으로 빈 공간이 쪼개지는 외부 단편화 발생" }
+    ]
+  },
+  {
+    domain: "CAOS",
+    topic: "페이지 교체 알고리즘",
+    keywords: [
+      "Victim 페이지 선정",
+      "FIFO & Belady의 모순",
+      "LRU · LFU",
+      "NUR (Clock) · SCR (2차 기회)",
+      "두음: 세랜피옵 LRN"
+    ],
+    diagram: `[Page Fault 발생 & 빈 프레임 없음] ➔ 교체 알고리즘으로 Victim 선정 ➔ 디스크 Swap-Out 후 신규 페이지 적재`,
+    tableRows: [
+      { major: "기본 기법", minor: "OPT (최적) & FIFO", desc: "• OPT(Optimal): 앞으로 가장 오랫동안 쓰이지 않을 페이지 교체 (이론적 최적, 구현 불가)\n• FIFO: 가장 먼저 적재된 페이지 교체 (프레임을 늘려도 페이지 부재가 증가하는 Belady's Anomaly 발생)" },
+      { major: "지역성 기반", minor: "LRU & LFU", desc: "• LRU(Least Recently Used): 가장 오랫동안 참조되지 않은 페이지 교체 (시간 지역성 활용, 적중률 우수)\n• LFU(Least Frequently Used): 참조 횟수가 가장 적은 페이지 교체 (초기 집중 참조 후 안 쓰이는 페이지 잔류 한계)" },
+      { major: "근사 기법", minor: "SCR & NUR (Clock)", desc: "• SCR(2차 기회): FIFO 기반이되 참조 비트가 1이면 0으로 초기화하고 큐 맨 뒤로 보내 한 번 더 기회 부여\n• NUR(Not Used Recently): 참조 비트(R)와 변형 비트(M) 2개만 사용해 적은 하드웨어 오버헤드로 LRU 근사 구현" }
     ]
   },
   {
@@ -112,15 +197,12 @@ const topics = [
     keywords: ["중첩(Superposition)", "얽힘(Entanglement)", "블로흐 구(Bloch Sphere)", "초전도", "포획 이온"],
     diagram: "qubit.png",
     tableRows: [
-      // [Table 1: 양자역학적 특성 및 주요 알고리즘]
       { category: "양자역학적 특성", sub: "양자 중첩 (Superposition)", desc: "0과 1 정보를 동시에 표현 가능" },
       { category: "", sub: "양자 얽힘 (Entanglement)", desc: "둘 이상의 큐비트 간 강한 상관관계, 비국소적 정보 전달 기반" },
       { category: "주요 알고리즘", sub: "Shor 알고리즘", desc: "소인수분해" },
       { category: "", sub: "Grover 알고리즘", desc: "비정렬 검색" },
       { category: "품질 및 제어", sub: "결맞음 시간 (Coherence Time)", desc: "양자 상태 유지 시간 (T1, T2), 양자 연산 가능 시간 결정" },
       { category: "", sub: "양자 오차 수정 (QEC)", desc: "디코히어런스 극복, 물리 큐비트를 묶어 논리 큐비트 형성" },
-
-      // [Table 2: 물리적 하드웨어 구현 방식 5대]
       { category: "하드웨어 구현", sub: "초전도 (조셉슨 접합)", desc: "[강점] 빠른 게이트 연산, 상용 클라우드 선도\n[과제] 극저온 냉동기 필수, 짧은 결맞음 시간\n[키워드] 인공 원자, 트랜스몬, 극저온" },
       { category: "", sub: "포획 이온 (전자기장)", desc: "[강점] 압도적 긴 결맞음 시간, 최고 수준 연산 충실도\n[과제] 연산 속도 상대적 느림, 복잡한 광학계 제어\n[키워드] 단일 이온, 광학 격자, 충실도" },
       { category: "", sub: "퀀텀닷 (양자점)", desc: "[강점] 기존 CMOS 팹 호환, 극소형 초고집적\n[과제] 큐비트 간 전자기 누화(Crosstalk), 균일 제어 공정 난제\n[키워드] 반도체 스핀, CMOS 호환성" },
@@ -128,55 +210,919 @@ const topics = [
       { category: "", sub: "중성 원자 (광학 핀셋)", desc: "[강점] 수천 큐비트급 대규모 배열 용이, 물리적 셔틀링 가능\n[과제] 원자 포획 손실률 관리 필요, 게이트 조작 속도 개선\n[키워드] 뤼드베리 상태, 대규모 확장" }
     ]
   },
+  {
+    domain: "CAOS",
+    topic: "결함허용 시스템 (FTS)",
+    keywords: [
+      "Fault Tolerant System",
+      "물리적 하드웨어 중복 (Lockstep)",
+      "절체시간 0초 (No Failover Time)",
+      "TMR (3중 모듈 중복)",
+      "N-Version 프로그래밍 · Recovery Block",
+      "두음: 탐진복 / 셀티와 / N버전N셀프RB"
+    ],
+    diagram: `[입력] ➔ [모듈 1] & [모듈 2] & [모듈 3] (동시 실행) ➔ [다수결 보터 (Voter)] ➔ 중단 없는 정상 출력 (절체시간 0초)`,
+    tableRows: [
+      { major: "핵심 개념", minor: "무중단 결함허용", desc: "시스템 주요 부품을 물리적으로 중복 구성하여 HW/SW 결함 발생 시에도 절체시간(0초) 없이 규정된 기능을 지속 수행하는 시스템" },
+      { major: "처리 절차", minor: "탐지 → 진단 → 복구", desc: "결함 탐지(Exception 처리) → 결함 진단(모니터링·시뮬레이션) → 결함 복구(격리·교체·롤백)" },
+      { major: "하드웨어 기법", minor: "TMR · Self-Purging", desc: "• TMR(3중 모듈 중복): 3개 모듈이 동일 연산 수행 후 다수결 보터(Voter)로 정상 결과 채택\n• 기타: Self-Purging Redundancy, Duplication with Comparison, Watchdog Timer" },
+      { major: "소프트웨어 기법", minor: "N-Version · Recovery Block", desc: "• N-Version Programming: 독립 개발된 N개 버전을 동시 실행해 결과 비교\n• Recovery Block: 주 루틴 실패 시 체크포인트로 롤백 후 대체 루틴 실행" }
+    ]
+  },
+  {
+    domain: "CAOS",
+    topic: "고가용성 (HA)",
+    keywords: [
+      "High Availability",
+      "클러스터 Failover (30~300초)",
+      "Heartbeat 장애 감시",
+      "Hot / Warm / Cold Standby",
+      "Mutual Takeover · Concurrent Access",
+      "두음: 핫무콜컨"
+    ],
+    diagram: `[Active 운영 노드] ──(Heartbeat 주기적 상태 감시 & 공유 스토리지)──▶ [Standby 대기 노드] (장애 시 Failover 절체)`,
+    tableRows: [
+      { major: "핵심 개념", minor: "고가용성 클러스터", desc: "2대 이상의 범용 서버를 하나의 클러스터로 묶어, 주 시스템 장애 시 예비 시스템으로 신속히 서비스를 절체(Failover)하는 기술" },
+      { major: "FTS와 차이", minor: "비용 및 절체시간", desc: "전용 HW를 쓰는 FTS(절체 0초, 고비용)와 달리 범용 HW/OS를 사용하며 절체 시간(수초~수분)이 존재하지만 구축 비용이 합리적" },
+      { major: "대기 방식", minor: "Hot · Mutual · Concurrent", desc: "• Hot Standby: 주 서버 가동 + 백업 서버 실시간 대기(장애 시 즉시 인수)\n• Mutual Takeover(상호 인수): 평시 2대가 각자 다른 업무 수행 후 장애 시 상대 업무까지 인수\n• Concurrent Access(동시 수행): 모든 노드가 Active로 동시 병렬 처리" }
+    ]
+  },
+  {
+    domain: "CAOS",
+    topic: "가용성 Five Nines (99.999%) 달성 아키텍처",
+    keywords: [
+      "가용도 = MTTF / (MTTF + MTTR)",
+      "연간 다운타임 5.26분 이내",
+      "단일장애점 (SPOF) 제거",
+      "Active-Active 다중 리전",
+      "카오스 엔지니어링"
+    ],
+    diagram: `• 가용도 공식 : Availability = MTTF ÷ MTBF = MTTF ÷ (MTTF + MTTR)
+• Five Nines (99.999%) = 고장 간격(MTTF) 극대화 + 자동 감지·무중단 절체로 수리 시간(MTTR → 0) 극소화`,
+    tableRows: [
+      { major: "가용성 지표", minor: "MTTF · MTTR · MTBF", desc: "• MTTF(평균고장시간): 복구 시점부터 다음 장애 발생 시점까지의 평균 정상 운영 시간\n• MTTR(평균수리시간): 장애 발생부터 복구 완료까지 걸리는 평균 시간\n• MTBF(평균고장간격): MTTF + MTTR" },
+      { major: "Five Nines", minor: "99.999%의 의미", desc: "전체 운영 시간 중 고장 없이 운영되는 비율이 99.999%로, 1년 기준 허용 다운타임이 약 5.26분 이내인 초고가용성 수준" },
+      { major: "달성 아키텍처", minor: "SPOF 제거 & 자동 복구", desc: "• 인프라: 전 계층(네트워크·서버·DB·전원) 이중화로 단일장애점(SPOF) 완전 제거 및 Active-Active 멀티 리전 구성\n• 애플리케이션: 서킷 브레이커(장애 격리), 무중단 배포(블루그린·카나리), 카오스 엔지니어링 기반 상시 장애 훈련" }
+    ]
+  },
+  {
+    domain: "CAOS",
+    topic: "메모리 벽 (Memory Wall)",
+    keywords: [
+      "폰노이만 병목 현상",
+      "프로세서-메모리 속도 격차",
+      "대역폭 한계 & 용량 한계",
+      "데이터 이동 에너지 소모"
+    ],
+    diagram: `[CPU/GPU 연산 성능: 매년 급격한 지수적 향상] ◀──(심화되는 속도·대역폭 격차: Memory Wall)──▶ [DRAM 메모리 속도: 완만한 향상]`,
+    tableRows: [
+      { major: "핵심 개념", minor: "메모리 벽 정의", desc: "멀티코어·AI 가속기의 연산 속도는 급증하는 반면, 메모리의 대역폭과 접근 지연시간 개선이 이를 따라가지 못해 전체 성능이 제한되는 현상" },
+      { major: "발생 원인", minor: "대역폭 및 핀 수 한계", desc: "폰노이만 구조에서 데이터 버스를 통한 지속적 데이터 이동이 필요하나, DDR 채널 확장 및 물리적 핀 수 증가에 한계 도달" },
+      { major: "극복 방향", minor: "3D 적층 · CXL · PIM", desc: "• 대역폭 돌파: TSV 수직 적층 기반 HBM(고대역폭 메모리) 도입\n• 용량·공유 돌파: CXL 기반 메모리 풀링 및 확장\n• 이동 제거: 메모리 내부에서 직접 연산하는 PIM(Processing-In-Memory) 및 뉴로모픽 도입" }
+    ]
+  },
+  {
+    domain: "CAOS",
+    topic: "CXL (Compute Express Link)",
+    keywords: [
+      "PCIe 5.0/6.0 기반 오픈 인터커넥트",
+      "CXL.io · CXL.cache · CXL.mem",
+      "Device Type 1 · 2 · 3",
+      "메모리 풀링(Pooling) & 패브릭 (CXL 3.0)",
+      "캐시 일관성 보장"
+    ],
+    diagram: `[호스트 CPU] ↕ CXL 통합 프로토콜 (CXL.io / CXL.cache / CXL.mem) ↕ [CXL 스위치 패브릭] ↕ [가속기(Type1/2) · 공유 메모리 풀(Type3)]`,
+    tableRows: [
+      { major: "핵심 개념", minor: "차세대 통합 인터페이스", desc: "PCIe 물리 계층 위에서 CPU와 가속기(GPU·FPGA), 메모리 확장 장치 간 고속·저지연 통신과 캐시 일관성을 제공하는 오픈 표준" },
+      { major: "3대 프로토콜", minor: "CXL.io / .cache / .mem", desc: "• CXL.io: PCIe 기반 장치 탐색·초기화·DMA 제어\n• CXL.cache: 가속기가 호스트 CPU 메모리를 캐시 일관성 있게 접근\n• CXL.mem: 호스트 CPU가 장치 부착 메모리를 Load/Store 명령으로 직접 접근" },
+      { major: "장치 유형", minor: "Type 1 · Type 2 · Type 3", desc: "• Type 1: 자체 메모리 없는 가속기 (스마트 NIC, io+cache)\n• Type 2: 자체 메모리 탑재 가속기 (GPU·밀집 연산기, io+cache+mem)\n• Type 3: 메모리 용량·대역폭 확장기 (CXL DRAM 모듈, io+mem)" },
+      { major: "CXL 3.0 혁신", minor: "스위치 패브릭 & 풀링", desc: "PCIe 6.0(64GT/s PAM4) 기반 대역폭 2배 향상, 다중 스위치 패브릭 및 백무효화(Back-Invalidation)를 통해 다수 서버 간 동적 메모리 풀링·공유(GFAM) 실현" }
+    ]
+  },
+  {
+    domain: "CAOS",
+    topic: "메모리 계층구조 (Memory Hierarchy)",
+    keywords: [
+      "레지스터 · 캐시 · 주기억장치 · 보조기억장치",
+      "속도 · 용량 · 비용 Trade-off",
+      "지역성 (Locality) 기반 계층 이동",
+      "워드(Word) 전송 vs 블록/페이지 전송"
+    ],
+    diagram: `[CPU 코어] ➔ 레지스터 (가장 빠름/소용량/고가) ➔ 캐시(SRAM) ➔ 주기억장치(DRAM) ➔ 스토리지(SSD/HDD, 대용량/저가)`,
+    tableRows: [
+      { major: "설계 철학", minor: "속도·비용 최적화", desc: "빠르고 비싼 소용량 메모리(SRAM)를 CPU 가까이에, 느리고 저렴한 대용량 메모리(DRAM/NAND)를 하위에 배치하여 평균 접근 시간 최소화" },
+      { major: "전송 단위", minor: "워드 · 블록 · 페이지", desc: "• CPU ↔ 캐시: 워드(Word) 단위 전송\n• 캐시 ↔ 주기억장치: 블록(캐시 라인) 단위 전송\n• 주기억장치 ↔ 보조기억장치: 페이지(Page) 또는 세그먼트 단위 전송" },
+      { major: "AI 시대 변화", minor: "계층 경계의 재편", desc: "거대 AI 모델 파라미터 적재를 위해 GPU 인접 HBM 계층이 추가되고, CXL 메모리 티어링 및 HBF가 DRAM-SSD 간 간극을 메움" }
+    ]
+  },
+  {
+    domain: "CAOS",
+    topic: "고대역 초고속 메모리 (HBM)",
+    keywords: [
+      "High Bandwidth Memory",
+      "DRAM 3D 수직 적층",
+      "TSV (실리콘 관통 전극)",
+      "실리콘 인터포저 (2.5D 패키징)",
+      "베이스 로직 다이 (Base Die)",
+      "HBM4 (2048-bit · 하이브리드 본딩)"
+    ],
+    diagram: `[HBM DRAM 코어 다이 적층 (TSV 수직 관통 연결)]
+         ↓ (마이크로범프 / 하이브리드 본딩)
+[베이스 로직 다이 (PHY 제어)] ⇄ (실리콘 인터포저 2048-bit 초광대역 배선) ⇄ [GPU / AI 가속기]`,
+    tableRows: [
+      { major: "핵심 개념", minor: "TSV 기반 적층 메모리", desc: "여러 개의 DRAM 다이를 수직으로 쌓고 미세 구멍을 뚫어 전극을 연결하는 TSV(실리콘 관통 전극) 기술로 대역폭을 극대화한 메모리" },
+      { major: "구성 요소", minor: "인터포저 & 베이스 다이", desc: "• 실리콘 인터포저: 패키지 기판 위에서 GPU와 HBM을 초미세 배선으로 병렬 연결(2.5D 패키징)\n• 베이스 로직 다이: 최하단에서 상부 DRAM 스택을 제어하고 GPU와 신호 교환" },
+      { major: "기술 진화", minor: "HBM4 (6세대) 혁신", desc: "• 입출력(I/O) 통로를 기존 1024-bit에서 2048-bit로 2배 확장\n• 베이스 다이에 파운드리 초미세 로직 공정을 적용(맞춤형 설계)하고 범프 없이 구리를 직접 붙이는 하이브리드 본딩으로 방열·신호 효율 극대화" }
+    ]
+  },
+  {
+    domain: "CAOS",
+    topic: "고대역폭 플래시 (HBF)",
+    keywords: [
+      "High Bandwidth Flash",
+      "3D NAND 플래시 수직 적층",
+      "TSV & 실리콘 인터포저",
+      "고대역폭 · 대용량 · 비휘발성 결합",
+      "CBA (CMOS directly Bonded to Array)"
+    ],
+    diagram: `[3D NAND 플래시 코어 다이 적층 (TSV 관통 연결)] ➔ [베이스 로직 다이] ⇄ [실리콘 인터포저] ⇄ [GPU / AI 가속기]`,
+    tableRows: [
+      { major: "핵심 개념", minor: "HBM 구조의 낸드 플래시", desc: "비휘발성 NAND 플래시 메모리를 HBM과 유사한 TSV 3D 스택 및 인터포저 구조로 패키징하여 고대역폭과 대용량을 동시 달성한 차세대 메모리" },
+      { major: "주요 구성", minor: "HBF Core Die & CBA", desc: "• TSV, HBF 코어 다이, 로직 다이(PIM 적용 가능), 마이크로범프, 실리콘 인터포저로 구성\n• CMOS 회로와 셀 어레이를 직접 접합하는 CBA(CMOS directly Bonded to Array) 공정 적용" },
+      { major: "도입 효과", minor: "LLM 가중치 저장 병목 해소", desc: "HBM의 용량 한계와 고비용 문제를 보완하여 초거대 AI 모델의 방대한 파라미터를 비휘발성 대용량으로 수용하고 고속 읽기를 지원" }
+    ]
+  },
+  {
+    domain: "CAOS",
+    topic: "PIM (Processing-In-Memory)",
+    keywords: [
+      "메모리 내부 연산기(PU) 집적",
+      "CPU-메모리 데이터 이동 최소화",
+      "HBM-PIM · PNM (Near-Memory)",
+      "폰노이만 병목 및 전력 소모 극복"
+    ],
+    diagram: `[기존 구조] 메모리 ──(좁은 버스 이동 병목)──▶ CPU/GPU 연산
+[PIM 구조]  [메모리 뱅크 + 내장 연산 코어(PIM PU)] ➔ 데이터 이동 없이 메모리 내부에서 즉시 벡터·행렬 연산!`,
+    tableRows: [
+      { major: "핵심 개념", minor: "메모리 내 연산 기술", desc: "메모리 반도체 내부에 프로세싱 유닛(연산기)을 집적하여 CPU/GPU와 메모리 간 데이터 이동으로 인한 지연과 전력 소모를 줄이는 기술" },
+      { major: "구현 유형", minor: "PNM · PIC · HBM-PIM", desc: "• PNM(Processing-Near-Memory): 로직 다이나 컨트롤러 인접 영역에 연산기 배치\n• HBM-PIM: HBM의 고대역폭 구조 내부에 AI 연산 블록을 결합해 대역폭 효율을 수배 향상" },
+      { major: "기대 효과", minor: "전성비 및 처리량 향상", desc: "전체 에너지의 대부분을 차지하는 '데이터 이동 에너지'를 획기적으로 절감하고 대규모 AI 추론 속도를 가속" }
+    ]
+  },
+  {
+    domain: "CAOS",
+    topic: "뉴로모픽 칩 (Neuromorphic Chip)",
+    keywords: [
+      "인간 뇌 신경망(뉴런·시냅스) 모사",
+      "스파이킹 신경망 (SNN)",
+      "비폰노이만 아키텍처",
+      "이벤트 기반 비동기 초저전력 연산"
+    ],
+    diagram: `[입력 스파이크 신호] ➔ [인공 뉴런(연산) + 시냅스(비휘발성 메모리) 일체형 코어 배열] ➔ 임계치 도달 시에만 스파이크 발화 (초저전력)`,
+    tableRows: [
+      { major: "핵심 개념", minor: "인간 뇌 구조 모사", desc: "연산장치(CPU)와 기억장치(메모리)가 분리된 폰노이만 구조에서 벗어나, 인간 뇌의 뉴런과 시냅스 연결 구조를 모사한 초저전력 반도체" },
+      { major: "동작 원리", minor: "스파이킹 신경망 (SNN)", desc: "클럭 주기에 맞춰 모든 노드를 계산하는 대신, 신호가 임계치를 넘어 스파이크(Spike)가 발생할 때만 비동기적으로 동작하여 전력 소모 극소화" },
+      { major: "주요 특징", minor: "연산·기억 융합 & 병렬성", desc: "수많은 저전력 코어가 시냅스 가중치를 자체 보유하며 대규모 병렬 처리 및 온디바이스 실시간 자율 학습에 적합" }
+    ]
+  },
+  {
+    domain: "CAOS",
+    topic: "NPU (Neural Processing Unit)",
+    keywords: [
+      "인공신경망(DNN/CNN/LLM) 전용 가속기",
+      "MAC (곱셈·누적) 행렬 연산기",
+      "저정밀도 연산 (INT8 · FP8 · FP16)",
+      "온디바이스 AI 핵심 코어"
+    ],
+    diagram: `[입력 텐서 & 가중치 버퍼] ➔ [대규모 MAC(곱셈·누산) 행렬 연산 엔진] ➔ [활성화 함수(ReLU/Sigmoid LUT) · 풀링 유닛] ➔ [출력]`,
+    tableRows: [
+      { major: "핵심 개념", minor: "신경망 전용 프로세서", desc: "딥러닝 알고리즘의 핵심인 대규모 행렬 곱셈과 합성곱 연산을 고속·저전력으로 처리하도록 설계된 AI 전용 비메모리 반도체" },
+      { major: "내부 구조", minor: "MAC 엔진 & 스케줄러", desc: "• 곱셈과 덧셈을 한 사이클에 처리하는 대규모 MAC(Multiply-Accumulate) 연산 배열\n• Sigmoid/ReLU 활성화 함수용 Look-Up Table(LUT), 가중치 온칩 버퍼, DMA 및 버스 스케줄러" },
+      { major: "핵심 강점", minor: "양자화·저전력 최적화", desc: "그래픽 렌더링 파이프라인을 덜어내고 AI 추론에 충분한 저정밀도(FP16, INT8, INT4) 연산에 집중해 GPU 대비 월등한 전성비(성능/와트) 달성" }
+    ]
+  },
+  {
+    domain: "CAOS",
+    topic: "GPU (Graphics Processing Unit)",
+    keywords: [
+      "수천 개 ALU 코어 병렬 처리",
+      "SM (스트리밍 멀티프로세서) · SP",
+      "Warp (32개 스레드 스케줄링 단위)",
+      "GPGPU & CUDA 플랫폼"
+    ],
+    diagram: `[CPU (소수 코어 직렬 제어)] ──(커널 함수 오프로딩: CUDA)──▶ [GPU: 다수 SM 블록 → 각 SM 내 수백 개 SP(ALU)가 32스레드(Warp) 단위로 대규모 병렬 연산]`,
+    tableRows: [
+      { major: "핵심 개념", minor: "대규모 병렬 연산 장치", desc: "직렬 처리에 최적화된 CPU와 달리 수천 개의 산술논리연산장치(ALU/SP) 코어로 구성되어 그래픽 및 범용 대규모 데이터 병렬 처리를 수행하는 장치" },
+      { major: "내부 구조", minor: "SM · SP · Warp · Global Mem", desc: "• SM(Stream Multiprocessor): 제어 로직과 명령 캐시를 공유하며 멀티 스레드를 동시 실행하는 블록\n• SP(Stream Processor): 실제 산술·논리 연산을 수행하는 코어\n• Warp: SM에서 스레드를 32개씩 묶어 단일 명령어로 스케줄링(SIMT)하는 단위" },
+      { major: "범용 확장", minor: "GPGPU & CUDA", desc: "GPU를 그래픽 외 일반 응용 프로그램 및 AI 행렬 연산에 활용하는 기법(GPGPU)으로, 엔비디아 CUDA 및 OpenCL 표준 플랫폼 활용" }
+    ]
+  },
+  {
+    domain: "CAOS",
+    topic: "TPU (Tensor Processing Unit)",
+    keywords: [
+      "구글 AI 전용 맞춤형 ASIC",
+      "시스톨릭 어레이 (Systolic Array)",
+      "MXU (행렬 곱셈 유닛)",
+      "레지스터 재접근 병목 제거"
+    ],
+    diagram: `[가중치(Weight) 사전 적재] + [입력 데이터 스트림 유입] ➔ [시스톨릭 어레이 격자 연산기(PE)를 따라 인접 셀로 직접 전달·누산] ➔ [고속 행렬 곱 출력]`,
+    tableRows: [
+      { major: "핵심 개념", minor: "텐서 연산 특화 가속기", desc: "구글이 딥러닝 신경망의 대규모 행렬(텐서) 연산만을 초고속·저전력으로 처리하기 위해 설계한 맞춤형 ASIC 프로세서" },
+      { major: "핵심 아키텍처", minor: "시스톨릭 어레이 (Systolic)", desc: "심장이 혈액을 뿜어내듯 데이터가 그물망처럼 연결된 연산기(PE)들을 통과하며, 매 연산마다 레지스터에 읽고 쓰는 과정 없이 인접 연산기로 중간 결과를 바로 전달" },
+      { major: "GPU와 차이", minor: "행렬 특화 전성비 극대화", desc: "범용 그래픽·분기 제어 회로를 완전히 제거하고 대규모 행렬 곱셈 유닛(MXU)과 HBM 대역폭에 집중하여 거대 모델 학습·추론 시 전성비 극대화" }
+    ]
+  },
+  {
+    domain: "CAOS",
+    topic: "ASIC (Application-Specific Integrated Circuit)",
+    keywords: [
+      "주문형 반도체 (맞춤형 집적회로)",
+      "회로 구조 고정 (변경 불가)",
+      "최고 수준 연산 속도 & 전력 효율",
+      "CPU → GPU → FPGA → ASIC 진화"
+    ],
+    diagram: `[유연성 높음 / 전성비 낮음]  CPU ➔ GPU ➔ FPGA (프로그래밍 가능 게이트) ➔ ASIC (회로 영구 고정, 양산 시 전성비 최고)  [특화성·전성비 최고]`,
+    tableRows: [
+      { major: "핵심 개념", minor: "주문형 맞춤 반도체", desc: "특정 응용 분야나 알고리즘만을 수행하도록 설계 단계부터 논리 게이트 회로를 맞춤형으로 고정 제작한 반도체 집적회로" },
+      { major: "장단점", minor: "고효율 vs 비유연성", desc: "• 강점: 불필요한 범용 제어 로직이 없어 연산 속도, 칩 면적, 전력 효율(성능/W)이 모든 반도체 중 가장 뛰어남\n• 한계: 초기 설계·마스크 제작 비용(NRE)과 개발 기간이 길며, 제작 후 알고리즘 변경 시 회로 수정 불가" },
+      { major: "FPGA와 비교", minor: "고정 회로 vs 재구성", desc: "알고리즘이 자주 바뀌는 초기 단계에는 회로 재프로그래밍이 가능한 FPGA를 쓰고, 규격이 확정된 대량 양산 단계에서는 ASIC으로 전환" }
+    ]
+  },
+  {
+    domain: "CAOS",
+    topic: "멀티 GPU 병렬화 기술",
+    keywords: [
+      "데이터 병렬화 (DP · All-Reduce)",
+      "텐서 병렬화 (TP) · 파이프라인 병렬화 (PP)",
+      "3D 병렬화 & ZeRO / FSDP",
+      "NVLink · NVSwitch · GPUDirect RDMA"
+    ],
+    diagram: `• 데이터 병렬화(DP) : [GPU 1: 전체모델 + 데이터A] & [GPU 2: 전체모델 + 데이터B] ➔ 그래디언트 All-Reduce 동기화
+• 모델 병렬화(TP/PP) : 거대 단일 모델을 [레이어 내부 행렬 분할(TP)] 또는 [층별 순차 분할(PP)]하여 다수 GPU에 분산 적재`,
+    tableRows: [
+      { major: "데이터 병렬화", minor: "DP & ZeRO / FSDP", desc: "• DP: 동일한 모델을 각 GPU에 복제하고 학습 데이터를 분할 처리 후 가중치 갱신값 동기화\n• ZeRO/FSDP: 중복 저장되는 옵티마이저 상태·그래디언트·파라미터를 GPU들에 샤딩(분산)하여 메모리 한계 돌파" },
+      { major: "모델 병렬화", minor: "텐서(TP) & 파이프라인(PP)", desc: "• 텐서 병렬화(TP): 단일 트랜스포머 레이어의 거대 행렬 연산을 여러 GPU로 쪼개어 동시 연산 (노드 내 초고속 통신 필수)\n• 파이프라인 병렬화(PP): 모델의 층(Layer)을 순서대로 GPU에 나누어 배치하고 마이크로 배치로 버블(유휴시간) 최소화" },
+      { major: "고속 인터커넥트", minor: "NVLink & RDMA", desc: "PCIe 대역폭 한계를 넘기 위해 노드 내 GPU 간에는 NVLink/NVSwitch로 직접 연결하고, 서버 노드 간에는 CPU를 우회하는 GPUDirect RDMA(InfiniBand/RoCE) 사용" }
+    ]
+  },
+  {
+    domain: "CAOS",
+    topic: "오토 스케일링 (Auto Scaling)",
+    keywords: [
+      "부하 기반 탄력적 자원 증감",
+      "수평 확장 (Scale-Out / HPA)",
+      "수직 확장 (Scale-Up / VPA)",
+      "쿨다운 (Cooldown) & 플래핑 방지"
+    ],
+    diagram: `[메트릭 수집 (CPU/GPU 사용률 · 요청 큐)] ➔ [임계치 초과 판단] ➔ [Scale-Out (인스턴스/파드 수 증설) 또는 Scale-Up (자원 스펙 상향)]`,
+    tableRows: [
+      { major: "핵심 개념", minor: "탄력적 자원 관리", desc: "실시간 워크로드 부하(CPU, 메모리, 네트워크, 커스텀 큐 지표)를 모니터링하여 컴퓨팅 자원을 자동으로 확장(Out/Up)하거나 축소(In/Down)하는 기술" },
+      { major: "확장 방식", minor: "수평(HPA) vs 수직(VPA)", desc: "• 수평 확장(Scale-Out / HPA): 실행 중인 서버 인스턴스나 컨테이너 파드(Pod)의 개수를 늘림 (무중단 확장에 유리)\n• 수직 확장(Scale-Up / VPA): 단일 인스턴스에 할당된 CPU 코어 수나 메모리 용량 스펙 자체를 증설" },
+      { major: "안정화 제어", minor: "Cooldown & 예측 스케일링", desc: "확장 직후 지표가 안정화될 때까지 추가 변동을 멈추는 쿨다운(Cooldown) 타이머로 잦은 증감 반복(Flapping/Thrashing)을 방지하며, 머신러닝 기반 사전 예측 확장 병행" }
+    ]
+  },
+  {
+    domain: "CAOS",
+    topic: "페이즈드 어텐션 (PagedAttention)",
+    keywords: [
+      "LLM 추론 KV 캐시 단편화 해결",
+      "OS 가상 메모리 페이징 차용",
+      "비연속 블록 할당 (Block Table)",
+      "Copy-on-Write 프롬프트 공유",
+      "vLLM 추론 엔진 핵심 기술"
+    ],
+    diagram: `[논리적 KV 블록 (연속된 토큰 시퀀스)] ──(블록 테이블 매핑)──▶ [물리적 GPU 메모리 블록 (비연속 분산 저장)]
+➔ 메모리 단편화 제로화 및 배치(Batch) 추론 처리량 2~4배 향상`,
+    tableRows: [
+      { major: "도입 배경", minor: "KV 캐시 메모리 낭비", desc: "LLM 자기회귀 추론 시 출력 길이를 미리 알 수 없어 KV 캐시를 최대 길이로 연속 할당하면 심각한 내부·외부 단편화(60~80% 낭비) 발생" },
+      { major: "핵심 원리", minor: "비연속 페이지 블록화", desc: "OS의 가상 메모리 페이징 기법을 차용하여 KV 캐시를 고정 크기 블록(Page)으로 쪼개고 물리 GPU 메모리에 비연속적으로 배치·관리" },
+      { major: "메모리 공유", minor: "Copy-on-Write (CoW)", desc: "동일한 시스템 프롬프트나 병렬 샘플링(Beam Search) 시 KV 블록을 여러 요청이 물리적으로 공유하고 수정 발생 시에만 복제" },
+      { major: "기대 효과", minor: "처리량(Throughput) 극대화", desc: "메모리 낭비를 4% 미만으로 줄여 확보된 GPU 여유 공간에 더 많은 동시 요청(Batch Size 확대)을 묶어 처리함으로써 추론 처리량 대폭 향상" }
+    ]
+  },
+  {
+    domain: "CAOS",
+    topic: "운영체제 CPU 스케줄링",
+    keywords: [
+      "CPU 이용률 · 처리량 극대화",
+      "응답시간 · 대기시간 · 반환시간 최소화",
+      "선점형 (RR · SRT · MLQ · MLFQ)",
+      "비선점형 (FCFS · SJF · HRN)",
+      "두음: 선점(RS멀레) / 비선점(우기피소히)"
+    ],
+    diagram: `[준비 큐(Ready Queue) 대기 프로세스들] ──(CPU 스케줄러/디스패처)──▶ [CPU 할당 및 문맥교환]
+• 비선점형 (스스로 반납할 때까지 유지: FCFS, SJF, HRN) vs 선점형 (타임슬라이스/우선순위로 강제 회수: RR, SRT, MLQ, MLFQ)`,
+    tableRows: [
+      { major: "스케줄링 목적", minor: "성능 지표 최적화", desc: "• 시스템 관점: CPU 이용률(Utilization) 및 단위 시간당 처리량(Throughput) 극대화\n• 사용자 관점: 반환시간(Turnaround), 대기시간(Waiting), 응답시간(Response) 최소화 및 공정성 보장" },
+      { major: "비선점형 기법", minor: "FCFS · SJF · Priority", desc: "• 강점: 문맥교환 오버헤드가 적고 응답시간 예측이 용이 (일괄 처리에 적합)\n• 알고리즘: 도착순(FCFS), 최단 작업 우선(SJF, 평균 대기시간 최소), 비선점 우선순위, HRN" },
+      { major: "선점형 기법", minor: "RR · SRT · MLQ · MLFQ", desc: "• 강점: 고우선순위 긴급 작업 및 대화형 시분할 시스템에서 빠른 응답시간 보장\n• 알고리즘: 라운드 로빈(RR, 동일 시간할당량 순환), 최소 잔여시간 우선(SRT), 다단계 큐(MLQ), 다단계 피드백 큐(MLFQ)" }
+    ]
+  },
+  {
+    domain: "CAOS",
+    topic: "RM (Rate Monotonic) 스케줄링",
+    keywords: [
+      "실시간 운영체제 (RTOS) 선점형 스케줄링",
+      "정적(고정) 우선순위 할당",
+      "실행 주기(Period)의 역수 비례",
+      "EDF (동적 마감시간 우선)와 비교"
+    ],
+    diagram: `• RM (Rate Monotonic) : 실행 주기(Period) T1 < T2 ➔ 주기가 더 짧은 T1에 고정 최우선순위 부여!
+• 비교 (EDF)          : 실행 시점마다 남은 마감시간(Deadline)이 가장 임박한 태스크에 동적 최우선순위 부여`,
+    tableRows: [
+      { major: "핵심 개념", minor: "주기 기반 정적 스케줄링", desc: "실시간 운영체제(RTOS)에서 독립적인 주기적 태스크들의 실행 주기(Period)를 기준으로, 주기가 짧을수록 더 높은 고정 우선순위를 부여하는 선점형 기법" },
+      { major: "특징 및 한계", minor: "구현 단순성 vs 이용률 상한", desc: "우선순위가 고정되어 오버헤드가 적으나, 태스크 수가 무한정 늘어날 때 스케줄링 가능한 CPU 이용률 상한이 약 69.3%(ln 2)로 제한됨" },
+      { major: "비교 기법", minor: "EDF (Earliest Deadline First)", desc: "마감시간(Deadline)이 가장 임박한 태스크에 동적으로 최우선순위를 부여하는 기법으로, RM과 달리 CPU 이용률을 이론상 100%까지 활용 가능" }
+    ]
+  },
+  {
+    domain: "CAOS",
+    topic: "다단계 큐 (MLQ, Multi-Level Queue)",
+    keywords: [
+      "선점형 다중 준비 큐 스케줄링",
+      "성격별(전경/배경) 큐 영구 분리",
+      "큐 간 프로세스 이동 불가",
+      "하위 큐 기아현상(Starvation) 발생"
+    ],
+    diagram: `[최상위: 시스템 프로세스 큐] ➔ [중위: 전경 대화형 큐 (RR 스케줄링)] ➔ [하위: 배경 일괄처리 큐 (FCFS)]
+➔ 큐 간 프로세스 이동이 불가능하고 상위 큐가 비어야 하위 큐가 실행되어 하위 큐 기아현상 발생!`,
+    tableRows: [
+      { major: "핵심 개념", minor: "고정 다중 큐 분할", desc: "프로세스를 특성에 따라 여러 그룹(시스템, 대화형, 편집, 일괄처리)으로 분류하고, 그룹마다 별도의 독자적인 준비 큐를 할당하는 스케줄링 기법" },
+      { major: "동작 방식", minor: "큐별 독립 스케줄링", desc: "각 큐는 자신만의 스케줄링 알고리즘(예: 전경 큐는 RR, 배경 큐는 FCFS)을 가지며, 큐와 큐 사이에는 고정 우선순위 선점형 스케줄링이나 차등 시간 할당 적용" },
+      { major: "주요 한계", minor: "유연성 부족 & 기아 발생", desc: "한 번 배정된 큐에서 다른 큐로 프로세스가 이동할 수 없으며, 상위 큐에 작업이 계속 들어오면 하위 큐 작업은 기아 상태에 빠짐 (MLFQ로 해결)" }
+    ]
+  },
+  {
+    domain: "CAOS",
+    topic: "다단계 피드백 큐 (MLFQ, Multi-Level Feedback Queue)",
+    keywords: [
+      "큐 간 프로세스 동적 이동 허용",
+      "하위 단계일수록 큰 타임 슬라이스 부여",
+      "CPU 버스트 긴 작업 강등",
+      "에이징 (Aging) 승격으로 기아 해소"
+    ],
+    diagram: `[신규 진입 → 최상위 큐 Q0 (타임 슬라이스 8ms)] ──(시간 내 미완료 시 강등)──▶ [중위 큐 Q1 (16ms)] ──▶ [하위 큐 Q2 (FCFS)]
+   ▲───────────────────────────────────────(장기 대기 시 상위 큐로 승격: Aging 기법)───────────────────────────────────────┘`,
+    tableRows: [
+      { major: "핵심 개념", minor: "동적 큐 이동 스케줄링", desc: "다단계 큐(MLQ)의 경직성과 기아 현상을 해결하기 위해, 프로세스의 CPU 사용 성향에 따라 큐 간 이동을 허용한 현대 OS 범용 스케줄링 기법" },
+      { major: "강등 메커니즘", minor: "짧은 작업/I/O 우대", desc: "처음 진입한 작업은 최상위 큐(가장 짧은 시간 할당량)에 배치하여 짧은 작업이나 대화형 I/O 작업은 즉시 끝내고, 시간 내에 못 끝낸 긴 연산 작업은 하위 큐(더 긴 시간 할당량)로 점진 강등" },
+      { major: "승격 메커니즘", minor: "에이징 (Aging) 기아 방지", desc: "하위 우선순위 큐에서 너무 오랫동안 CPU를 할당받지 못하고 대기한 프로세스는 다시 상위 우선순위 큐로 승격(Boost)시켜 기아 현상 원천 방지" }
+    ]
+  },
+  {
+    domain: "CAOS",
+    topic: "단일 큐 멀티프로세서 스케줄링 (SQMS)",
+    keywords: [
+      "Single-Queue Multiprocessor Scheduling",
+      "단일 전역 준비 큐 공유",
+      "락(Lock) 동기화 경합 병목",
+      "캐시 친화성 (Cache Affinity) 저하"
+    ],
+    diagram: `[단일 공용 준비 큐 (Global Ready Queue)] ──(Lock 경합 발생)──▶ [CPU 1] / [CPU 2] / [CPU 3] / [CPU 4]
+➔ 프로세스가 실행될 때마다 매번 다른 CPU에 배정되어 로컬 캐시(L1/L2) 및 TLB 무효화 빈발!`,
+    tableRows: [
+      { major: "핵심 구조", minor: "단일 전역 큐 공유", desc: "멀티코어 환경에서 모든 CPU가 단 하나의 전역 준비 큐(Ready Queue)를 공유하여 다음 실행할 작업을 꺼내가는 스케줄링 방식" },
+      { major: "핵심 강점", minor: "설계 단순성 & 자동 부하분산", desc: "기존 단일 CPU 스케줄러 구조를 그대로 재사용할 수 있으며, 노는 CPU가 즉시 큐에서 작업을 가져가므로 부하 불균형이 발생하지 않음" },
+      { major: "치명적 한계", minor: "락 경합 & 캐시 친화성 상실", desc: "• 확장성 병목: 코어 수가 많아질수록 공용 큐 접근 시 락(Lock) 경합으로 심각한 성능 저하 발생\n• 캐시 미스: 프로세스가 문맥교환마다 다른 코어로 옮겨 다녀 이전 코어 캐시에 쌓인 데이터를 쓰지 못함(Cache Affinity 저하)" }
+    ]
+  },
+  {
+    domain: "CAOS",
+    topic: "다중 큐 멀티프로세서 스케줄링 (MQMS)",
+    keywords: [
+      "Multi-Queue Multiprocessor Scheduling",
+      "코어별 독립 준비 큐 보유",
+      "락 경합 해소 & 캐시 친화성 극대화",
+      "부하 불균형 & 작업 훔치기 (Work Stealing)"
+    ],
+    diagram: `[큐 1] ──▶ [CPU 1 (동일 프로세스 반복 실행: 캐시 친화성 극대화)]
+[큐 2] ──▶ [CPU 2 (유휴 발생 시 큐 1의 대기 작업을 훔쳐옴: Work Stealing)]`,
+    tableRows: [
+      { major: "핵심 구조", minor: "코어별 독립 큐 배치", desc: "각 CPU 코어마다 독립된 로컬 준비 큐를 배치하여 코어 수 증가에 따른 확장성을 확보한 현대 운영체제 표준 멀티프로세서 스케줄링" },
+      { major: "핵심 강점", minor: "무경합 & 캐시 친화성", desc: "• 확장성 우수: 자기 큐만 접근하므로 CPU 간 큐 잠금(Lock) 경합이 전혀 없음\n• 캐시 친화성(Affinity): 같은 프로세스가 동일 CPU에서 계속 재실행되어 L1/L2 캐시 및 TLB 적중률 극대화" },
+      { major: "한계와 해결", minor: "부하 불균형 & Work Stealing", desc: "특정 CPU 큐에만 작업이 몰리거나 비어버리는 부하 불균형(Load Imbalance)이 발생할 수 있으며, 한가한 큐가 바쁜 큐의 작업을 가져오는 작업 훔치기(Work Stealing)로 해결" }
+    ]
+  },
+  {
+    domain: "CAOS",
+    topic: "HRN (Highest Response-ratio Next) 알고리즘",
+    keywords: [
+      "비선점형 스케줄링",
+      "SJF의 장시간 작업 기아 보완",
+      "우선순위 = (대기시간 + 실행시간) / 실행시간",
+      "대기시간 가중치 반영"
+    ],
+    diagram: `• HRN 응답률 공식 : 우선순위(Response Ratio) = (대기시간 + 예상 실행시간) ÷ 예상 실행시간
+➔ 실행시간이 짧을수록 유리(SJF 장점 유지) + 대기시간이 길어질수록 분자가 커져 우선순위 자동 상승!`,
+    tableRows: [
+      { major: "등장 배경", minor: "SJF의 불평등 해결", desc: "최단 작업 우선(SJF) 스케줄링에서 실행 시간이 긴 작업이 짧은 작업들에 밀려 영구히 CPU를 할당받지 못하는 현상을 해결하기 위해 고안" },
+      { major: "핵심 원리", minor: "최고 응답률 우선", desc: "단순히 실행 시간만 비교하지 않고 프로세스가 준비 큐에서 기다린 '대기 시간'을 분자에 더해 응답률(Response Ratio)이 가장 높은 프로세스에 CPU 배정" },
+      { major: "장단점", minor: "공정성 vs 계산 오버헤드", desc: "긴 작업도 오래 기다리면 우선순위가 높아져 기아 현상을 막아주지만, 비선점형이며 매 스케줄링 시마다 모든 프로세스의 응답률을 계산해야 하는 오버헤드 존재" }
+    ]
+  },
+  {
+    domain: "CAOS",
+    topic: "기아현상 (Starvation)",
+    keywords: [
+      "특정 프로세스 무한 대기",
+      "우선순위/SJF/MLQ 스케줄링 부작용",
+      "교착상태(Deadlock)와의 차이",
+      "에이징 (Aging: 대기시간 비례 우선순위 상향)"
+    ],
+    diagram: `[고우선순위 작업 지속 유입] ➔ [저우선순위 프로세스 무한 대기 (Starvation)] ──(해결: Aging 기법)──▶ 대기 시간마다 우선순위 +1씩 단계적 격상!`,
+    tableRows: [
+      { major: "핵심 개념", minor: "기아현상 (Starvation)", desc: "프로세스가 실행에 필요한 자원(CPU 등)을 할당받기 위해 준비 상태에서 대기 중이나, 우선순위가 낮아 무기한 연기되는 현상" },
+      { major: "비교 구분", minor: "기아현상 vs 교착상태", desc: "• 기아현상: 시스템은 정상 작동 중이나 스케줄링 정책(SJF, SRT, 고정 우선순위, MLQ) 편향으로 특정 프로세스만 소외되는 상태 (Ready 상태 대기)\n• 교착상태: 둘 이상의 프로세스가 서로 점유한 자원을 요구하며 다 같이 멈춰버린 상태 (Wait/Blocked 상태 대기)" },
+      { major: "핵심 해결책", minor: "에이징 (Aging) 기법", desc: "오랫동안 자원을 할당받지 못하고 대기한 프로세스의 우선순위를 대기 시간에 비례해 점진적으로 높여주어 유한 시간 내 실행을 보장 (HRN, MLFQ 등에 적용)" }
+    ]
+  },
+  {
+    domain: "CAOS",
+    topic: "경쟁조건 (Race Condition)",
+    keywords: [
+      "공유 자원 동시 접근 무결성 훼손",
+      "실행 순서(타이밍) 의존적 결함",
+      "데이터 불일치 (Lost Update)",
+      "커널 모드 · 인터럽트 · 멀티스레드 경합"
+    ],
+    diagram: `[스레드 A: count = count + 1 읽기(10)] & [스레드 B: count = count + 1 읽기(10)]
+➔ 동시 연산 후 덮어쓰기 ➔ 기대값(12)이 아닌 오염된 결과(11) 발생! (원자성 훼손)`,
+    tableRows: [
+      { major: "핵심 개념", minor: "Race Condition 정의", desc: "두 개 이상의 프로세스나 스레드가 공유 자원에 동시에 접근·조작할 때, 접근 순서나 타이밍에 따라 실행 결과가 달라지고 무결성이 깨지는 비정상 상태" },
+      { major: "발생 시점", minor: "멀티스레드 & 커널 선점", desc: "• 고급 언어의 단일 문장(예: count++)이 기계어 수준(Load → Add → Store)으로 쪼개져 실행 도중 문맥교환될 때 발생\n• 다중 코어 동시 메모리 접근, 인터럽트 핸들러 개입 시 발생" },
+      { major: "예방 대책", minor: "임계영역 보호 & 원자성", desc: "공유 자원 접근 코드 블록을 임계영역(Critical Section)으로 지정하고 상호배제 락(뮤텍스, 세마포어, 모니터) 또는 원자적 연산(Atomic) 적용" }
+    ]
+  },
+  {
+    domain: "CAOS",
+    topic: "운영체제의 동기화",
+    keywords: [
+      "임계영역 (Critical Section)",
+      "3대 해결 조건: 상호배제 · 진행 · 한정대기",
+      "HW 동기화 (Test&Set · Compare&Swap)",
+      "SW 동기화 (피터슨 · 램포트 빵집)",
+      "두음: 상진한 / 데피램 / 테컴인"
+    ],
+    diagram: `[진입 구역 (Entry: 락 획득 검사)] ➔ [임계 구역 (Critical Section: 공유자원 단독 조작)] ➔ [퇴출 구역 (Exit: 락 해제)]
+• 필수 3원칙 : ① 상호배제 (1개만 진입) + ② 진행 (유한 시간 내 진입자 결정) + ③ 한정 대기 (기아 방지 상한선)`,
+    tableRows: [
+      { major: "개념 및 필요성", minor: "데이터 일관성 보장", desc: "병행 수행되는 프로세스/스레드들 간에 실행 순서를 맞추고 공유 데이터의 일관성(Consistency)과 원자성을 보장하기 위한 운영체제 제어 메커니즘" },
+      { major: "임계영역 3조건", minor: "상호배제 · 진행 · 한정대기", desc: "① 상호배제(Mutual Exclusion): 한 프로세스가 임계영역에 있으면 타 프로세스 진입 불가\n② 진행(Progress): 임계영역이 비어 있을 때 진입할 프로세스를 유한 시간 내 결정\n③ 한정 대기(Bounded Waiting): 특정 프로세스가 무한정 기다리지 않도록 대기 횟수 제한" },
+      { major: "주요 구현 기법", minor: "HW / SW / OS 동기화", desc: "• 하드웨어 기법: 원자적 명령어(Test-and-Set, Compare-and-Swap), 인터럽트 비활성화\n• 소프트웨어 알고리즘: 데커(Dekker), 피터슨(Peterson), 램포트 빵집(Bakery) 알고리즘\n• OS/언어 동기화 도구: 뮤텍스, 세마포어, 스핀락, 모니터" }
+    ]
+  },
+  {
+    domain: "CAOS",
+    topic: "뮤텍스 (Mutex)",
+    keywords: [
+      "상호배제 (Mutual Exclusion) 단일 잠금",
+      "Lock 소유권 (Ownership) 존재",
+      "0 또는 1 상태",
+      "스핀락 (Spinlock)과의 비교"
+    ],
+    diagram: `[스레드 A] ──(lock 획득: 소유자 지정)──▶ [임계영역 단독 실행] ──(스레드 A만 unlock 해제 가능)──▶ [대기 큐의 스레드 B 깨움]`,
+    tableRows: [
+      { major: "핵심 개념", minor: "소유권 기반 단일 락", desc: "공유 자원에 동시에 단 하나의 스레드만 접근할 수 있도록 잠금(Lock)을 제공하는 동기화 객체로, 락을 획득한 소유자(Owner)만 해제 가능" },
+      { major: "동작 특성", minor: "블로킹 대기 (Sleep)", desc: "임계영역이 이미 잠겨 있으면 요청 스레드는 CPU를 양보하고 대기 큐(Sleep)로 들어가며, 락 해제 시 깨어남" },
+      { major: "비교 구분", minor: "뮤텍스 vs 스핀락", desc: "• 뮤텍스: 대기 시 Sleep 상태로 전환되어 긴 임계영역에서 CPU 낭비를 막음 (문맥교환 발생)\n• 스핀락(Spinlock): 대기 시 잠들지 않고 루프를 돌며(Busy Waiting) 락을 확인해 짧은 임계영역에서 문맥교환 오버헤드 제거" }
+    ]
+  },
+  {
+    domain: "CAOS",
+    topic: "세마포어 (Semaphore)",
+    keywords: [
+      "공유 자원 카운팅 변수 (S)",
+      "P 연산 (Proberen: wait · 자원 획득)",
+      "V 연산 (Verhogen: signal · 자원 반납)",
+      "이진 세마포어 vs 계수 세마포어",
+      "소유권 없음 (외부 신호 해제 가능)"
+    ],
+    diagram: `• P(S) 진입 연산 : S ← S - 1 (만약 S < 0 이면 대기 큐에 Block)
+• V(S) 퇴출 연산 : S ← S + 1 (만약 S ≤ 0 이면 대기 큐의 프로세스 1개를 Wakeup 깨움)`,
+    tableRows: [
+      { major: "핵심 개념", minor: "정수형 동기화 변수", desc: "다익스트라가 제안한 기법으로, 가용한 공유 자원의 개수(S)를 나타내는 정수 변수와 두 개의 원자적 연산(P, V)으로 상호배제 및 실행 순서 동기화 수행" },
+      { major: "유형 구분", minor: "이진(Binary) vs 계수(Counting)", desc: "• 이진 세마포어: S가 0 또는 1만 가지며 뮤텍스처럼 상호배제에 사용\n• 계수 세마포어: S가 0 이상의 정수(N)를 가지며 N개의 동일한 자원 풀(Pool)을 여러 프로세스에 분배할 때 사용" },
+      { major: "뮤텍스와 차이", minor: "소유권 유무 및 한계", desc: "뮤텍스와 달리 락 소유권 개념이 없어 락을 걸지 않은 다른 프로세스가 V 연산으로 신호를 보내 깨울 수 있으며, P·V 호출 순서 실수 시 교착상태 유발 위험 존재" }
+    ]
+  },
+  {
+    domain: "CAOS",
+    topic: "모니터 (Monitor)",
+    keywords: [
+      "고수준 프로그래밍 언어 동기화 구조",
+      "공유 자원 + 접근 프로시저 캡슐화",
+      "조건 변수 (wait · signal/notify)",
+      "세마포어 타이밍 오류 해결"
+    ],
+    diagram: `[모니터 캡슐 내부: 공유 데이터 + 동기화 함수(synchronized)]
+  ▲
+[진입 큐 (한 번에 1개 스레드만 허용)] & [조건 변수 대기 큐: wait()로 양보 / signal()로 재진입 통지]`,
+    tableRows: [
+      { major: "등장 배경", minor: "세마포어 구현 실수 방지", desc: "개발자가 직접 P·V 연산 코드를 작성할 때 발생하는 누락·순서 역전(교착상태 및 타이밍 오류)을 막기 위해 컴파일러/언어 차원에서 상호배제를 자동화한 구조" },
+      { major: "핵심 구조", minor: "캡슐화 & 자동 상호배제", desc: "공유 변수와 이를 조작하는 프로시저들을 하나의 모니터 객체로 묶어, 외부에서 공유 변수에 직접 접근하지 못하고 오직 모니터 내 함수를 통해서만 한 번에 한 프로세스씩 실행하도록 보장" },
+      { major: "실행 제어", minor: "조건 변수 (wait / signal)", desc: "모니터 내부에서 특정 조건이 충족될 때까지 일시 양보(wait)하고, 다른 스레드가 조건을 달성한 뒤 깨워주는(signal / Java notify) 조건 변수 큐 제공" }
+    ]
+  },
+  {
+    domain: "CAOS",
+    topic: "교착상태 (Deadlock)",
+    keywords: [
+      "상호배제 · 점유대기 · 비선점 · 환형대기 (상점비환)",
+      "예방 · 회피 · 발견 · 복구 (예회발복)",
+      "자원할당 그래프 & Wait-For 그래프",
+      "Wait-Die / Wound-Wait"
+    ],
+    diagram: `[4대 필요충분조건: ①상호배제 + ②점유와 대기 + ③비선점 + ④환형대기] (모두 성립 시 무한 대기 발생!)
+➔ 해결: 예방(4조건 중 1개 부정) / 회피(안전상태만 할당) / 발견(사이클 탐지) / 복구(프로세스 종료·자원 선점)`,
+    tableRows: [
+      { major: "발생 4대 조건", minor: "상 · 점 · 비 · 환", desc: "① 상호배제(자원 독점) ② 점유와 대기(자원 보유한 채 타 자원 요청) ③ 비선점(강제 빼앗기 불가) ④ 환형대기(프로세스들이 원형 고리로 서로의 자원 대기) — 4가지 동시 만족 시에만 발생" },
+      { major: "사전 차단", minor: "예방(Prevention) & 회피(Avoidance)", desc: "• 예방: 4대 조건 중 하나를 원천 부정 (예: 모든 자원 일괄 요청, 자원 일련번호 순서 할당 → 자원 활용률 저하)\n• 회피: 교착상태 가능성이 있는 불안전 상태를 피하고 안전 상태만 허용 (은행가 알고리즘, 타임스탬프 기반 Wait-Die / Wound-Wait)" },
+      { major: "사후 처리", minor: "발견(Detection) & 복구(Recovery)", desc: "• 발견: 자원할당 그래프(단일 인스턴스는 대기 그래프 Cycle 여부, 다중 인스턴스는 그래프 소거법)로 주기적 탐지\n• 복구: 교착 프로세스 강제 종료(Kill) 또는 희생자(Victim) 선정 후 자원 강제 선점·롤백" }
+    ]
+  },
+  {
+    domain: "CAOS",
+    topic: "은행가 알고리즘 (Banker's Algorithm)",
+    keywords: [
+      "교착상태 회피 (Deadlock Avoidance)",
+      "다익스트라 고안",
+      "안전 상태 (Safe State) & 안전 수열",
+      "Max · Allocation · Need · Available",
+      "두음: AMAN (에이맨)"
+    ],
+    diagram: `• 핵심 수식 : 잔여 요구량 Need[i] = 최대 요구량 Max[i] - 현재 할당량 Allocation[i]
+• 검증 절차 : Need[i] ≤ 가용 자원(Available) 인 프로세스부터 순차 실행 → 자원 반납(+Allocation) → 전원 종료 가능한 [안전 수열] 도출!`,
+    tableRows: [
+      { major: "핵심 개념", minor: "안전 상태 검증 회피법", desc: "은행이 모든 고객의 인출 요구를 감당할 수 있을 때만 대출해 주듯, OS가 자원 할당 후에도 모든 프로세스가 정상 종료될 수 있는 '안전 수열(Safe Sequence)'이 존재할 때만 자원을 할당하는 기법" },
+      { major: "4대 자료구조", minor: "Available · Max · Alloc · Need", desc: "• Available: 현재 시스템에 남아있는 가용 자원 수\n• Max: 각 프로세스가 선언한 최대 자원 요구량\n• Allocation: 각 프로세스에 현재 할당된 자원 수\n• Need: 앞으로 추가 필요한 자원 수 (Need = Max - Allocation)" },
+      { major: "한계점", minor: "사전 파악 및 오버헤드", desc: "프로세스가 실행 전에 자신의 최대 자원 요구량(Max)을 미리 정확히 알아야 하고, 전체 자원 수가 고정되어야 하며 매 요청마다 안전성 검증 연산 오버헤드가 발생" }
+    ]
+  },
+  {
+    domain: "CAOS",
+    topic: "우선순위 역전 (Priority Inversion)",
+    keywords: [
+      "선점형 RTOS 동기화 결함",
+      "고순위(TH) · 중순위(TM) · 저순위(TL)",
+      "중간 우선순위 태스크의 선점",
+      "무한 역전 (Unbounded Inversion)",
+      "두음: 임상선"
+    ],
+    diagram: `[1단계] 저순위(TL)가 공유자원 락 획득 실행 ➔ [2단계] 고순위(TH)가 동일 락 요청 후 대기(Block)
+[3단계] 락과 무관한 중순위(TM)가 TL을 CPU 선점! ➔ 결국 고순위(TH)가 중순위(TM)보다 늦게 실행되는 역전 발생`,
+    tableRows: [
+      { major: "핵심 개념", minor: "우선순위 역전 정의", desc: "선점형 우선순위 스케줄링 환경에서 높은 우선순위 태스크(TH)가 낮은 우선순위 태스크(TL)가 점유한 공유 자원을 기다리는 동안, 중간 우선순위 태스크(TM)들에게 밀려 늦게 처리되는 현상" },
+      { major: "발생 3대 원인", minor: "임계영역 · 상호배제 · 선점형", desc: "① 공유 자원 임계영역 존재 ② 뮤텍스/세마포어 상호배제 락 대기 ③ 중간 우선순위 태스크(TM)가 저순위 태스크(TL)의 CPU를 빼앗는 선점형 스케줄링" },
+      { major: "대표 장애사례", minor: "마르스 패스파인더 리셋", desc: "1997년 화성 탐사선 패스파인더에서 정보 버스 뮤텍스를 둘러싼 우선순위 역전으로 워치독 타이머가 타임아웃되어 시스템이 반복 리셋된 사례" }
+    ]
+  },
+  {
+    domain: "CAOS",
+    topic: "태스크 우선순위 상속 (Priority Inheritance)",
+    keywords: [
+      "우선순위 역전 (Priority Inversion) 해결",
+      "우선순위 상속 프로토콜 (PIP)",
+      "우선순위 천장/올림 프로토콜 (PCP / Ceiling)",
+      "연쇄 블로킹(Chained Blocking) 방지",
+      "두음: 상·올"
+    ],
+    diagram: `• 우선순위 상속(PIP) : 고순위(TH)가 락 대기 시 ➔ 락 보유 저순위(TL)의 우선순위를 TH로 일시 격상 (중순위 TM 선점 차단)
+• 우선순위 올림(PCP) : 자원을 획득하는 순간 ➔ 해당 자원의 사전 지정 최고 우선순위(천장값)로 즉시 격상!`,
+    tableRows: [
+      { major: "사후 동적 격상", minor: "우선순위 상속 (Inheritance)", desc: "고순위 태스크(TH)가 락을 요청해 블록되는 시점에, 현재 락을 쥔 저순위 태스크(TL)에게 TH의 우선순위를 물려주어 중순위(TM)에 선점당하지 않고 빨리 임계영역을 빠져나오게 하는 기법" },
+      { major: "사전 즉시 격상", minor: "우선순위 올림 (Ceiling)", desc: "모든 공유 자원마다 그 자원을 사용할 수 있는 태스크들 중 가장 높은 우선순위(Ceiling)를 미리 부여해 두고, 자원을 획득하는 즉시 해당 최고 우선순위로 승격시키는 기법" },
+      { major: "비교 구분", minor: "상속(PIP) vs 올림(PCP)", desc: "• 우선순위 상속: 구현이 단순해 일반 RTOS에서 널리 쓰이나 다중 락 사용 시 연쇄 블로킹 및 교착상태 가능성 잔존\n• 우선순위 올림: 모든 태스크의 자원 요구를 사전 파악해야 하나 연쇄 블로킹과 교착상태까지 원천 차단" }
+    ]
+  },
+  {
+    domain: "CAOS",
+    topic: "메모리 주요 영역",
+    keywords: [
+      "코드(Text) · 데이터(Data/BSS) · 힙(Heap) · 스택(Stack)",
+      "정적 할당 vs 동적 할당 영역",
+      "힙 (낮은→높은 주소) vs 스택 (높은→낮은 주소)",
+      "두음: 코데힙스"
+    ],
+    diagram: `[낮은 주소]  코드(Text: 기계어) ➔ 데이터(전역·정적 변수) ➔ 힙(Heap: 동적할당 ↓)  ... 빈 공간 ...  (↑ 호출 프레임) 스택(Stack)  [높은 주소]`,
+    tableRows: [
+      { major: "정적 할당 영역", minor: "코드 (Code / Text)", desc: "실행할 프로그램의 기계어 명령어 코드가 저장되는 영역 (컴파일 시 크기 결정, 읽기 전용으로 보호)" },
+      { major: "정적 할당 영역", minor: "데이터 (Data & BSS)", desc: "전역 변수와 정적(static) 변수가 저장되는 영역으로 프로그램 시작 시 할당되어 종료 시 소멸 (초기화 변수는 Data, 미초기화 변수는 BSS)" },
+      { major: "동적 할당 영역", minor: "힙 (Heap)", desc: "프로그래머가 런타임에 동적으로 할당·해제(malloc/new)하는 영역으로 낮은 주소에서 높은 주소 방향으로 자라남 (스레드 간 공유)" },
+      { major: "동적 할당 영역", minor: "스택 (Stack)", desc: "함수 호출 시 매개변수, 복귀 주소, 지역 변수가 저장되는 LIFO 영역으로 높은 주소에서 낮은 주소로 자라남 (스레드별 독립 보유)" }
+    ]
+  },
+  {
+    domain: "CAOS",
+    topic: "메모리 단편화 해결 (슬랩·버디)",
+    keywords: [
+      "내부 단편화 vs 외부 단편화",
+      "버디 메모리 시스템 (2의 거듭제곱 분할)",
+      "슬랩 할당자 (커널 객체 캐시)",
+      "메모리 압축(Compaction) & 통합(Coalescing)",
+      "두음: P고내/세슬 · S가외/페버 · 재메통압"
+    ],
+    diagram: `• 버디 시스템 (외부 단편화 해결) : [64KB 블록] ➔ 32KB ➔ 16KB ➔ [8KB 할당] (반납 시 인접 짝 'Buddy'와 즉시 병합)
+• 슬랩 할당자 (내부 단편화 해결) : [페이지 프레임] ➔ [커널 자료구조(inode, task_struct) 크기별 전용 슬랩 캐시로 세분화 할당]`,
+    tableRows: [
+      { major: "단편화 유형", minor: "내부 vs 외부 단편화", desc: "• 내부 단편화: 고정 크기 분할(페이징) 시 할당된 블록 내부에서 프로세스가 쓰지 않고 남는 낭비 공간\n• 외부 단편화: 가변 크기 분할(세그먼트) 시 빈 공간들이 잘게 쪼개져 합치면 충분함에도 연속 할당하지 못하는 현상" },
+      { major: "외부 단편화 해결", minor: "버디 메모리 알고리즘", desc: "메모리 블록을 2^n(1/2) 단위로 계속 절반씩 쪼개어 요청 크기에 가장 맞는 블록을 할당하고, 해제 시 인접 버디(Buddy) 블록과 빠르게 통합하는 리눅스 커널 페이지 할당 기법" },
+      { major: "내부 단편화 해결", minor: "슬랩 할당자 (Slab Allocator)", desc: "버디 시스템으로부터 받은 페이지 프레임을 커널에서 자주 생성·소멸되는 작은 객체(Object) 크기별 캐시(Slab)로 미리 쪼개어 할당함으로써 내부 단편화와 초기화 오버헤드 제거" },
+      { major: "공통 해결 기법", minor: "통합 · 압축 · 메모리 풀", desc: "인접 빈 공간을 합치는 통합(Coalescing), 사용 중인 공간을 한쪽으로 몰아넣는 압축(Compaction), 사전 크기별 블록을 확보하는 메모리 풀(Memory Pool) 활용" }
+    ]
+  },
+  {
+    domain: "CAOS",
+    topic: "스래싱 (Thrashing)",
+    keywords: [
+      "과도한 페이지 부재 (Page Fault)",
+      "CPU 이용률 급락",
+      "다중 프로그래밍 정도 (MPD)",
+      "워킹셋 (Working Set)",
+      "페이지 부재 빈도 (PFF)"
+    ],
+    diagram: `[다중 프로그래밍 정도(MPD) 과다 증가] ➔ 프로세스별 프레임 부족 ➔ 연쇄 Page Fault(디스크 스왑 I/O 폭증) ➔ [CPU 이용률 수직 급락: 스래싱!]`,
+    tableRows: [
+      { major: "핵심 개념", minor: "스래싱 현상 및 원인", desc: "다중 프로그래밍 정도가 임계점을 넘어 각 프로세스에 할당된 물리 프레임이 부족해지면서, CPU가 실제 연산보다 페이지 교체(Swap I/O)에 모든 시간을 허비해 CPU 이용률이 급락하는 현상" },
+      { major: "동적 해결 1", minor: "워킹셋 (Working Set) 모델", desc: "시간 지역성에 기반하여 프로세스가 일정 시간 창(Δ) 동안 집중적으로 참조하는 페이지 집합(Working Set) 전체를 메모리에 동시 상주시켜 페이지 부재를 예방 (보장 불가 시 프로세스 Swap-Out)" },
+      { major: "동적 해결 2", minor: "PFF (페이지 부재 빈도)", desc: "페이지 부재율(Page Fault Frequency)의 상한선과 하한선을 설정하여, 부재율이 상한선을 넘으면 프레임을 추가 할당하고 하한선보다 낮으면 프레임을 회수하여 직접 제어" }
+    ]
+  },
+  {
+    domain: "CAOS",
+    topic: "메모리 누수 (Memory Leak)",
+    keywords: [
+      "힙(Heap) 동적 메모리 미해제",
+      "가용 메모리 고갈 (OOM)",
+      "댕글링 포인터 · 순환 참조",
+      "가비지 컬렉션 (GC) & 스마트 포인터"
+    ],
+    diagram: `[런타임 Heap 메모리 동적 할당 (malloc/new)] ➔ 참조 포인터 유실 또는 미해제(free 누락) ➔ [Unreachable 가비지 누적] ➔ Out Of Memory 장애!`,
+    tableRows: [
+      { major: "핵심 개념", minor: "메모리 누수 정의", desc: "프로그램이 동적으로 할당받은 힙(Heap) 메모리를 사용 완료 후 운영체제에 반납하지 않고 참조만 잃어버려, 가용 메모리가 점진적으로 고갈되는 현상" },
+      { major: "발생 원인", minor: "미해제 및 강한 참조 잔류", desc: "• C/C++: 할당(malloc/new) 후 해제(free/delete) 누락 또는 예외 발생 시 조기 리턴\n• GC 언어(Java/Python): 정적(Static) 컬렉션에 객체 계속 추가, 이벤트 리스너/클로저 미해제, 순환 참조" },
+      { major: "탐지 및 예방", minor: "RAII · 스마트 포인터 · 분석기", desc: "• 네이티브 언어: 스코프 종료 시 자동 해제되는 RAII 패턴 및 스마트 포인터(unique_ptr, shared_ptr/weak_ptr), Valgrind/ASan 정적·동적 분석\n• 매니지드 언어: 힙 덤프(Heap Dump) 프로파일링 및 약한 참조(WeakReference) 활용" }
+    ]
+  },
+  {
+    domain: "CAOS",
+    topic: "캐시 메모리 (Cache Memory)",
+    keywords: [
+      "CPU-주기억장치 속도 완충 (SRAM)",
+      "시간 · 공간 · 순차 지역성 (시공순)",
+      "사상: 직접 · 완전연관 · 집합연관 (직연집)",
+      "Write-Through vs Write-Back",
+      "두음: 사쓰호교 / 직연집"
+    ],
+    diagram: `[CPU 레지스터] ⇄ (워드 전송) ⇄ [L1/L2/L3 캐시 (SRAM)] ⇄ (블록/라인 전송) ⇄ [주기억장치 (DRAM)]
+• 캐시 사상 : 직접 사상 (1:1 고정)  |  완전 연관 (어디든 배치)  |  집합 연관 (N-Way 세트 내 자유 배치)`,
+    tableRows: [
+      { major: "설계 원리", minor: "지역성 (시간·공간·순차)", desc: "• 시간 지역성: 최근 참조된 주소를 곧 다시 참조 (루프, 스택 변수)\n• 공간 지역성: 참조된 주소 주변의 인접 메모리를 연속 참조 (배열 순회, 캐시 블록 프리페치)\n• 순차 지역성: 분기가 없는 한 명령어가 저장된 순서대로 인출" },
+      { major: "캐시 사상", minor: "직접 · 연관 · 집합연관", desc: "• 직접 사상(Direct): 메모리 블록이 정해진 단일 캐시 라인에만 매핑 (회로 단순·고속이나 충돌 미스 빈발)\n• 완전 연관(Associative): 빈 캐시 라인 어디든 적재 가능 (적중률 최고이나 전체 태그 비교 비용 큼)\n• 집합 연관(Set-Associative): 정해진 세트 내 N개 라인에 연관 배치하는 실무 표준(N-Way)" },
+      { major: "쓰기 정책", minor: "Write-Through vs Write-Back", desc: "• Write-Through(즉시 쓰기): 캐시와 주기억장치에 동시 기록 (일관성 유지 쉬우나 버스 트래픽·쓰기 지연 증가)\n• Write-Back(나중 쓰기): 캐시에만 먼저 기록(Dirty Bit 표시) 후 블록 교체 시점에 주기억장치에 일괄 반영 (고성능)" }
+    ]
+  },
+  {
+    domain: "CAOS",
+    topic: "MMU (Memory Management Unit)",
+    keywords: [
+      "논리(가상) 주소 → 물리 주소 실시간 변환",
+      "재배치 레지스터 (Base Register)",
+      "한계 레지스터 (Limit Register)",
+      "메모리 보호 및 권한 검증"
+    ],
+    diagram: `[CPU 논리 주소 요청] ➔ [MMU: 주소 < Limit 검증 (위반 시 Trap) + Base 시작주소 가산 / 페이지 테이블 변환] ➔ [물리 메모리(RAM) 주소]`,
+    tableRows: [
+      { major: "핵심 개념", minor: "메모리 관리 하드웨어", desc: "CPU 내부에 탑재되어 프로그램 실행 중 발생하는 논리(가상) 주소를 실제 주기억장치의 물리 주소로 동적 변환해 주는 하드웨어 유닛" },
+      { major: "메모리 보호", minor: "Base & Limit 레지스터", desc: "• 재배치(Base) 레지스터: 프로세스의 시작 물리 주소를 더해주어 주소 재배치 수행\n• 한계(Limit) 레지스터: 프로세스가 자신에게 허용된 주소 범위를 벗어나 타 프로세스나 커널 영역을 침범하면 즉시 인터럽트(Trap) 발생" },
+      { major: "페이지 테이블", minor: "PTBR & 권한 비트", desc: "페이지 테이블 기준 레지스터(PTBR)를 참조하여 가상 페이지를 물리 프레임으로 변환하며 읽기/쓰기/실행(R/W/X) 권한을 하드웨어 수준에서 검증" }
+    ]
+  },
+  {
+    domain: "CAOS",
+    topic: "TLB (Translation Lookaside Buffer)",
+    keywords: [
+      "페이지 테이블 고속 연관 캐시",
+      "시간 지역성 기반 주소 변환 가속",
+      "TLB Hit / Miss & 유효 접근 시간 (EAT)",
+      "TLB Reach (Huge Page) & ASID"
+    ],
+    diagram: `CPU 가상주소 요청 ➔ [MMU 내 TLB 캐시 조회]
+ ├─ TLB Hit  ➔ RAM 페이지 테이블 접근 생략! 즉시 물리 메모리 데이터 접근 (메모리 1회 접근)
+ └─ TLB Miss ➔ RAM 페이지 테이블 조회 후 TLB에 등록하고 물리 메모리 접근 (메모리 2회 접근)`,
+    tableRows: [
+      { major: "핵심 개념", minor: "주소 변환 고속 버퍼", desc: "페이지 테이블이 주기억장치(RAM)에 위치해 데이터 1회 참조 시 메모리에 2번 접근해야 하는 성능 저하를 막기 위해, 최근 변환된 [가상 페이지 → 물리 프레임] 매핑을 저장한 MMU 내부 초고속 캐시" },
+      { major: "동작 원리", minor: "완전/집합 연관 탐색", desc: "시간 지역성에 따라 최근 참조한 페이지 번호를 병렬 하드웨어(연관 메모리)로 즉시 검색하여 TLB 적중(Hit) 시 변환 지연을 제거" },
+      { major: "성능 최적화", minor: "Huge Page & ASID", desc: "• Huge Page: 페이지 크기를 키워(예: 2MB/1GB) 적은 TLB 엔트리로 넓은 메모리를 커버(TLB Reach 확대)\n• ASID(Address Space ID): 문맥교환 시 TLB 전체가 비워지는(Flush) 오버헤드를 막기 위해 프로세스 식별 태그 부여" }
+    ]
+  },
+  {
+    domain: "CAOS",
+    topic: "DMA (Direct Memory Access)",
+    keywords: [
+      "CPU 개입 없는 고속 I/O 전송",
+      "PIO(프로그램 입출력) 병목 해소",
+      "DMA 컨트롤러 & 버스 마스터",
+      "사이클 스틸링 (Cycle Stealing) · 버스트 모드"
+    ],
+    diagram: `[CPU] ──(1. 전송 명령 하달)──▶ [DMA 컨트롤러] ──(2. 시스템 버스 제어권 획득 후 직접 고속 전송)──▶ [I/O 장치 ⇄ 주기억장치(RAM)]
+                                     └──(3. 전체 블록 전송 완료 후 인터럽트 1회 보고)──▶ [CPU]`,
+    tableRows: [
+      { major: "핵심 개념", minor: "직접 메모리 접근", desc: "입출력 장치와 주기억장치 간 대량 데이터 전송 시 CPU가 매 워드마다 개입하는 오버헤드를 없애기 위해, DMA 제어기가 직접 버스를 제어해 데이터를 전송하고 완료 시에만 CPU에 인터럽트를 보내는 기법" },
+      { major: "동작 절차", minor: "버스 허가 → 전송 → 완료 보고", desc: "① CPU가 DMA에 입출력 주소·크기 전달 ② DMA가 버스 요청(BR) 및 허가(BG) 획득 ③ CPU 개입 없이 메모리-I/O 간 직접 전송 ④ 완료 인터럽트 발생" },
+      { major: "전송 모드", minor: "Cycle Stealing & Burst", desc: "• 사이클 스틸링(Cycle Stealing): CPU가 버스를 쓰지 않는 사이클을 양보받아 한 워드씩 전송 (CPU 지연 최소화)\n• 버스트 모드(Burst Mode): 데이터 블록 전체 전송이 끝날 때까지 DMA가 버스를 독점하여 초고속 전송" }
+    ]
+  },
+  {
+    domain: "CAOS",
+    topic: "파이프라인 해저드 (Pipeline Hazard)",
+    keywords: [
+      "구조적 · 데이터 · 제어 해저드 (구데제)",
+      "데이터 의존성 (RAW · WAR · WAW)",
+      "전방전달 (Forwarding) & 인터락 (Stall)",
+      "레지스터 재명명 (Register Renaming)",
+      "분기 예측 (Branch Prediction) & BTB"
+    ],
+    diagram: `[명령어 파이프라인: IF(인출) → ID(해독) → EX(실행) → MEM(메모리) → WB(기록)]
+• 3대 해저드 : 구조적(HW 자원 충돌)  |  데이터(RAW·WAR·WAW 종속)  |  제어(분기 명령어 목적지 미정)`,
+    tableRows: [
+      { major: "구조적 해저드", minor: "자원 충돌 & 하버드 구조", desc: "• 원인: 명령어 인출과 데이터 접근이 동시에 단일 메모리에 접근하는 등 HW 자원 충돌로 발생\n• 해결: 명령어 캐시와 데이터 캐시 분리(하버드 구조), 메모리 인터리빙, 기능 유닛 추가" },
+      { major: "데이터 해저드", minor: "RAW · WAR · WAW", desc: "• 원인: 이전 명령어의 실행 결과에 후속 명령어가 종속되어 발생 (진성 의존성 RAW, 반의존성 WAR, 출력 의존성 WAW)\n• 해결: 연산 직후 결과를 바로 넘기는 전방전달(Forwarding), 하드웨어 인터락(Stall), 레지스터 재명명(WAR/WAW 제거)" },
+      { major: "제어 해저드", minor: "분기 예측 & 지연 분기", desc: "• 원인: 조건 분기(Branch) 명령어의 점프 여부가 결정될 때까지 후속 명령어를 인출하지 못해 버블 발생\n• 해결: 동적 분기 예측(Branch Prediction), 분기 타겟 버퍼(BTB), 지연 분기(Delayed Branch)" }
+    ]
+  },
+  {
+    domain: "CAOS",
+    topic: "병렬처리 시스템 (Parallel Processing System)",
+    keywords: [
+      "플린 분류 (SISD · SIMD · MISD · MIMD)",
+      "슈퍼파이프라인 vs 슈퍼스칼라",
+      "VLIW (컴파일러 정적 스케줄링)",
+      "SMP (대칭형 멀티프로세서) vs MPP"
+    ],
+    diagram: `• 명령어 수준(ILP) : 슈퍼스칼라 (복수 파이프라인 동시 실행)  |  VLIW (컴파일러가 독립 명령어들을 긴 워드로 묶어 실행)
+• 플린(Flynn) 분류 : SISD (단일) / SIMD (단일 명령·다중 데이터 배열, GPU) / MISD / MIMD (멀티코어 SMP · 분산 MPP)`,
+    tableRows: [
+      { major: "명령어 병렬성", minor: "슈퍼스칼라 vs VLIW", desc: "• 슈퍼스칼라: CPU 내부에 여러 개의 실행 파이프라인을 두고 하드웨어가 동적으로 한 클럭에 복수 명령어 동시 실행(CPI < 1)\n• VLIW: 컴파일러가 컴파일 시점에 동시 수행 가능한 독립 명령어들을 하나의 긴 명령어로 묶어 실행 (HW 구조 단순화)" },
+      { major: "Flynn 분류", minor: "SISD · SIMD · MISD · MIMD", desc: "• SIMD: 하나의 명령어로 수많은 데이터 스트림을 동시 연산 (벡터 프로세서, GPU, 멀티미디어 확장 명령)\n• MIMD: 여러 프로세서가 각자 다른 명령어로 다른 데이터를 비동기 병렬 처리 (현대 멀티코어 및 클러스터 표준)" },
+      { major: "메모리 결합", minor: "SMP (강결합) vs MPP (약결합)", desc: "• SMP(대칭형 멀티프로세서): 복수 코어가 단일 공유 메모리와 버스를 공유 (캐시 일관성 필요)\n• MPP(대규모 병렬처리): 각 노드가 독립 CPU·메모리를 갖고 고속 네트워크로 메시지 패싱 통신 (초대규모 확장 용이)" }
+    ]
+  },
+  {
+    domain: "CAOS",
+    topic: "DAS (Direct Attached Storage)",
+    keywords: [
+      "서버-스토리지 직접 케이블 연결",
+      "파일시스템 서버 호스트 직접 관리",
+      "SATA · SAS · NVMe 인터페이스",
+      "단순·저비용 vs 공유 불가"
+    ],
+    diagram: `[서버 호스트 (OS 파일시스템)] ──(전용 케이블 직접 연결: SAS / SATA / NVMe)──▶ [외장 디스크 어레이 (DAS)] (타 서버와 직접 공유 불가)`,
+    tableRows: [
+      { major: "핵심 개념", minor: "직접 연결 스토리지", desc: "네트워크 스위치를 거치지 않고 서버에 저장장치를 전용 케이블로 직접 연결하여 사용하는 방식" },
+      { major: "핵심 강점", minor: "속도 및 비용 효율", desc: "네트워크 프로토콜 변환 오버헤드가 없어 초기 속도가 빠르고 구축 비용 및 관리가 가장 단순함" },
+      { major: "주요 한계", minor: "스토리지 사일로(Silo)", desc: "다른 서버와 저장 공간을 직접 공유하기 어렵고 연결 포트 수 제한으로 인해 대규모 확장성이 떨어짐" }
+    ]
+  },
+  {
+    domain: "CAOS",
+    topic: "NAS (Network Attached Storage)",
+    keywords: [
+      "이더넷(TCP/IP) 기반 네트워크 연결",
+      "파일(File) 단위 스토리지 공유",
+      "NFS (리눅스/유닉스) · SMB/CIFS (윈도우)",
+      "자체 파일시스템 탑재"
+    ],
+    diagram: `[다수 클라이언트/서버] ──(일반 LAN TCP/IP 이더넷 스위치: NFS / SMB 프로토콜)──▶ [NAS 스토리지 (자체 OS·파일시스템 탑재)]`,
+    tableRows: [
+      { major: "핵심 개념", minor: "네트워크 결합 스토리지", desc: "기존 LAN(TCP/IP) 네트워크에 연결되어 여러 클라이언트와 서버에 파일(File) 단위로 저장 공간을 공유하는 전용 파일 서버" },
+      { major: "공유 프로토콜", minor: "NFS & SMB/CIFS", desc: "NAS 장비 내부에 자체 파일시스템이 내장되어 있으며, 리눅스/유닉스 환경은 NFS, 윈도우 환경은 SMB/CIFS 프로토콜로 마운트" },
+      { major: "장단점", minor: "공유 편의성 vs 대역폭 병목", desc: "• 강점: 이기종 OS 간 파일 공유가 매우 쉽고 구축 비용이 저렴\n• 한계: 일반 이더넷 망을 공유하므로 트래픽 병목과 지연이 발생해 고성능 DB 트랜잭션 처리에는 부적합" }
+    ]
+  },
+  {
+    domain: "CAOS",
+    topic: "SAN (Storage Area Network)",
+    keywords: [
+      "광채널(FC) / iSCSI 전용 고속 네트워크",
+      "블록(Block) 단위 스토리지 할당",
+      "SAN 스위치 · HBA 카드 · LUN",
+      "초고속·저지연 엔터프라이즈 DB/HA 최적"
+    ],
+    diagram: `[업무 서버들 (HBA 카드 장착)] ──(전용 Fibre Channel 광스위치 / iSCSI 고속망)──▶ [대규모 공유 스토리지 풀 (블록 단위 LUN 할당)]`,
+    tableRows: [
+      { major: "핵심 개념", minor: "스토리지 전용 고속망", desc: "일반 LAN과 분리된 별도의 광채널(FC) 또는 고속 네트워크(iSCSI)로 서버들과 스토리지를 연결해 블록(Block) 단위로 디스크를 할당하는 아키텍처" },
+      { major: "동작 특성", minor: "블록 수준 인식 (LUN)", desc: "파일시스템을 서버 호스트가 직접 관리하며, 서버 입장에서는 원격 스토리지 공간(LUN)이 마치 로컬에 장착된 물리 디스크처럼 인식됨" },
+      { major: "장단점", minor: "초고성능 vs 구축 고비용", desc: "• 강점: LAN 병목이 전혀 없는 초고속·저지연 I/O를 보장하며 서버 HA 클러스터링 및 미션 크리티컬 DB에 최적\n• 한계: 전용 HBA 어댑터와 FC 스위치 도입 등 초기 구축 및 운영 비용이 높음" }
+    ]
+  },
+  {
+    domain: "CAOS",
+    topic: "TPM (Trusted Platform Module)",
+    keywords: [
+      "하드웨어 기반 신뢰점 (Root of Trust)",
+      "암호키 생성·안전 격리",
+      "PCR 레지스터 & 측정 부팅 (Measured Boot)",
+      "밀봉 (Sealing) & 원격 증명 (Attestation)",
+      "BitLocker 연동"
+    ],
+    diagram: `[전원 인가] ➔ [BIOS/UEFI → 부트로더 → OS 커널 해시값 순차 측정] ➔ [TPM 내부 PCR 레지스터에 누적 기록] ➔ [무결성 확인 후 암호키 해제]`,
+    tableRows: [
+      { major: "핵심 개념", minor: "하드웨어 신뢰점 (RoT)", desc: "메인보드에 탑재되어 암호키 생성·보호, 하드웨어 난수 생성, 시스템 무결성 검증을 수행하는 국제 표준(TCG TPM 2.0) 보안 마이크로컨트롤러" },
+      { major: "내부 구성", minor: "EK · SRK · PCR 레지스터", desc: "• EK(Endorsement Key): 칩 제조 시 주입되는 고유 불변 식별 키\n• SRK(Storage Root Key): 사용자 암호키들을 계층적으로 보호하는 루트 키\n• PCR(Platform Configuration Register): 부팅 단계별 SW 해시 측정값을 누적 확장(Extend) 기록하는 레지스터" },
+      { major: "핵심 보안기능", minor: "측정 부팅 · 밀봉 · 원격 증명", desc: "• 측정 부팅(Measured Boot): 부팅 체인의 해시값을 PCR에 기록해 부트킷·루트킷 변조 탐지\n• 밀봉(Sealing) 및 원격 증명: PCR 값이 정상 상태일 때만 디스크 암호화 키(BitLocker)를 해제하고 외부 서버에 단말 무결성 증명" }
+    ]
+  },
+  {
+    domain: "CAOS",
+    topic: "가트너(Gartner) 전략 기술 트렌드",
+    keywords: [
+      "에이전틱 AI (Agentic AI)",
+      "하이브리드 컴퓨팅 (Hybrid Computing)",
+      "에너지 효율적 컴퓨팅 (Green IT)",
+      "양자 이후 암호화 (PQC)",
+      "공간 컴퓨팅 & 앰비언트 인텔리전스"
+    ],
+    diagram: `[AI 지능화] 에이전틱 AI · 거대행동모델 · 다중기능 로봇
+[차세대 컴퓨팅/신뢰] 하이브리드 컴퓨팅(CPU+GPU+양자+뉴로모픽) · 에너지 효율 컴퓨팅 · 양자내성암호(PQC) · 허위정보 보안`,
+    tableRows: [
+      { major: "AI 자율화", minor: "에이전틱 AI & 다중기능 로봇", desc: "인간의 개입 없이 스스로 목표를 분석·계획하고 외부 도구를 호출해 복합 과업을 수행하는 자율형 에이전틱 AI 및 범용 작업 로봇 확산" },
+      { major: "컴퓨팅 혁신", minor: "하이브리드 컴퓨팅", desc: "CPU, GPU, AI ASIC, 뉴로모픽, 양자 컴퓨팅, 광학 컴퓨팅 등 서로 다른 연산 패러다임을 조합·오케스트레이션하여 단일 기술 한계를 돌파" },
+      { major: "지속가능 인프라", minor: "에너지 효율적 컴퓨팅", desc: "AI 데이터센터의 전력 병목과 탄소 배출을 해결하기 위해 저전력 반도체(NPU/PIM), 액침 냉각, 고효율 그린 알고리즘을 결합하는 아키텍처" },
+      { major: "신뢰와 보안", minor: "양자 이후 암호화 (PQC)", desc: "양자 컴퓨터에 의한 기존 공개키 암호(RSA, ECC) 해독 위협에 대응하여 격자 기반 등 양자내성암호(PQC)로의 전환 및 암호 민첩성 확보" }
+    ]
+  },
 
+  // =========================================================================
   // 3. DB (데이터베이스)
+  // =========================================================================
   {
     domain: "DB",
-    topic: "트랜잭션 고립성 수준 (4단계)",
+    topic: "트랜잭션 고립성 수준 (Isolation Level)",
     keywords: [
-      "커밋 전 읽기 (Level 0)",
-      "커밋 후 읽기 (Level 1)",
-      "반복 가능 읽기 (Level 2)",
-      "직렬화 (Level 3)",
-      "오손·반복불가·유령 읽기",
+      "Read Uncommitted (Level 0)",
+      "Read Committed (Level 1)",
+      "Repeatable Read (Level 2)",
+      "Serializable (Level 3)",
+      "오손 · 반복불가 · 유령 읽기",
       "다중 버전 동시성 제어 (MVCC)"
     ],
     diagram: `[동시성 높음 / 일관성 낮음]  Read Uncommitted → Read Committed → Repeatable Read → Serializable  [일관성 높음 / 동시성 낮음]`,
     tableRows: [
-      { major: "고립성 4단계", minor: "0. Read Uncommitted", desc: "커밋 전 변경 데이터 읽기 허용 → 오손 읽기·반복불가·유령 데이터 모두 발생" },
-      { major: "고립성 4단계", minor: "1. Read Committed", desc: "커밋 완료된 데이터만 읽기 허용 (Oracle 기본) → 오손 읽기 방지, 반복불가·유령 발생" },
-      { major: "고립성 4단계", minor: "2. Repeatable Read", desc: "트랜잭션 내 동일 조회 결과 보장 (MySQL 기본) → 오손·반복불가 방지, 유령 발생 가능" },
+      { major: "고립성 4단계", minor: "0. Read Uncommitted", desc: "커밋 전 변경 데이터 읽기 허용 → 오손 읽기(Dirty Read)·반복불가·유령 데이터 모두 발생" },
+      { major: "고립성 4단계", minor: "1. Read Committed", desc: "커밋 완료된 데이터만 읽기 허용 (Oracle 기본) → 오손 읽기 방지, 반복불가·유령 읽기 발생" },
+      { major: "고립성 4단계", minor: "2. Repeatable Read", desc: "트랜잭션 내 동일 조회 결과 보장 (MySQL 기본) → 오손·반복불가 방지, 유령 읽기(Phantom Read) 발생 가능" },
       { major: "고립성 4단계", minor: "3. Serializable", desc: "완전 순차 실행과 동일한 격리 보장 → 모든 이상현상 방지, 동시 처리 성능 저하" },
       { major: "핵심 기술", minor: "MVCC (다중버전 제어)", desc: "Undo 영역의 이전 버전 스냅샷을 읽어 잠금(Lock) 대기 없이 빠른 읽기 성능 제공" }
     ]
   },
   {
     domain: "DB",
-    topic: "인덱스 구조 (B-Tree vs B+Tree)",
+    topic: "B-Tree 인덱스",
     keywords: [
       "루트 · 브랜치 · 리프 노드",
-      "균형 트리 O(log N)",
-      "B+Tree 리프 연결 리스트",
-      "범위 검색 (Range Scan)",
-      "클러스터드 인덱스"
+      "균형 이진/다진 탐색 트리 O(log N)",
+      "모든 노드에 키와 데이터 포인터 저장",
+      "단건 등치(=) 탐색"
     ],
-    diagram: `        [ 루트 노드 (길 안내 키) ]
-           ↙                ↘
-  [ 브랜치 노드 ]        [ 브랜치 노드 ]
-     ↓                      ↓
-[ 리프 노드(데이터) ] ⇄ [ 리프 노드(데이터) ] (양방향 연결 리스트로 범위 검색 고속화)`,
+    diagram: `        [ 루트 노드 (키 + 데이터 포인터) ]
+           ↙                        ↘
+[ 브랜치 노드 (키 + 포인터) ]   [ 브랜치 노드 (키 + 포인터) ]
+           ↓                        ↓
+      [ 리프 노드 ]            [ 리프 노드 ] (모든 노드가 실제 데이터 주소 보유)`,
     tableRows: [
-      { major: "구조 비교", minor: "B-Tree", desc: "루트·브랜치·리프 모든 노드에 키와 실제 데이터(또는 주소)를 함께 저장" },
-      { major: "구조 비교", minor: "B+Tree", desc: "내부 노드는 경로 탐색용 키만 보관하고, 오직 리프 노드에만 데이터를 저장" },
-      { major: "B+Tree 강점", minor: "높은 팬아웃(Fan-out)", desc: "내부 노드에 데이터가 없어 한 블록에 더 많은 키를 담아 트리 높이를 낮게 유지" },
-      { major: "B+Tree 강점", minor: "범위 검색 최적화", desc: "리프 노드끼리 양방향 연결 리스트로 이어져 부등호(BETWEEN, >, <) 스캔에 매우 유리" }
+      { major: "핵심 구조", minor: "Balanced Tree", desc: "루트로부터 모든 리프 노드까지의 거리를 일정하게 유지(균형 트리)하여 항상 O(log N)의 탐색 성능을 보장하는 인덱스 구조" },
+      { major: "데이터 저장", minor: "전 노드 데이터 보유", desc: "루트, 브랜치(내부), 리프 모든 노드에 인덱스 키값과 실제 테이블 레코드를 가리키는 데이터(ROWID/포인터)를 함께 저장" },
+      { major: "장단점", minor: "등치 탐색 vs 범위 탐색", desc: "• 강점: 상위 노드에서 원하는 키를 찾으면 리프까지 내려가지 않고 즉시 탐색 종료 가능\n• 한계: 노드에 데이터가 포함되어 팬아웃(Fan-out)이 작고, 부등호 범위 검색 시 트리 전체를 중위 순회해야 함" }
+    ]
+  },
+  {
+    domain: "DB",
+    topic: "B+Tree 인덱스",
+    keywords: [
+      "내부 노드(경로 키)와 리프 노드(데이터) 분리",
+      "리프 노드 양방향 연결 리스트",
+      "높은 팬아웃 (Fan-out)",
+      "범위 검색 (Range Scan) 최적화"
+    ],
+    diagram: `        [ 루트 노드 (오직 길 안내 키만 보유) ]
+           ↙                            ↘
+  [ 브랜치 노드 (키만 보유) ]      [ 브랜치 노드 (키만 보유) ]
+     ↓                                  ↓
+[ 리프 노드(키 + 데이터) ] ⇄ [ 리프 노드(키 + 데이터) ] (양방향 연결 리스트로 순차 범위 스캔 고속화)`,
+    tableRows: [
+      { major: "핵심 구조", minor: "탐색 키와 데이터 분리", desc: "루트·브랜치(내부 노드)에는 경로 탐색을 위한 가이드 키만 보관하고, 오직 최하단 리프 노드에만 실제 데이터(또는 주소)를 저장하는 RDBMS 표준 인덱스" },
+      { major: "핵심 강점 1", minor: "높은 팬아웃 (Fan-out)", desc: "내부 노드에 데이터가 없어 한 블록(Page)에 훨씬 더 많은 자식 노드 포인터를 담아 트리 높이를 낮게 유지 (디스크 I/O 횟수 절감)" },
+      { major: "핵심 강점 2", minor: "범위 검색 (Range Scan)", desc: "리프 노드끼리 양방향 연결 리스트(Doubly Linked List)로 연결되어 있어 시작점만 찾으면 부등호(BETWEEN, >, <) 및 정렬 순차 스캔이 초고속으로 수행됨" }
     ]
   },
 
+  // =========================================================================
   // 4. DS (디지털서비스·신기술)
+  // =========================================================================
   {
     domain: "DS",
-    topic: "쿠버네티스 (컨테이너 오케스트레이션)",
+    topic: "쿠버네티스 (Kubernetes)",
     keywords: [
       "마스터 노드 (Control Plane)",
       "워커 노드 (Data Plane)",
@@ -190,9 +1136,9 @@ const topics = [
     tableRows: [
       { major: "마스터 노드", minor: "kube-apiserver", desc: "모든 내부 컴포넌트와 외부 명령(kubectl)이 거치는 중앙 통신 관문" },
       { major: "마스터 노드", minor: "etcd", desc: "클러스터의 모든 설정값과 현재 상태를 안전하게 보관하는 분산 Key-Value 저장소" },
-      { major: "마스터 노드", minor: "스케줄러 & 컨트롤러", desc: "자원 여유를 보고 파드를 노드에 배치(스케줄러)하고 원하는 개수를 유지(컨트롤러)" },
-      { major: "워커 노드", minor: "kubelet & proxy", desc: "마스터 지시를 받아 컨테이너를 실행(큐블릿)하고 파드 간 통신 규칙 제어(프록시)" },
-      { major: "배포 단위", minor: "파드 (Pod)", desc: "쿠버네티스에서 생성·배포·관리할 수 있는 가장 작은 컨테이너 묶음 단위 (IP 공유)" }
+      { major: "마스터 노드", minor: "스케줄러 & 컨트롤러", desc: "자원 여유를 보고 파드를 노드에 배치(스케줄러)하고 원하는 복제본 개수를 유지(컨트롤러)" },
+      { major: "워커 노드", minor: "kubelet & kube-proxy", desc: "마스터 지시를 받아 컨테이너를 실행(큐블릿)하고 파드 간 네트워크 통신 규칙 제어(프록시)" },
+      { major: "배포 단위", minor: "파드 (Pod)", desc: "쿠버네티스에서 생성·배포·관리할 수 있는 가장 작은 컨테이너 묶음 단위 (IP·볼륨 공유)" }
     ]
   },
   {
@@ -215,53 +1161,73 @@ const topics = [
     ]
   },
 
+  // =========================================================================
   // 5. NW (네트워크)
+  // =========================================================================
   {
     domain: "NW",
-    topic: "차세대 웹 프로토콜 (HTTP/3 & QUIC)",
+    topic: "HTTP/3",
     keywords: [
-      "UDP 기반 전송",
-      "0-RTT / 1-RTT 초고속 연결",
-      "HOLB (앞차 막힘) 해소",
-      "연결 ID (Connection Migration)",
+      "QUIC 전송 계층 기반 차세대 웹 프로토콜",
+      "TCP HOLB (앞차 막힘) 근본 해소",
+      "QPACK 헤더 압축",
+      "TLS 1.3 기본 내장",
       "두음: 유제로홀독연"
     ],
-    diagram: `• HTTP/2 : [HTTP/2] + [TLS 별도] + [TCP (패킷 1개 유실 시 전체 스트림 멈춤)]
-• HTTP/3 : [HTTP/3] + [QUIC (TLS 1.3 내장 + 독립 스트림 다중화)] + [UDP]`,
+    diagram: `• HTTP/2 : [HTTP/2 (HPACK)] + [TLS 1.2/1.3 별도] + [TCP (패킷 1개 유실 시 전체 스트림 멈춤: TCP HOLB)]
+• HTTP/3 : [HTTP/3 (QPACK)] + [QUIC (TLS 1.3 내장 + 독립 스트림 다중화)] + [UDP]`,
     tableRows: [
-      { major: "등장 배경", minor: "TCP HOLB 한계", desc: "TCP는 패킷 하나만 유실돼도 순서 보장을 위해 다른 스트림까지 모두 멈추는 병목 발생" },
-      { major: "핵심 기술", minor: "UDP 기반 QUIC", desc: "전송 계층에 UDP를 채택하고 그 위에 신뢰성과 보안 기능을 직접 구현" },
-      { major: "핵심 기술", minor: "0-RTT / 1-RTT 연결", desc: "전송 연결과 TLS 1.3 암호화 협상을 하나로 합쳐 초기 접속 지연 시간 대폭 단축" },
-      { major: "핵심 기술", minor: "독립 스트림 다중화", desc: "스트림별로 패킷 손실을 독립 복구하여 다른 화면 요소 로딩이 멈추지 않음" },
-      { major: "핵심 기술", minor: "연결 이동성 보장", desc: "IP 주소가 아닌 고유 Connection ID를 사용해 와이파이↔5G 전환 시에도 세션 유지" }
+      { major: "등장 배경", minor: "HTTP/2의 TCP 한계", desc: "HTTP/2는 애플리케이션 계층 다중화를 도입했으나, 하부 전송 계층인 TCP에서 패킷 1개만 유실되어도 전체 스트림이 멈추는 TCP HOLB 병목 발생" },
+      { major: "핵심 구조", minor: "QUIC 위에서 동작", desc: "기존 TCP를 과감히 버리고 구글이 설계한 UDP 기반의 QUIC 프로토콜을 전송 계층으로 채택한 IETF 표준 차세대 웹 프로토콜" },
+      { major: "헤더 압축", minor: "QPACK 알고리즘", desc: "스트림들이 서로 독립적으로 도착하는 비순차 환경에서도 HOLB 없이 안전하게 HTTP 헤더를 압축·복원하는 QPACK 적용" }
+    ]
+  },
+  {
+    domain: "NW",
+    topic: "QUIC 프로토콜",
+    keywords: [
+      "UDP 기반 신뢰성 전송 프로토콜",
+      "0-RTT / 1-RTT 초고속 핸드셰이크",
+      "TLS 1.3 암호화 일체화",
+      "독립 스트림 다중화",
+      "연결 ID (Connection Migration)"
+    ],
+    diagram: `[기존 TCP+TLS] TCP 3-Way 핸드셰이크(1-RTT) + TLS 협상(1~2 RTT) ➔ 총 2~3 RTT 소요
+[QUIC 연결]    전송 핸드셰이크 + TLS 1.3 키 교환 통합 ➔ 최초 연결 1-RTT, 재방문 시 0-RTT 즉시 데이터 전송!`,
+    tableRows: [
+      { major: "핵심 원리", minor: "UDP 위 신뢰성·보안 구현", desc: "커널 수정이 어려운 TCP 대신 UDP를 기반으로 채택하고, 사용자 공간에서 흐름 제어·혼잡 제어·재전송과 TLS 1.3 보안을 직접 구현" },
+      { major: "지연 단축", minor: "1-RTT / 0-RTT 연결", desc: "전송 연결 설정과 TLS 1.3 암호화 협상을 단일 핸드셰이크로 합쳐 최초 접속 시 1-RTT, 이전 세션 캐시 보유 시 0-RTT 만에 데이터 전송" },
+      { major: "성능 및 이동성", minor: "독립 스트림 & Connection ID", desc: "• 스트림별 개별 손실 복구로 특정 스트림 패킷 유실이 타 스트림을 막지 않음(HOLB 제거)\n• IP·포트 대신 고유 Connection ID로 세션을 식별해 Wi-Fi ↔ 5G 망 전환 시에도 연결 유지" }
     ]
   },
   {
     domain: "NW",
     topic: "소프트웨어 정의 네트워크 (SDN)",
     keywords: [
-      "제어 영역과 데이터 영역 분리",
+      "제어 영역(Control)과 데이터 영역(Data) 분리",
       "SDN 중앙 컨트롤러",
-      "오픈플로우 (OpenFlow)",
-      "네트워크 기능 가상화 (NFV)"
+      "남향 인터페이스 (OpenFlow)",
+      "북향 인터페이스 (REST API)"
     ],
     diagram: `[응용 계층 (보안·라우팅 앱)] ↕ 북향 API ↕ [제어 계층 (중앙 컨트롤러)] ↕ 남향 API(OpenFlow) ↕ [데이터 계층 (스위치)]`,
     tableRows: [
-      { major: "핵심 원리", minor: "제어·전달 분리", desc: "네트워크 장비에서 경로 결정 두뇌(Control Plane)를 분리해 중앙 소프트웨어로 통합" },
-      { major: "3계층 구조", minor: "데이터 계층", desc: "패킷 전달(Forwarding)만 고속 수행하는 물리/가상 스위치 장비" },
-      { major: "3계층 구조", minor: "제어 계층", desc: "전체 네트워크 토폴로지를 파악하고 최적 경로를 계산하는 SDN 컨트롤러" },
-      { major: "인터페이스", minor: "남향 (Southbound)", desc: "컨트롤러와 스위치 장비 간 플로우 테이블 제어 프로토콜 (대표: OpenFlow)" },
-      { major: "인터페이스", minor: "북향 (Northbound)", desc: "컨트롤러와 상위 네트워크 관리 앱 간의 통신 인터페이스 (REST API)" }
+      { major: "핵심 원리", minor: "제어·전달 평면 분리", desc: "네트워크 장비에서 경로 결정 두뇌(Control Plane)를 분리해 중앙 소프트웨어 컨트롤러로 통합 관리" },
+      { major: "3계층 구조", minor: "데이터 계층 (인프라)", desc: "컨트롤러가 내려준 플로우 테이블 규칙에 따라 패킷 전달(Forwarding)만 고속 수행하는 물리/가상 스위치" },
+      { major: "3계층 구조", minor: "제어 계층 (컨트롤러)", desc: "전체 네트워크 토폴로지를 중앙에서 파악하고 최적 경로 및 정책을 계산하는 SDN 두뇌" },
+      { major: "인터페이스", minor: "남향(South) & 북향(North)", desc: "• 남향 API: 컨트롤러와 스위치 장비 간 플로우 제어 프로토콜 (OpenFlow 등)\n• 북향 API: 컨트롤러와 상위 네트워크 관리 앱 간의 통신 인터페이스 (REST API)" }
     ]
   },
 
+  // =========================================================================
   // 6. 경영 (IT경영·전략·법제도)
+  // =========================================================================
   {
     domain: "경영",
-    topic: "전사적 아키텍처 (EA / ITA)",
+    topic: "전사적 아키텍처 (EA)",
     keywords: [
+      "정보기술아키텍처 (ITA)",
       "5대 영역: 업무·응용·데이터·기술·보안",
-      "범정부 5대 참조모델 (RM)",
+      "범정부 5대 참조모델 (PRM·BRM·SRM·DRM·TRM)",
       "As-Is → To-Be → 이행계획",
       "두음: 업응데기보 / 성업서데기"
     ],
@@ -269,8 +1235,7 @@ const topics = [
     tableRows: [
       { major: "5대 아키텍처", minor: "업무 (BA) & 응용 (AA)", desc: "조직의 업무 프로세스 구조(BA)와 이를 지원하는 애플리케이션 체계(AA) 정의" },
       { major: "5대 아키텍처", minor: "데이터(DA)·기술(TA)·보안(SA)", desc: "전사 데이터 표준(DA), 인프라 기술 표준(TA), 보안 통제 체계(SA) 설계" },
-      { major: "5대 참조모델", minor: "PRM · BRM · SRM", desc: "성과 참조모델(PRM), 업무 참조모델(BRM), 서비스 참조모델(SRM)" },
-      { major: "5대 참조모델", minor: "DRM · TRM", desc: "기관 간 데이터 공유를 위한 데이터 참조모델(DRM) 및 기술 참조모델(TRM)" },
+      { major: "5대 참조모델", minor: "PRM · BRM · SRM · DRM · TRM", desc: "성과 참조모델(PRM), 업무 참조모델(BRM), 서비스 참조모델(SRM), 데이터 참조모델(DRM), 기술 참조모델(TRM)" },
       { major: "추진 절차", minor: "이행계획 수립", desc: "현황(As-Is)과 목표(To-Be) 간의 격차(Gap)를 분석하여 단계별 전환 로드맵 도출" }
     ]
   },
@@ -293,21 +1258,23 @@ const topics = [
     ]
   },
 
+  // =========================================================================
   // 7. 보안 (정보보안)
+  // =========================================================================
   {
     domain: "보안",
     topic: "제로 트러스트 보안 (Zero Trust)",
     keywords: [
       "Never Trust, Always Verify",
-      "정책 결정소 (PDP: PE+PA)",
-      "정책 집행소 (PEP)",
+      "정책 결정 지점 (PDP: PE+PA)",
+      "정책 집행 지점 (PEP)",
       "마이크로 세그멘테이션",
       "두음: 명최가 미지모"
     ],
     diagram: `[접속 주체(사용자+단말)] ➔ [PDP (정책 결정 두뇌: 신뢰도 평가)] ➔ [PEP (정책 집행 관문)] ➔ [기업 리소스(최소 권한 접근)]`,
     tableRows: [
-      { major: "3대 핵심 원칙", minor: "명시적 검증 & 최소 권한", desc: "모든 접근 요청의 신원·단말·맥락을 매번 검증하고, 세션별로 꼭 필요한 권한만 부여" },
-      { major: "3대 핵심 원칙", minor: "침해 가정 (Assume Breach)", desc: "내부망도 이미 침투당했다고 가정하고 구역을 잘게 쪼개어(마이크로 세그멘테이션) 측면 이동 차단" },
+      { major: "3대 핵심 원칙", minor: "명시적 검증 & 최소 권한", desc: "모든 접근 요청의 신원·단말·맥락을 매번 검증하고, 세션별로 꼭 필요한 최소 권한만 부여" },
+      { major: "3대 핵심 원칙", minor: "침해 가정 (Assume Breach)", desc: "내부망도 이미 침투당했다고 가정하고 구역을 잘게 쪼개어(마이크로 세그멘테이션) 측면 이동(Lateral Movement) 차단" },
       { major: "논리 구성요소", minor: "PDP (정책 결정 지점)", desc: "제어 영역(Control Plane): 정책 엔진(PE)과 관리자(PA)가 신뢰도를 평가해 접근 승인 여부 결정" },
       { major: "논리 구성요소", minor: "PEP (정책 집행 지점)", desc: "데이터 영역(Data Plane): PDP의 결정에 따라 실제 보안 세션을 연결하거나 차단하는 관문" }
     ]
@@ -330,7 +1297,9 @@ const topics = [
     ]
   },
 
+  // =========================================================================
   // 8. 소공 (소프트웨어공학)
+  // =========================================================================
   {
     domain: "소공",
     topic: "마이크로서비스 아키텍처 (MSA)",
@@ -342,10 +1311,10 @@ const topics = [
       "서킷 브레이커",
       "두음: 독분자격 폴데C"
     ],
-    diagram: `[클라이언트] → [API 게이트웨이] → [주문 서비스(DB)] / [결제 서비스(DB)] / [배송 서비스(DB)] (카프카 이벤트 연동)`,
+    diagram: `[클라이언트] → [API 게이트웨이] → [주문 서비스(DB)] / [결제 서비스(DB)] / [배송 서비스(DB)] (이벤트 브로커 연동)`,
     tableRows: [
       { major: "진입·통신", minor: "API 게이트웨이", desc: "단일 진입점 역할을 수행하며 인증, 라우팅, 속도 제한, 로드밸런싱을 통합 처리" },
-      { major: "진입·통신", minor: "서비스 메시", desc: "비즈니스 코드 수정 없이 사이드카 프록시를 통해 서비스 간 통신·암호화·추적 제어" },
+      { major: "진입·통신", minor: "서비스 메시 (Service Mesh)", desc: "비즈니스 코드 수정 없이 사이드카 프록시를 통해 서비스 간 통신·암호화(mTLS)·추적 제어" },
       { major: "데이터 정합성", minor: "사가 패턴 (Saga)", desc: "분산된 DB 간 트랜잭션을 이벤트로 순차 실행하고, 실패 시 보상 트랜잭션으로 취소" },
       { major: "데이터 정합성", minor: "CQRS 패턴", desc: "데이터 변경(Command) 모델과 조회(Query) 모델을 분리하여 조회 성능 극대화" },
       { major: "장애 복원력", minor: "서킷 브레이커", desc: "특정 서비스 장애 시 호출을 즉시 차단(두꺼비집 원리)하여 전체 시스템 연쇄 장애 방지" }
@@ -353,96 +1322,180 @@ const topics = [
   },
   {
     domain: "소공",
-    topic: "클린 아키텍처 & 헥사고날 아키텍처",
+    topic: "클린 아키텍처 (Clean Architecture)",
     keywords: [
       "관심사 분리",
+      "단방향 의존성 규칙 (바깥 → 안쪽)",
       "의존성 역전 원칙 (DIP)",
-      "포트 (Port) & 어댑터 (Adapter)",
-      "도메인 중심 설계"
+      "엔티티 · 유스케이스 · 어댑터 · 인프라"
     ],
-    diagram: `[외부 어댑터 (웹 UI / DB / 외부 API)] ──(포트 인터페이스)──▶ [내부 코어 (유스케이스 / 핵심 도메인 엔티티)]`,
+    diagram: `[외부 프레임워크/DB/UI] ──(의존성 방향)──▶ [인터페이스 어댑터] ──▶ [유스케이스(응용 규칙)] ──▶ [엔티티(핵심 비즈니스 도메인)]`,
     tableRows: [
-      { major: "핵심 철학", minor: "의존성 규칙", desc: "모든 소스코드 의존성은 반드시 바깥쪽(기술·인프라)에서 안쪽(도메인 규칙)으로만 향함" },
-      { major: "내부 계층", minor: "엔티티 & 유스케이스", desc: "외부 DB나 웹 프레임워크가 바뀌어도 절대 변하지 않는 핵심 비즈니스 규칙" },
-      { major: "외부 연결", minor: "포트 (Port)", desc: "내부 도메인이 외부 세계와 소통하기 위해 정의한 추상 인터페이스 규격" },
-      { major: "외부 연결", minor: "어댑터 (Adapter)", desc: "포트 인터페이스를 실제로 구현한 외부 기술 요소 (컨트롤러, JPA/DB 구현체 등)" }
+      { major: "핵심 철학", minor: "단방향 의존성 규칙", desc: "모든 소스코드 의존성은 반드시 바깥쪽(저수준 기술·인프라)에서 안쪽(고수준 도메인 규칙)으로만 향해야 함" },
+      { major: "내부 코어", minor: "엔티티 & 유스케이스", desc: "외부 DB나 웹 프레임워크가 교체되어도 절대 변하지 않는 핵심 비즈니스 규칙과 애플리케이션 시나리오" },
+      { major: "경계 분리", minor: "의존성 역전 (DIP)", desc: "내부 유스케이스가 외부 DB를 직접 호출하지 않고 추상 인터페이스에 의존하여 비즈니스 로직의 순수성 및 테스트 용이성 보장" }
+    ]
+  },
+  {
+    domain: "소공",
+    topic: "헥사고날 아키텍처 (포트 앤 어댑터)",
+    keywords: [
+      "도메인 중심 육각형 구조",
+      "인바운드 / 아웃바운드 포트 (Port)",
+      "프라이머리 / 세컨더리 어댑터 (Adapter)",
+      "외부 기술 교체 용이성"
+    ],
+    diagram: `[외부 요청 (REST/웹 UI: 인바운드 어댑터)] ──▶ (인바운드 포트) ──▶ [도메인 코어] ──▶ (아웃바운드 포트) ──▶ [DB/외부 API: 아웃바운드 어댑터]`,
+    tableRows: [
+      { major: "핵심 개념", minor: "포트 앤 어댑터 패턴", desc: "비즈니스 도메인 코어를 중앙에 두고, 모든 외부 세계(UI, DB, 메시지큐)와의 연결을 포트와 어댑터로 분리하는 아키텍처" },
+      { major: "규격 정의", minor: "포트 (Port)", desc: "내부 애플리케이션 코어가 외부와 소통하기 위해 정의한 추상 인터페이스 규격 (인바운드 UseCase 포트 / 아웃바운드 SPI 포트)" },
+      { major: "기술 구현", minor: "어댑터 (Adapter)", desc: "포트 인터페이스를 실제 외부 기술에 맞게 구현한 모듈 (웹 컨트롤러, JPA Repository 구현체, 외부 API 클라이언트 등)" }
     ]
   },
 
+  // =========================================================================
   // 9. 통계 (통계·데이터분석)
+  // =========================================================================
   {
     domain: "통계",
-    topic: "가설검정 & 제1종·제2종 오류",
+    topic: "가설검정 (Hypothesis Testing)",
     keywords: [
       "귀무가설(H0) vs 대립가설(H1)",
-      "제1종 오류 (α) · 제2종 오류 (β)",
       "유의수준(α) & 유의확률(p-value)",
-      "검정력 (1 - β)",
-      "두음: 귀참기1 / 대참채2"
+      "기각역 & 임계값",
+      "양측검정 vs 단측검정"
     ],
-    diagram: `• 판정 기준: 유의확률(p-value) < 유의수준(α, 0.05) ➔ 귀무가설(H0) 기각, 대립가설(H1) 채택!`,
+    diagram: `[가설 설정: H0(차이 없음) vs H1(차이 있음)] ➔ [검정통계량 및 유의확률(p-value) 산출] ➔ p-value < 유의수준(α, 0.05) 이면 H0 기각, H1 채택!`,
     tableRows: [
-      { major: "가설 설정", minor: "귀무가설(H0) & 대립가설(H1)", desc: "기존 통념·차이 없음(H0)과 연구자가 입증하려는 새로운 주장·차이 있음(H1)" },
-      { major: "오류 유형", minor: "제1종 오류 (α)", desc: "귀무가설(H0)이 참인데도 이를 잘못 기각하는 오류 (효과 없는데 있다고 오판)" },
-      { major: "오류 유형", minor: "제2종 오류 (β)", desc: "대립가설(H1)이 참인데도 귀무가설을 기각하지 못하는 오류 (진짜 효과를 놓침)" },
-      { major: "판정 지표", minor: "유의확률 (p-value)", desc: "귀무가설이 맞다고 가정할 때 표본 같은 극단적 결과가 우연히 관측될 확률" },
-      { major: "판정 지표", minor: "검정력 (1 - β)", desc: "대립가설이 실제로 참일 때 이를 올바르게 채택(귀무가설 기각)할 확률" }
+      { major: "가설 설정", minor: "귀무가설(H0) & 대립가설(H1)", desc: "기존 통념·차이 없음(H0)과 연구자가 강한 근거로 입증하려는 새로운 주장·차이 있음(H1)" },
+      { major: "판정 지표", minor: "유의수준(α) & 유의확률(p-value)", desc: "• 유의수준(α): 귀무가설을 기각하는 기준이 되는 최대 허용 오류 확률 (통상 0.05 또는 0.01)\n• 유의확률(p-value): 귀무가설이 참일 때 현재 표본처럼 극단적인 결과가 우연히 관측될 확률" },
+      { major: "의사 결정", minor: "기각 여부 판정", desc: "p-value < α 이면 우연히 일어날 확률이 매우 희박하므로 귀무가설(H0)을 기각하고 대립가설(H1)을 통계적으로 유의하다고 채택" }
     ]
   },
   {
     domain: "통계",
-    topic: "회귀분석 & 다중공선성 (VIF)",
+    topic: "제1종 오류와 제2종 오류",
+    keywords: [
+      "제1종 오류 (α, 위양성 False Positive)",
+      "제2종 오류 (β, 위음성 False Negative)",
+      "검정력 (Power = 1 - β)",
+      "α와 β의 상충관계 (Trade-off)",
+      "두음: 귀참기1 / 대참채2"
+    ],
+    diagram: `• 제1종 오류(α) : 귀무가설(H0)이 참인데 기각 (무죄인 사람을 유죄 판결)
+• 제2종 오류(β) : 대립가설(H1)이 참인데 H0 채택 (유죄인 범인을 무죄 방면)  |  검정력(1-β) = 진짜 효과를 찾아낼 확률`,
+    tableRows: [
+      { major: "오류 유형", minor: "제1종 오류 (α)", desc: "귀무가설(H0)이 실제로는 참인데도 이를 잘못 기각하는 오류 (효과가 없는데 있다고 오판, 유의수준 α로 통제)" },
+      { major: "오류 유형", minor: "제2종 오류 (β)", desc: "대립가설(H1)이 실제로는 참인데도 귀무가설을 기각하지 못하는 오류 (진짜 있는 효과를 놓침)" },
+      { major: "검정 능력", minor: "검정력 (1 - β) & 관계", desc: "• 검정력(1-β): 대립가설이 참일 때 이를 올바르게 채택할 확률\n• 표본 크기가 고정된 상태에서 α를 줄이면 β가 커지는 상충관계(Trade-off)가 존재하며, 둘 다 줄이려면 표본 크기(n)를 늘려야 함" }
+    ]
+  },
+  {
+    domain: "통계",
+    topic: "회귀분석 (Regression Analysis)",
     keywords: [
       "독립변수(X) · 종속변수(Y)",
       "최소제곱법 (OLS)",
-      "결정계수 (R²)",
-      "다중공선성 (VIF ≥ 10)",
-      "두음: 선독등정 (4대 가정)"
+      "4대 기본가정 (선형성·독립성·등분산성·정규성)",
+      "결정계수 (R²) & 수정된 R²",
+      "두음: 선독등정"
     ],
-    diagram: `[독립변수 X1, X2, ...] ➔ [선형 회귀모형 Y = β0 + β1X1 + ... + ε] ➔ [종속변수 Y 예측 및 인과성 분석]`,
+    diagram: `[독립변수 X1, X2, ...] ➔ [선형 회귀모형 Y = β0 + β1X1 + ... + ε (OLS 잔차제곱합 최소화)] ➔ [F-검정(모형) · t-검정(회귀계수) · R² 평가]`,
     tableRows: [
-      { major: "4대 기본가정", minor: "선형성 & 독립성", desc: "X와 Y의 선형 관계 성립(선형성), 잔차들 간에 자기상관이 없을 것(독립성, 더빈-왓슨)" },
-      { major: "4대 기본가정", minor: "등분산성 & 정규성", desc: "잔차의 분산이 일정할 것(등분산성), 잔차가 정규분포를 따를 것(정규성)" },
-      { major: "모형 평가", minor: "결정계수 (R²)", desc: "전체 변동 중 회귀모형이 설명해 주는 비율 (0~1 사이, 독립변수 증가 시 수정된 R² 사용)" },
-      { major: "주요 문제점", minor: "다중공선성 (VIF)", desc: "독립변수들끼리 강한 상관관계를 갖는 현상 (VIF ≥ 10이면 변수 제거·PCA·릿지/라쏘 적용)" }
+      { major: "핵심 원리", minor: "최소제곱법 (OLS)", desc: "독립변수(원인 X)와 종속변수(결과 Y) 간의 선형 함수식을 도출하기 위해 실제값과 예측값의 차이인 잔차 제곱합(SSE)을 최소화하는 계수 추정" },
+      { major: "4대 기본가정", minor: "선 · 독 · 등 · 정", desc: "① 선형성(X와 Y의 선형 관계) ② 잔차 독립성(자기상관 없음, 더빈-왓슨 검정) ③ 잔차 등분산성(분산 일정) ④ 잔차 정규성(정규분포 충족)" },
+      { major: "모형 적합도", minor: "결정계수 (R²)", desc: "총변동(SST) 중 회귀모형에 의해 설명되는 변동(SSR)의 비율(0~1)로, 독립변수 수 증가에 따른 과대평가를 보정하기 위해 수정된 결정계수(Adjusted R²) 활용" }
+    ]
+  },
+  {
+    domain: "통계",
+    topic: "다중공선성 (Multicollinearity)",
+    keywords: [
+      "독립변수 간 강한 상관관계",
+      "회귀계수 분산 팽창 (불안정성)",
+      "분산팽창요인 (VIF ≥ 10)",
+      "주성분 분석(PCA) · 릿지(L2) · 라쏘(L1)"
+    ],
+    diagram: `[독립변수 X1 ↔ X2 강한 상관관계 발생] ➔ 회귀계수 추정치 왜곡 ➔ [진단: VIF = 1 ÷ (1 - R_i²) ≥ 10] ➔ [해결: 변수 제거 · PCA · 정규화(Ridge/Lasso)]`,
+    tableRows: [
+      { major: "핵심 개념", minor: "다중공선성 정의", desc: "다중회귀분석에서 독립변수들끼리 서로 독립적이지 않고 강한 선형 상관관계를 가져 회귀계수 추정의 표준오차가 비정상적으로 커지는 현상" },
+      { major: "진단 지표", minor: "분산팽창요인 (VIF)", desc: "특정 독립변수를 다른 독립변수들로 회귀분석했을 때의 결정계수(R_i²)를 이용한 지표로, 통상 VIF ≥ 10 이면 심각한 다중공선성 존재로 판정" },
+      { major: "해결 방안", minor: "변수 선택 · 차원축소 · 규제", desc: "• 상관성이 높은 중복 독립변수 제거 또는 단계적 변수 선택법 적용\n• 주성분 회귀(PCR/PCA)로 서로 직교하는 주성분 도출\n• 가중치 크기에 페널티를 부여하는 릿지(Ridge, L2 규제) 또는 라쏘(Lasso, L1 규제) 회귀 적용" }
     ]
   },
 
+  // =========================================================================
   // 10. 프관 (프로젝트관리)
+  // =========================================================================
   {
     domain: "프관",
-    topic: "기성고 관리 (EVM: 일정·원가 통합 성과측정)",
+    topic: "기성고 관리 (EVM)",
     keywords: [
+      "Earned Value Management",
       "계획가치(PV) · 획득가치(EV) · 실제비용(AC)",
-      "일정편차(SV) & 일정지수(SPI)",
-      "원가편차(CV) & 원가지수(CPI)",
-      "완료시점 추정치 (EAC)",
+      "일정편차(SV) & 일정성과지수(SPI)",
+      "원가편차(CV) & 원가성과지수(CPI)",
+      "완료시점 추정치 (EAC · ETC)",
       "두음: 계획실 / 일원편지"
     ],
-    diagram: `• 일정 분석: SV = EV - PV (0보다 크면 앞섬)  |  SPI = EV ÷ PV (1.0보다 크면 양호)
-• 원가 분석: CV = EV - AC (0보다 크면 절감)  |  CPI = EV ÷ AC (1.0보다 크면 양호)`,
+    diagram: `• 일정 성과 : SV = EV - PV (>0 앞섬)  |  SPI = EV ÷ PV (>1.0 양호)
+• 원가 성과 : CV = EV - AC (>0 절감)  |  CPI = EV ÷ AC (>1.0 양호)  |  최종예상비용 EAC = BAC ÷ CPI`,
     tableRows: [
-      { major: "3대 기본지표", minor: "PV · EV · AC", desc: "계획가치(PV: 계획 예산), 획득가치(EV: 실제 완성한 일의 가치), 실제비용(AC: 지출 비용)" },
-      { major: "일정 성과", minor: "SV (편차) & SPI (지수)", desc: "획득가치(EV)를 계획가치(PV)와 비교하여 일정 지연 여부 판단 (SV=EV-PV, SPI=EV/PV)" },
-      { major: "원가 성과", minor: "CV (편차) & CPI (지수)", desc: "획득가치(EV)를 실제비용(AC)과 비교하여 예산 초과 여부 판단 (CV=EV-AC, CPI=EV/AC)" },
-      { major: "미래 예측", minor: "BAC · ETC · EAC", desc: "총예산(BAC), 잔여예상비용(ETC), 최종예상총비용(EAC = BAC ÷ CPI)" }
+      { major: "3대 기본지표", minor: "PV · EV · AC", desc: "• 계획가치(PV): 기준 시점까지 계획된 예산\n• 획득가치(EV): 실제 완료된 작업량의 화폐 가치(기성고)\n• 실제비용(AC): 작업 수행에 실제 지출된 총비용" },
+      { major: "성과 분석", minor: "일정(SV·SPI) & 원가(CV·CPI)", desc: "• 일정 분석: 획득가치(EV)에서 계획가치(PV)를 빼거나 나누어 진척도 평가\n• 원가 분석: 획득가치(EV)에서 실제비용(AC)을 빼거나 나누어 예산 효율성 평가" },
+      { major: "미래 예측", minor: "BAC · ETC · EAC", desc: "완료시점 총예산(BAC), 잔여작업 예상비용(ETC), 현재 원가효율 지속 시 최종 예상 총비용(EAC = BAC ÷ CPI)" }
     ]
   },
   {
     domain: "프관",
-    topic: "주공정법 (CPM) & 일정 단축 기법",
+    topic: "주공정법 (CPM)",
     keywords: [
-      "주공정 (Critical Path)",
-      "여유시간 (Float / Slack = 0)",
-      "크래싱 (Crashing: 자원 추가)",
-      "패스트 트래킹 (Fast Tracking: 병행 수행)"
+      "Critical Path Method",
+      "주공정 (Critical Path: 최장 경로)",
+      "ES · EF (조기 시작·종료)",
+      "LS · LF (만기 시작·종료)",
+      "총 여유시간 (Total Float / Slack = 0)"
     ],
-    diagram: `[작업 네트워크 분석 (ES·EF / LS·LF)] ➔ [여유시간(Slack) = 0 인 가장 긴 경로(주공정) 도출] ➔ [크래싱 / 패스트트래킹 단축]`,
+    diagram: `[전진 계산 (Forward Pass): ES · EF 도출] ➔ [후진 계산 (Backward Pass): LF · LS 도출]
+➔ 여유시간(Float = LS - ES = LF - EF)이 '0'인 작업들을 연결한 최장 경로 = [주공정 (Critical Path)]`,
     tableRows: [
-      { major: "핵심 개념", minor: "주공정 (Critical Path)", desc: "프로젝트 네트워크에서 시작부터 종료까지 가장 긴 시간이 걸리는 경로 (전체 기간 결정)" },
-      { major: "핵심 개념", minor: "여유시간 (Total Float)", desc: "전체 일정을 지연시키지 않고 늦출 수 있는 시간 (주공정 위의 작업들은 여유시간이 0)" },
-      { major: "일정 단축", minor: "크래싱 (Crashing)", desc: "주공정 작업에 인력·장비·예산을 추가 투입하여 기간 단축 (비용 증가 위험)" },
-      { major: "일정 단축", minor: "패스트 트래킹", desc: "순차 진행할 작업(예: 설계와 개발)을 겹쳐서 동시 병행 수행 (재작업·품질 저하 위험)" }
+      { major: "핵심 개념", minor: "주공정 (Critical Path)", desc: "프로젝트 네트워크 다이어그램에서 시작부터 종료까지 가장 긴 시간이 소요되는 경로로, 프로젝트 전체 최소 완료 기간을 결정함" },
+      { major: "일정 계산", minor: "전진 계산 & 후진 계산", desc: "• 전진 계산: 시작부터 끝으로 진행하며 가장 빠른 시작(ES)·종료(EF) 시간 산출\n• 후진 계산: 종료 시점부터 역산하며 전체 일정을 늦추지 않는 가장 늦은 시작(LS)·종료(LF) 시간 산출" },
+      { major: "여유 시간", minor: "총 여유시간 (Total Float)", desc: "전체 프로젝트 완료일을 지연시키지 않고 특정 활동을 늦출 수 있는 시간(LS - ES)으로, 주공정 위의 모든 활동은 여유시간이 0임" }
+    ]
+  },
+  {
+    domain: "프관",
+    topic: "크래싱 (Crashing)",
+    keywords: [
+      "일정 단축 기법 (Schedule Compression)",
+      "주공정(Critical Path) 활동 자원 추가 투입",
+      "비용-일정 교환 (Time-Cost Trade-off)",
+      "직접 원가 상승 위험"
+    ],
+    diagram: `[주공정 작업 A (정상 10일 / 100만원)] ──(인력·장비·특근 자원 추가 투입: Crashing)──▶ [단축 작업 A (5일 / 180만원)]
+➔ 작업 순서는 그대로 유지하면서 직접 비용(Cost)을 추가 투입해 주공정 기간 단축!`,
+    tableRows: [
+      { major: "핵심 개념", minor: "자원 투입형 일정 단축", desc: "프로젝트 범위(Scope)를 축소하지 않고, 주공정(Critical Path) 상의 활동에 인력·장비·초과근무 등 추가 자원을 투입하여 최소의 추가 비용으로 최대의 일정을 단축하는 기법" },
+      { major: "적용 원칙", minor: "비용 기울기 (Cost Slope)", desc: "단위 기간(1일) 단축 시 증가하는 비용 기울기[(급속비용-정상비용) ÷ (정상기간-급속기간)]가 가장 작은 주공정 활동부터 우선 단축" },
+      { major: "핵심 리스크", minor: "원가 상승 & 수확체감", desc: "직접 원가(비용)가 상승하며, 과도한 인력 투입 시 의사소통 채널 증가(브룩스의 법칙)로 인해 오히려 효율이 저하될 수 있음" }
+    ]
+  },
+  {
+    domain: "프관",
+    topic: "패스트 트래킹 (Fast Tracking)",
+    keywords: [
+      "일정 단축 기법 (Schedule Compression)",
+      "순차 공정의 병행(중첩) 수행",
+      "FS(종료-시작) → SS(시작-시작) 관계 변경",
+      "재작업(Rework) 및 품질 저하 위험"
+    ],
+    diagram: `• 기존 순차 수행 : [설계 완료] ──▶ [개발 착수] ──▶ [테스트] (전체 기간 10주)
+• 패스트 트래킹  : [설계 진행 중] + [설계 확정 부분부터 개발 동시 병행 착수!] (전체 기간 7주로 단축, 재작업 리스크 증가)`,
+    tableRows: [
+      { major: "핵심 개념", minor: "공정 중첩형 일정 단축", desc: "원래 순차적으로 수행할 계획이었던 주공정 상의 활동이나 단계들을 일정 부분 겹쳐서(Overlapping) 동시에 병행 수행함으로써 전체 일정을 단축하는 기법" },
+      { major: "적용 방식", minor: "선후행 관계 조정", desc: "선행 작업이 100% 끝나기 전에 후행 작업을 앞당겨 시작(Lead Time 부여, FS 관계를 SS+지연 관계로 전환)" },
+      { major: "핵심 리스크", minor: "재작업(Rework) & 품질 저하", desc: "추가 자원 투입 비용은 들지 않으나, 앞 단계 산출물이 변경될 경우 대규모 재작업(Rework)이 발생하고 프로젝트 리스크와 품질 저하 위험이 커짐" }
     ]
   }
 ];
