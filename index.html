@@ -88,10 +88,12 @@
         .subnote-table td.col-desc { width: 56%; color: #e2e8f0; text-align: left; white-space: pre-line; }
 
         /* Controls */
-        .controls { display: flex; gap: 10px; margin-top: 10px; padding-bottom: 10px; }
-        .ctrl-btn { flex: 1; background: var(--card-bg); border: 1px solid var(--border-color); color: var(--text-primary); padding: 12px; border-radius: 10px; font-weight: 600; font-size: 0.95rem; cursor: pointer; }
-        .ctrl-btn:active { background: var(--border-color); }
-        .ctrl-btn.primary { background: var(--accent); color: #0f172a; border: none; }
+        .controls { display: flex; gap: 8px; margin-top: 10px; padding-bottom: 10px; }
+        .ctrl-btn { flex: 1; background: var(--card-bg); border: 1px solid var(--border-color); color: var(--text-primary); padding: 13px 8px; border-radius: 10px; font-weight: 700; font-size: 0.92rem; cursor: pointer; transition: all 0.15s; white-space: nowrap; }
+        .ctrl-btn:active { transform: scale(0.97); background: var(--border-color); }
+        .ctrl-btn.check-btn { border-color: rgba(74, 222, 128, 0.45); color: #86efac; background: rgba(22, 101, 52, 0.25); }
+        .ctrl-btn.check-btn.is-mastered { background: #22c55e; color: #052e16; border-color: #22c55e; font-weight: 800; }
+        .ctrl-btn.primary { background: var(--accent); color: #0f172a; border: none; font-weight: 800; }
     </style>
 </head>
 <body>
@@ -179,7 +181,8 @@
             </div>
 
             <div class="controls">
-                <button class="ctrl-btn" onclick="prevCard(event)">이전</button>
+                <button class="ctrl-btn" onclick="prevCard(event)">← 이전</button>
+                <button class="ctrl-btn check-btn" id="master-btn" onclick="toggleMastered(event)">☐ 이해함</button>
                 <button class="ctrl-btn primary" onclick="nextCard(event)">다음 카드 →</button>
             </div>
         </div>
@@ -190,8 +193,36 @@
         let currentDeck = [];
         let currentIndex = 0;
         let isFlipped = false;
+        let masteredSet = new Set();
+        const MASTERED_STORAGE_KEY = 'itpe_mastered_topics_v1';
+
+        function loadMastered() {
+            try {
+                const raw = localStorage.getItem(MASTERED_STORAGE_KEY);
+                if (raw) {
+                    masteredSet = new Set(JSON.parse(raw));
+                }
+            } catch (e) {
+                masteredSet = new Set();
+            }
+        }
+
+        function saveMastered() {
+            try {
+                localStorage.setItem(MASTERED_STORAGE_KEY, JSON.stringify([...masteredSet]));
+            } catch (e) {}
+        }
+
+        function getTopicKey(card) {
+            return `${card.domain}::${card.topic}`;
+        }
+
+        function isMastered(card) {
+            return masteredSet.has(getTopicKey(card));
+        }
 
         function initApp() {
+            loadMastered();
             if (typeof topics === 'undefined' || !topics.length) {
                 document.getElementById('domain-grid').innerHTML = '<p style="color:red; grid-column:span 2;">topics.js 로드 대기 중...</p>';
                 return;
@@ -200,36 +231,43 @@
             document.getElementById('total-badge').innerText = `총 ${topics.length}개 토픽`;
 
             const domainCounts = {};
+            const domainMasteredCounts = {};
             topics.forEach(t => {
                 domainCounts[t.domain] = (domainCounts[t.domain] || 0) + 1;
+                if (isMastered(t)) {
+                    domainMasteredCounts[t.domain] = (domainMasteredCounts[t.domain] || 0) + 1;
+                }
             });
 
             const grid = document.getElementById('domain-grid');
             grid.innerHTML = '';
 
             Object.keys(domainCounts).forEach(domain => {
+                const total = domainCounts[domain];
+                const done = domainMasteredCounts[domain] || 0;
                 const btn = document.createElement('div');
                 btn.className = 'domain-btn';
                 btn.onclick = () => startStudy(domain);
                 btn.innerHTML = `
                     <div class="domain-name">${domain}</div>
-                    <div class="domain-count">${domainCounts[domain]}개 토픽</div>
+                    <div class="domain-count">${total}개 토픽 ${done > 0 ? `<span style="color:#4ade80;">(이해 ${done})</span>` : ''}</div>
                 `;
                 grid.appendChild(btn);
             });
         }
 
         function startStudy(domain) {
-            if (domain === 'ALL') {
-                currentDeck = [...topics].sort(() => Math.random() - 0.5);
-            } else {
-                currentDeck = topics.filter(t => t.domain === domain).sort(() => Math.random() - 0.5);
-            }
+            const pool = domain === 'ALL' ? [...topics] : topics.filter(t => t.domain === domain);
 
-            if (currentDeck.length === 0) {
+            if (pool.length === 0) {
                 alert('해당 도메인에 토픽이 없습니다.');
                 return;
             }
+
+            // 미암기 카드는 앞쪽에 랜덤 배치, 이해한 카드는 맨 뒤쪽에 배치
+            const unmastered = pool.filter(t => !isMastered(t)).sort(() => Math.random() - 0.5);
+            const mastered = pool.filter(t => isMastered(t)).sort(() => Math.random() - 0.5);
+            currentDeck = [...unmastered, ...mastered];
 
             currentIndex = 0;
             isFlipped = false;
@@ -243,9 +281,15 @@
             document.getElementById('study-view').style.display = 'none';
             document.getElementById('app-header').style.display = 'flex';
             document.getElementById('home-view').style.display = 'flex';
+            initApp();
         }
 
+        let justSwiped = false;
         function flipCard() {
+            if (justSwiped) {
+                justSwiped = false;
+                return;
+            }
             const card = document.getElementById('flashcard');
             isFlipped = !isFlipped;
             if (isFlipped) {
@@ -395,11 +439,52 @@
             const backScroll = document.getElementById('back-scroll-body');
             if (backScroll) backScroll.scrollTop = 0;
 
+            const masterBtn = document.getElementById('master-btn');
+            const mastered = isMastered(card);
+            if (masterBtn) {
+                if (mastered) {
+                    masterBtn.classList.add('is-mastered');
+                    masterBtn.innerText = '✅ 이해완료';
+                } else {
+                    masterBtn.classList.remove('is-mastered');
+                    masterBtn.innerText = '☐ 이해함';
+                }
+            }
+
+            document.getElementById('front-domain').innerText = mastered ? `${card.domain} · ✅ 이해완료` : card.domain;
             document.getElementById('progress-text').innerText = `${currentIndex + 1} / ${currentDeck.length}`;
         }
 
+        function toggleMastered(event) {
+            if (event) event.stopPropagation();
+            if (!currentDeck.length) return;
+
+            const card = currentDeck[currentIndex];
+            const key = getTopicKey(card);
+
+            if (masteredSet.has(key)) {
+                // 이미 이해함 상태인 경우 -> 체크 해제
+                masteredSet.delete(key);
+                saveMastered();
+                renderCard();
+            } else {
+                // 새로 이해함 체크 -> 저장 후 현재 덱의 맨 뒤로 이동!
+                masteredSet.add(key);
+                saveMastered();
+
+                if (currentDeck.length > 1) {
+                    const [movedCard] = currentDeck.splice(currentIndex, 1);
+                    currentDeck.push(movedCard);
+                    if (currentIndex >= currentDeck.length) {
+                        currentIndex = 0;
+                    }
+                }
+                renderCard();
+            }
+        }
+
         function nextCard(event) {
-            event.stopPropagation();
+            if (event) event.stopPropagation();
             if (currentIndex < currentDeck.length - 1) {
                 currentIndex++;
                 renderCard();
@@ -409,7 +494,7 @@
         }
 
         function prevCard(event) {
-            event.stopPropagation();
+            if (event) event.stopPropagation();
             if (currentIndex > 0) {
                 currentIndex--;
                 renderCard();
@@ -418,7 +503,46 @@
             }
         }
 
-        window.onload = initApp;
+        // 엄지손가락 좌우 스와이프 제스처 지원
+        function setupSwipeGesture() {
+            const container = document.querySelector('.card-container');
+            if (!container) return;
+
+            let startX = 0;
+            let startY = 0;
+
+            container.addEventListener('touchstart', (e) => {
+                if (!e.touches || e.touches.length !== 1) return;
+                startX = e.touches[0].clientX;
+                startY = e.touches[0].clientY;
+                justSwiped = false;
+            }, { passive: true });
+
+            container.addEventListener('touchend', (e) => {
+                if (!e.changedTouches || e.changedTouches.length !== 1) return;
+                const endX = e.changedTouches[0].clientX;
+                const endY = e.changedTouches[0].clientY;
+                const dx = endX - startX;
+                const dy = endY - startY;
+
+                // 가로 스와이프 거리가 50px 이상이고 세로 스크롤보다 가로 이동이 뚜렷할 때
+                if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.4) {
+                    justSwiped = true;
+                    if (dx < 0) {
+                        // 오른쪽 -> 왼쪽으로 밀기: 다음 카드
+                        nextCard();
+                    } else {
+                        // 왼쪽 -> 오른쪽으로 밀기: 이전 카드
+                        prevCard();
+                    }
+                }
+            }, { passive: true });
+        }
+
+        window.onload = () => {
+            initApp();
+            setupSwipeGesture();
+        };
     </script>
 </body>
 </html>
