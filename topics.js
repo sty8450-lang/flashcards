@@ -422,5 +422,29 @@ const topics = [
       { major: "일정 단축", minor: "크래싱 (Crashing)", desc: "주공정 작업에 인력·장비·예산을 추가 투입하여 기간 단축 (비용 증가 위험)" },
       { major: "일정 단축", minor: "패스트 트래킹", desc: "순차 진행할 작업(예: 설계와 개발)을 겹쳐서 동시 병행 수행 (재작업·품질 저하 위험)" }
     ]
+  },
+
+  // 신기술
+  {
+    domain: "신기술",
+    topic: "큐비트 (Qubit)",
+    keywords: ["중첩(Superposition)", "얽힘(Entanglement)", "블로흐 구(Bloch Sphere)", "초전도", "포획 이온"],
+    diagram: "【블로흐 구(Bloch Sphere) & Classical vs Qubit】\n- Classical Bit: 0 또는 1 (One out of 2^n)\n- Qubit: a|0⟩ + b|1⟩ (All of 2^n, 중첩 및 얽힘 상태 표현)",
+    tableRows: [
+      // [Table 1: 양자역학적 특성 및 주요 알고리즘]
+      { category: "양자역학적 특성", sub: "양자 중첩 (Superposition)", desc: "0과 1 정보를 동시에 표현 가능" },
+      { category: "", sub: "양자 얽힘 (Entanglement)", desc: "둘 이상의 큐비트 간 강한 상관관계, 비국소적 정보 전달 기반" },
+      { category: "주요 알고리즘", sub: "Shor 알고리즘", desc: "소인수분해" },
+      { category: "", sub: "Grover 알고리즘", desc: "비정렬 검색" },
+      { category: "품질 및 제어", sub: "결괏값 시간 (Coherence Time)", desc: "양자 상태 유지 시간 (T1, T2), 양자 연산 가능 시간 결정" },
+      { category: "", sub: "양자 오차 수정 (QEC)", desc: "디코히어런스 극복, 물리 큐비트를 묶어 논리 큐비트 형성" },
+
+      // [Table 2: 물리적 하드웨어 구현 방식 5대]
+      { category: "하드웨어 구현", sub: "초전도 (조셉슨 접합)", desc: "[강점] 빠른 게이트 연산, 상용 클라우드 선도\n[과제] 극저온 냉동기 필수, 짧은 결괏값 시간\n[키워드] 인공 원자, 트랜스몬, 극저온" },
+      { category: "", sub: "포획 이온 (전자기장)", desc: "[강점] 압도적 긴 결괏값 시간, 최고 수준 연산 충실도\n[과제] 연산 속도 상대적 느림, 복잡한 광학계 제어\n[키워드] 단일 이온, 광학 격자, 충실도" },
+      { category: "", sub: "퀀텀닷 (양자점)", desc: "[강점] 기존 CMOS 팹 호환, 극소형 초고집적\n[과제] 큐비트 간 전자기 누화(Crosstalk), 균일 제어 공정 난제\n[키워드] 반도체 스핀, CMOS 호환성" },
+      { category: "", sub: "광자 (위상 변조)", desc: "[강점] 유일한 상온 동작 가능, 장거리 통신 결합\n[과제] 광자간 직접 상호작용 유도 극난, 얽힘 생성 확률적 한계\n[키워드] 비행 큐비트, 상온 퀀텀, 광섬유" },
+      { category: "", sub: "중성 원자 (광학 핀셋)", desc: "[강점] 수천 큐비트급 대규모 배열 용이, 물리적 셔틀링 가능\n[과제] 원자 포획 손실률 관리 필요, 게이트 조작 속도 개선\n[키워드] 뤼드베리 상태, 대규모 확장" }
+    ]
   }
 ];

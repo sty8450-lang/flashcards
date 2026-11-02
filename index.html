@@ -74,7 +74,7 @@
         .subnote-table td { padding: 7px 8px; border: 1px solid #334155; color: #f1f5f9; vertical-align: middle; line-height: 1.4; word-break: keep-all; }
         .subnote-table td.col-major { width: 20%; font-weight: 700; color: #7dd3fc; background: rgba(30, 58, 138, 0.28); text-align: center; }
         .subnote-table td.col-minor { width: 24%; font-weight: 600; color: #bae6fd; background: rgba(30, 41, 59, 0.5); text-align: center; }
-        .subnote-table td.col-desc { width: 56%; color: #e2e8f0; text-align: left; }
+        .subnote-table td.col-desc { width: 56%; color: #e2e8f0; text-align: left; white-space: pre-line; }
 
         /* Controls */
         .controls { display: flex; gap: 10px; margin-top: 10px; padding-bottom: 10px; }
@@ -248,27 +248,27 @@
 
             tableWrapper.style.display = 'flex';
 
-            // Normalize row objects: support { major, minor, desc } or [major, minor, desc]
+            // Normalize row objects: support { category, sub, desc } / { major, minor, desc } or [major, minor, desc]
             const normalized = rows.map(r => {
                 if (Array.isArray(r)) {
                     return { major: r[0] || '', minor: r[1] || '', desc: r[2] || '' };
                 }
                 return {
                     major: r.major ?? r.category ?? r.대분류 ?? '',
-                    minor: r.minor ?? r.subCategory ?? r.소분류 ?? '',
+                    minor: r.minor ?? r.sub ?? r.subCategory ?? r.소분류 ?? '',
                     desc: r.desc ?? r.feature ?? r.특징 ?? ''
                 };
             });
 
-            // Calculate rowspan for consecutive identical major categories
+            // Calculate rowspan for consecutive identical major categories OR empty string "" continuation
             const rowspans = new Array(normalized.length).fill(1);
             for (let i = 0; i < normalized.length; i++) {
                 if (rowspans[i] === 0) continue;
                 let span = 1;
                 while (
                     i + span < normalized.length &&
-                    normalized[i + span].major !== '' &&
-                    normalized[i + span].major === normalized[i].major
+                    normalized[i].major !== '' &&
+                    (normalized[i + span].major === '' || normalized[i + span].major === normalized[i].major)
                 ) {
                     rowspans[i + span] = 0;
                     span++;
