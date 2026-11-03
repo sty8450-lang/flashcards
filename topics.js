@@ -2281,60 +2281,743 @@ const topics = [
   // =========================================================================
   {
     domain: "소공",
+    topic: "소프트웨어 공학 & 좋은 SW 4대 특성",
+    mnemonic: "도·프·방·패 / 유·신·효·수",
+    definition: "SW 위기 극복 위해 공학적 원리로 품질·생산성 향상 학문",
+    keywords: [
+      "NATO SW 위기 (1968)",
+      "품질과 생산성 극대화",
+      "비가시성 · 복잡성 · 순응성 · 변경성 (Brooks)",
+      "최소 비용 · 정해진 일정 내 개발"
+    ],
+    diagram: `[SW 위기 (일정 지연·비용 초과·품질 저하)] ──▶ [SW 공학 4요소: 도구(CASE) · 프로세스 · 방법 · 패러다임] ──▶ [좋은 SW: 유지보수성 · 신뢰성 · 효율성 · 수용성]`,
+    tableRows: [
+      { major: "SW공학 4대 요소", minor: "도구 (Tools)", desc: "분석·설계·구현·테스트 전 과정을 자동화 지원하는 CASE 및 통합개발환경" },
+      { major: "", minor: "프로세스 (Process)", desc: "작업을 수행하는 절차와 단계별 산출물, 품질보증 및 형상관리 활동 정의 체계" },
+      { major: "", minor: "방법 (Methods)", desc: "요구분석, 설계 모델링, 코딩, 테스팅 등 소프트웨어 구축을 위한 기술적 노하우" },
+      { major: "", minor: "패러다임 (Paradigm)", desc: "절차지향, 정보공학, 객체지향, CBD, 애자일 등 시대를 관통하는 개발 접근 관점" },
+      { major: "좋은 SW 4대 특성", minor: "유지보수성 (Maintainability)", desc: "비즈니스 환경 및 고객의 요구사항 변화에 맞춰 적은 비용으로 신속히 수정·진화 가능한 특성" },
+      { major: "", minor: "신뢰성 (Dependability)", desc: "신뢰도·보안성·안전성을 포괄하며, 장애 발생 시에도 물리적·경제적 피해 없이 정상 동작하는 특성" },
+      { major: "", minor: "효율성 (Efficiency)", desc: "메모리·CPU·네트워크 등 시스템 자원을 낭비하지 않고 빠른 응답시간과 처리량을 제공하는 특성" },
+      { major: "", minor: "수용성 (Acceptability)", desc: "실제 사용자가 이해·학습하기 쉽고 타 시스템 및 업무 환경과 자연스럽게 호환되는 특성" }
+    ]
+  },
+  {
+    domain: "소공",
+    topic: "SW 개발방법론 & 테일러링 (Tailoring)",
+    mnemonic: "절·활·산·도·기 / 특·표·상·세·문",
+    definition: "조직 표준 프로세스를 프로젝트 특성에 맞게 최적화하는 기법",
+    keywords: [
+      "발전: 구조적 → 정보공학 → 객체지향 → CBD → Agile",
+      "내부 기준 (목표환경·요구사항·규모·보유기술)",
+      "외부 기준 (법적 제약·국제표준)",
+      "ISO/IEC 12207 · CMMI · SPICE"
+    ],
+    diagram: `[특성 정의 (내·외부 환경)] → [표준 프로세스 선정] → [상위 수준 커스터마이징 (단계 가감)] → [세부 수준 커스터마이징 (산출물 조정)] → [테일러링 문서화]`,
+    tableRows: [
+      { major: "개발방법론 구성요소", minor: "절차 · 활동 · 산출물", desc: "무엇을 어떤 순서로 수행할지 정의한 작업 단계(Phase/Activity)와 단계별 결과 문서" },
+      { major: "", minor: "도구 · 기법 · 역할", desc: "각 활동을 수행하기 위한 모델링 기법, 자동화 도구(CASE) 및 참여자 책임(Role)" },
+      { major: "방법론 진화 과정", minor: "구·정·객·C·A", desc: "구조적(DFD/모듈분할) → 정보공학(자료중심/ERD) → 객체지향(캡추다정상) → CBD(컴포넌트 조립) → 애자일(고객소통/반복)" },
+      { major: "테일러링 수행 절차", minor: "1. 프로젝트 특성 정의", desc: "규모, 복잡도, 기술 성숙도(내부 기준) 및 법규, 국제표준(외부 기준)을 분석하여 매트릭스 작성" },
+      { major: "", minor: "2. 표준 프로세스 선정", desc: "조직 표준 방법론 중 프로젝트 성격(신규 개발, 유지보수, 패키지 도입 등)에 부합하는 기본 모델 선택" },
+      { major: "", minor: "3. 상위/세부 커스터마이징", desc: "생략·병합할 단계와 태스크를 조정(상위)하고, 산출물 양식과 검토 주기를 구체화(세부)" },
+      { major: "", minor: "4. 테일러링 문서화", desc: "조정 사유와 최종 확정된 WBS·산출물 목록을 프로젝트 계획서에 명시하고 이해관계자 합의 도출" }
+    ]
+  },
+  {
+    domain: "소공",
+    topic: "애자일 (Agile) 방법론 & 12원칙",
+    mnemonic: "고·요·배·의·동·대·작·지·좋·단·고·요",
+    definition: "고객 소통과 짧은 반복 주기로 변화에 민첩 대응하는 방법론",
+    keywords: [
+      "애자일 선언문 4대 핵심 가치",
+      "스크럼 (제품 백로그 · 스프린트 · 일일 스크럼 · 회고)",
+      "XP (짝 프로그래밍 · TDD · 지속적 통합 · 리팩토링)",
+      "칸반 (WIP 제한 · 리드타임 최소화) & 린 (낭비 제거)"
+    ],
+    diagram: "se_agile_12.png",
+    tableRows: [
+      { major: "4대 핵심 가치", minor: "개인과 상호작용 우선", desc: "프로세스와 도구보다 팀원 간의 긴밀한 대면 소통과 협업을 중시" },
+      { major: "", minor: "작동하는 소프트웨어 우선", desc: "방대한 문서 작성보다 실제 실행 가능한 소프트웨어를 진척도의 척도로 삼음" },
+      { major: "", minor: "고객과의 협력 우선", desc: "초기 계약 협상에만 매몰되지 않고 개발 전 과정에서 고객과 상시 협력" },
+      { major: "", minor: "변화에 대한 대응 우선", desc: "초기 계획을 고수하기보다 개발 후반부라도 요구사항 변경을 경쟁력으로 수용" },
+      { major: "대표 실천 방법론", minor: "Scrum (스크럼)", desc: "제품책임자(PO)·스크럼마스터(SM)·개발팀이 2~4주 스프린트 주기로 잠재 출시 가능 증분을 반복 인도" },
+      { major: "", minor: "XP (eXtreme Programming)", desc: "용기·단순성·의사소통·피드백·존중 5대 가치 기반 TDD, 페어 프로그래밍, CI, 리팩토링 실천" }
+    ]
+  },
+  {
+    domain: "소공",
+    topic: "요구공학 (Requirements Engineering)",
+    mnemonic: "도·분·명·검 / 협·기·변·확 / 정·명·일·완·수·이·검·추",
+    definition: "사용자 요구를 체계적 도출·분석·명세·검증 및 변경관리 활동",
+    keywords: [
+      "ISO/IEC 29148 요구공학 국제표준",
+      "기능 요구사항 vs 비기능 요구사항",
+      "정형 명세 (Z, Petri-Net, 수학적 기호) vs 비정형 명세 (자연어, UML)",
+      "변경통제위원회 (CCB)"
+    ],
+    diagram: `[개발 절차: 도출(Elicitation) → 분석(Analysis) → 명세(Specification) → 검증(Validation)] ──▶ [관리 절차: 협상 → 기준선(Baseline) → 변경관리(CCB) → 확인]`,
+    tableRows: [
+      { major: "요구사항 개발 절차", minor: "도출 (Elicitation)", desc: "인터뷰, 설문, 워크숍(JAD), 프로토타이핑, 유스케이스 등으로 이해관계자 요구 수집" },
+      { major: "", minor: "분석 (Analysis)", desc: "요구사항 간 상충·중복을 해결하고 타당성, 우선순위(MoSCoW, Kano 모델), 구조/객체 모델링 수행" },
+      { major: "", minor: "명세 (Specification)", desc: "분석된 요구사항을 정형(수학/논리 표기) 또는 비정형(자연어/다이어그램) 기법으로 SRS 문서화" },
+      { major: "", minor: "검증 (Validation)", desc: "작성된 명세서가 고객 의도와 부합하는지 동료 검토, 인스펙션, 프로토타입 시연으로 확인" },
+      { major: "요구사항 품질 속성", minor: "정·명·일·완", desc: "정확성(고객 요구 부합), 명확성(모호함 배제·단일 해석), 일관성(상호 모순 없음), 완전성(누락 없음)" },
+      { major: "", minor: "수·이·검·추", desc: "수정용이성(변경 파급 최소화), 이해용이성, 검증가능성(테스트 가능), 추적가능성(식별자·RTM 부여)" }
+    ]
+  },
+  {
+    domain: "소공",
+    topic: "요구사항 명세서 (SRS) & 요구사항 추적표 (RTM)",
+    mnemonic: "기·외·성·논·제 / 식·근·구·검·통 (순·역·양)",
+    definition: "합의된 요구사항을 기록한 공식 문서와 생명주기 양방향 추적표",
+    keywords: [
+      "IEEE 830 / ISO 29148 SRS 표준 목차",
+      "골드 플레이팅 (Gold Plating, 요구하지 않은 과잉 구현 방지)",
+      "요구사항 스코프 크리프 (Scope Creep 통제)",
+      "계약 및 검수의 법적 기준"
+    ],
+    diagram: `[비즈니스 목표/RFP] ◀──(역방향 추적: 골드플레이팅 방지)── [SRS 요구사항 ID] ──(순방향 추적: 누락 방지)──▶ [설계(아키텍처/DB) → 소스코드 → 테스트케이스(TC)]`,
+    tableRows: [
+      { major: "SRS 핵심 구성항목", minor: "개요 항목 (개·범·목·시·일)", desc: "시스템 개요, 범위, 목표, 시장 및 비즈니스 배경, 일반적 제약사항 정의" },
+      { major: "", minor: "상세 명세 (기·외·성·논·제)", desc: "기능 요구사항, 외부 인터페이스(UI/타시스템), 성능 요구사항, 논리적 DB 요구, 설계 제약사항" },
+      { major: "RTM 구성요소", minor: "식·근·구·검·통", desc: "요구사항 식별자(ID), 발주 근거(RFP), 구현(설계서·모듈), 검증(테스트케이스 ID), 변경 통제 상태" },
+      { major: "RTM 추적 방향", minor: "순방향 추적 (Forward)", desc: "요구사항이 설계·구현·테스트까지 빠짐없이 반영되었는지 검증하여 요구사항 누락 방지" },
+      { major: "", minor: "역방향 추적 (Backward)", desc: "구현된 코드와 테스트케이스가 실제 어느 요구사항에서 유래했는지 역추적하여 불필요한 과잉 개발(Gold Plating) 차단" },
+      { major: "", minor: "양방향 추적 (Bi-directional)", desc: "순방향과 역방향을 결합하여 변경 발생 시 파급 영향도를 즉각 산출하고 산출물 간 일관성 유지" }
+    ]
+  },
+  {
+    domain: "소공",
+    topic: "객체지향 캡슐화 (Encapsulation) & 정보은닉 (Information Hiding)",
+    mnemonic: "캡·추·다·정·상",
+    definition: "속성과 연산을 하나로 묶고 내부 구현을 외부로부터 숨기는 원리",
+    keywords: [
+      "추상화 (공통 속성·행위 추출)",
+      "상속성 (상위 클래스 재사용·확장)",
+      "다형성 (오버로딩 · 오버라이딩)",
+      "접근제어자 (private, protected, public) & Getter/Setter"
+    ],
+    diagram: `<img src="se_encapsulation.png" alt="캡슐화"><img src="se_info_hiding.png" alt="정보은닉">`,
+    tableRows: [
+      { major: "캡슐화 (Encapsulation)", minor: "개념 및 목적", desc: "밀접하게 관련된 데이터(속성)와 이를 조작하는 함수(메서드)를 하나의 객체 단위로 묶어 응집도와 재사용성 향상" },
+      { major: "", minor: "정보은닉과의 관계", desc: "캡슐화는 '묶는 행위(포장)' 자체를 뜻하며, 외부 노출 여부는 강제하지 않으나 정보은닉을 통해 완성됨" },
+      { major: "정보은닉 (Information Hiding)", minor: "개념 및 목적", desc: "객체 내부의 상세 구현 로직과 상태 변수를 외부에서 직접 접근하지 못하게 차단(private)하여 결합도를 낮춤" },
+      { major: "", minor: "인터페이스 통신", desc: "외부 객체는 오직 공개된 퍼블릭 메서드(메시지)를 통해서만 상호작용하므로 내부 수정 시 외부 파급효과(Ripple Effect) 제거" },
+      { major: "객체지향 기타 특성", minor: "추상화 · 상속 · 다형성", desc: "핵심 개념만 모델링(추상화), 부모 속성을 물려받아 확장(상속), 동일 메시지에 객체별로 다르게 반응(다형성: 오버라이딩/오버로딩)" }
+    ]
+  },
+  {
+    domain: "소공",
+    topic: "객체지향 설계 5원칙 (SOLID)",
+    mnemonic: "S·O·L·I·D (단·개·리·인·의)",
+    definition: "유지보수성과 확장성 극대화 위해 객체지향 설계 시 지킬 5원칙",
+    keywords: [
+      "Robert C. Martin (로버트 마틴)",
+      "높은 응집도(High Cohesion) & 낮은 결합도(Low Coupling)",
+      "변경 파급효과 최소화",
+      "디자인 패턴 및 클린 아키텍처의 이론적 토대"
+    ],
+    diagram: `[객체 내부 설계: SRP(단일 책임) · OCP(개방-폐쇄)] + [객체 간 관계 설계: LSP(리스코프 치환) · ISP(인터페이스 분리) · DIP(의존성 역전)] ──▶ [유연하고 확장 가능한 아키텍처]`,
+    tableRows: [
+      { major: "객체 내부 설계", minor: "SRP (단일 책임 원칙)", desc: "한 클래스는 오직 하나의 책임(변경해야 할 단 하나의 이유)만 가져야 하며, 이를 통해 응집도를 높임" },
+      { major: "", minor: "OCP (개방-폐쇄 원칙)", desc: "소프트웨어 요소는 기능 확장에는 열려(Open) 있고, 기존 코드 수정에는 닫혀(Closed) 있어야 함 (추상화·다형성 활용)" },
+      { major: "객체 간 관계 설계", minor: "LSP (리스코프 치환 원칙)", desc: "자식 클래스는 언제나 부모 클래스의 자리에 교체 투입되어도 부모의 의도와 규약을 위배하지 않고 정상 동작해야 함" },
+      { major: "", minor: "ISP (인터페이스 분리 원칙)", desc: "클라이언트가 자신이 사용하지 않는 메서드에 의존하지 않도록 범용 인터페이스 하나보다 구체적인 여러 인터페이스로 분리" },
+      { major: "", minor: "DIP (의존성 역전 원칙)", desc: "고수준 모듈이 저수준의 구체 클래스에 직접 의존하지 않고, 둘 모두 추상 인터페이스에 의존하도록 의존 방향을 역전" }
+    ]
+  },
+  {
+    domain: "소공",
+    topic: "모듈화 (응집도 · 결합도 · Fan-in/Fan-out)",
+    mnemonic: "우·논·시·절·통·순·기 / 내·공·외·제·스·자",
+    definition: "복잡도 감소 위해 고응집·저결합 기준으로 시스템을 분할한 기법",
+    keywords: [
+      "응집도(모듈 내부 요소 연관도) ↑ 높을수록 우수",
+      "결합도(모듈 간 상호 의존도) ↓ 낮을수록 우수",
+      "적정 모듈 수: 개발 비용과 인터페이스 비용의 교차점",
+      "Fan-out 7±2 법칙 (중간 제어 모듈 추가)"
+    ],
+    diagram: `<img src="se_module.png" alt="응집도와 결합도"><img src="se_fanin.png" alt="Fan-in과 Fan-out">`,
+    tableRows: [
+      { major: "응집도 (높음→낮음)", minor: "기능적 · 순차적 · 통신적", desc: "단일 기능 수행(기능적) > 출력이 다음 입력으로 전달(순차적) > 동일 입출력 데이터 사용(통신적)" },
+      { major: "", minor: "절차적 · 시간적 · 논리적 · 우연적", desc: "순서대로 실행(절차적) > 특정 시점 동시 실행(시간적) > 유사 성격 분류(논리적) > 무관한 작업 모음(우연적, 최악)" },
+      { major: "결합도 (낮음→높음)", minor: "자료 · 스탬프 · 제어", desc: "단순 값 파라미터 전달(자료, 최선) < 배열·객체 등 자료구조 전달(스탬프) < 제어 플래그·신호 전달(제어)" },
+      { major: "", minor: "외부 · 공통 · 내용", desc: "외부 프로토콜·환경 공유(외부) < 전역변수 참조(공통) < 타 모듈 내부 변수·로직 직접 참조·수정(내용, 최악)" },
+      { major: "복잡도 측정", minor: "Fan-in (팬인)", desc: "자신을 호출하는 상위 모듈 수 → 높을수록 공통 모듈로서 재사용성이 우수하나 단일 장애점 관리 필요" },
+      { major: "", minor: "Fan-out (팬아웃)", desc: "자신이 호출하는 하위 모듈 수 → 과도하게 높으면 제어 복잡도가 증가하므로 중간 모듈을 두어 축소(7±2 이하)" }
+    ]
+  },
+  {
+    domain: "소공",
+    topic: "관점 지향 프로그래밍 (AOP) & 의존성 주입 (DI)",
+    mnemonic: "조·포·어·위·애 / 생·세·인",
+    definition: "공통 횡단 관심사 분리(AOP)와 외부 객체 주입(DI)으로 결합 완화",
+    keywords: [
+      "핵심 관심사(Core Concerns) vs 횡단 관심사(Cross-cutting Concerns)",
+      "제어의 역전 (IoC, Inversion of Control 컨테이너)",
+      "프록시 패턴 (Dynamic Proxy / 바이트코드 조작)",
+      "Spring 프레임워크 핵심 원리"
+    ],
+    diagram: `[핵심 비즈니스 로직 (주문·결제)] ◀──(위빙 Weaving: 로깅·보안·트랜잭션 애스펙트 결합)── [AOP 프록시] + [IoC 컨테이너가 생성자 DI로 의존 객체 주입]`,
+    tableRows: [
+      { major: "AOP 핵심 구성요소", minor: "조인포인트 & 포인트컷", desc: "공통 모듈이 삽입될 수 있는 실행 지점(JoinPoint)과 그중 실제 적용할 대상을 선별하는 표현식(Pointcut)" },
+      { major: "", minor: "어드바이스 & 애스펙트", desc: "실제 실행될 부가 기능 코드(Advice: Before/After/Around)와 포인트컷을 하나로 묶은 모듈(Aspect)" },
+      { major: "", minor: "위빙 (Weaving)", desc: "핵심 로직 코드를 수정하지 않고 컴파일·로딩·런타임(프록시) 시점에 횡단 관심사를 결합하는 과정" },
+      { major: "의존성 주입 (DI) 유형", minor: "생성자 주입 (권장)", desc: "객체 생성 시점에 의존성을 강제 주입하여 불변성(final) 확보, 순환 참조 컴파일 시점 방지 및 단위 테스트 용이" },
+      { major: "", minor: "Setter 주입 & 인터페이스 주입", desc: "선택적 의존성 변경 시 수정자 메서드로 주입(Setter)하거나 의존성 주입 전용 인터페이스를 구현하여 주입" }
+    ]
+  },
+  {
+    domain: "소공",
+    topic: "소프트웨어 아키텍처 4+1 뷰 (4+1 View)",
+    mnemonic: "U·L·I·P·D (유·논·구·프·배)",
+    definition: "다양한 이해관계자 관점 반영 위해 5개 뷰로 아키텍처 명세 모델",
+    keywords: [
+      "필립 크루첸 (Philippe Kruchten)",
+      "이해관계자별 관심사 분리",
+      "UML 다이어그램 매핑",
+      "아키텍처 설계 절차: 요·참·모·프·배"
+    ],
+    diagram: "se_4plus1_view.png",
+    tableRows: [
+      { major: "중심 시나리오", minor: "유스케이스 뷰 (+1 View)", desc: "최종 사용자·분석가·테스터 관점에서 기능 요구사항을 시나리오로 정의하며 나머지 4개 뷰의 중심 검증 기준 역할" },
+      { major: "4대 아키텍처 뷰", minor: "논리 뷰 (Logical View)", desc: "설계자·개발자 관점에서 시스템 기능 요구사항을 클래스·패키지·객체 간 관계로 표현 (클래스/통신 다이어그램)" },
+      { major: "", minor: "구현 뷰 (Implementation View)", desc: "개발자 관점에서 소스코드 모듈 구조, 빌드 컴포넌트, 형상관리 단위를 정의 (컴포넌트 다이어그램)" },
+      { major: "", minor: "프로세스 뷰 (Process View)", desc: "시스템 통합자 관점에서 런타임 동시성, 스레드, 동기/비동기 통신, 성능·처리량 등 비기능 특성 표현 (활동 다이어그램)" },
+      { major: "", minor: "배포 뷰 (Deployment View)", desc: "시스템 엔지니어·인프라 담당자 관점에서 서버 노드, 네트워크 토폴로지 등 물리적 배치 구조 표현 (배치 다이어그램)" }
+    ]
+  },
+  {
+    domain: "소공",
+    topic: "소프트웨어 아키텍처 스타일 (Architecture Style)",
+    mnemonic: "저·파·계·엠·마·클·이",
+    definition: "반복되는 시스템 구조 설계 문제를 해결하는 상위 수준 표준 패턴",
+    keywords: [
+      "시스템 전체 수준 (Architecture Style) vs 모듈 내부 수준 (Design Pattern)",
+      "컴포넌트(Component)와 커넥터(Connector) 조합",
+      "품질속성 충족을 위한 청사진",
+      "단일 스타일 또는 복합(Hybrid) 스타일 적용"
+    ],
+    diagram: "se_arch_style.png",
+    tableRows: [
+      { major: "데이터 중심형", minor: "저장소 (Repository) 패턴", desc: "중앙 공유 데이터베이스(또는 블랙보드)를 두고 모든 서브시스템이 중앙 저장소를 통해 데이터를 접근·공유" },
+      { major: "데이터 흐름형", minor: "파이프-필터 (Pipe & Filter)", desc: "데이터 스트림을 각 필터 컴포넌트가 독립 가공하여 파이프로 전달 (유닉스 쉘, 컴파일러, ETL 파이프라인)" },
+      { major: "계층·분산 구조", minor: "계층화 (Layered) & C/S", desc: "역할별로 상위→하위 단방향 계층을 분리(OSI 7계층, 3-Tier)하거나 서비스 요청자(Client)와 제공자(Server)로 분할" },
+      { major: "상호작용·제어", minor: "MVC (Model-View-Controller)", desc: "데이터/비즈니스 로직(Model), 화면 표시(View), 입력 제어(Controller)를 분리하여 UI 변경 파급효과 차단" },
+      { major: "", minor: "마스터-슬레이브 & 이벤트 버스", desc: "마스터가 슬레이브에 작업을 분배·취합(병렬처리)하거나, 이벤트 채널을 통해 발행-구독 방식으로 비동기 연동" }
+    ]
+  },
+  {
+    domain: "소공",
+    topic: "소프트웨어 아키텍처 평가 (ATAM & CBAM)",
+    mnemonic: "협·기·상·후 (A비아·식품분·브분결) / 시·효·접·선",
+    definition: "품질속성 간 상충관계(ATAM)와 경제적 투자효용(CBAM) 분석 기법",
+    keywords: [
+      "SEI (카네기멜론대 SW공학연구소) 시나리오 기반 정방향 평가",
+      "SAAM (수정용이성·기능 중심 초기 모델)",
+      "품질속성 유틸리티 트리 (Utility Tree)",
+      "민감점(Sensitivity Point) & 절충점(Trade-off Point)"
+    ],
+    diagram: "se_atam.png",
+    tableRows: [
+      { major: "시나리오 기반 평가", minor: "ATAM (Trade-off 분석)", desc: "비즈니스 동인을 바탕으로 유틸리티 트리를 작성하고, 성능·보안·가용성 등 품질속성 간 상충점(Trade-off)과 민감점을 도출" },
+      { major: "", minor: "ATAM 4단계 (협·기·상·후)", desc: "1.협력과 준비 → 2.기본평가(A비아·식품분) → 3.상세평가(브레인스토밍·시나리오 우선순위·분석) → 4.후속조치(보고서)" },
+      { major: "", minor: "CBAM (경제성 비용·효익 분석)", desc: "ATAM 결과에 아키텍처 전략별 구축 비용과 기대 효용(ROI)을 정량화하여 예산 제약 하 최적 아키텍처 대안 선정" },
+      { major: "", minor: "CBAM 4단계 (시·효·접·선)", desc: "1.시나리오 수집·정제 → 2.품질속성 효용-반응값 곡선 작성 → 3.아키텍처 접근법별 전체 이익(ROI) 계산 → 4.최적안 선정·검증" },
+      { major: "설계·혼합 기반 평가", minor: "SAAM · ADR · ARID", desc: "변경용이성 평가(SAAM), 설계 문서의 응집도 중심 리뷰(ADR), 초기 중간 설계 단계에 ATAM+ADR을 결합한 경량 평가(ARID)" }
+    ]
+  },
+  {
+    domain: "소공",
+    topic: "GoF 디자인 패턴 (Design Pattern)",
+    mnemonic: "생(5)·구(7)·행(11) / 추·팩·싱·빌·프 / 어·브·컴·데·퍼·플·프",
+    definition: "객체지향 설계 시 반복 발생하는 문제를 해결하는 23개 표준 해법",
+    keywords: [
+      "에리히 감마 외 4인 (Gang of Four)",
+      "바퀴를 다시 발명하지 마라 (검증된 설계 재사용)",
+      "생성(객체 생성 분리) · 구조(클래스 조합 확장) · 행위(책임 분배·소통)",
+      "클래스 패턴(상속 관계·정적) vs 객체 패턴(합성/위임 관계·동적)"
+    ],
+    diagram: "se_design_pattern.png",
+    tableRows: [
+      { major: "생성 패턴 (5개)", minor: "싱글톤 · 팩토리 메서드 · 추상 팩토리", desc: "전역 단일 인스턴스 보장(Singleton), 객체 생성을 서브클래스에 위임(Factory Method), 연관 객체군 일괄 생성(Abstract Factory)" },
+      { major: "", minor: "빌더 · 프로토타입", desc: "복잡한 객체의 생성 과정과 표현 분리(Builder), 기존 객체를 복제하여 생성 비용 절감(Prototype)" },
+      { major: "구조 패턴 (7개)", minor: "어댑터 · 브리지 · 데코레이터", desc: "호환성 없는 인터페이스 변환(Adapter), 구현부에서 추상층 분리(Bridge), 상속 없이 동적으로 부가 기능 덧씌움(Decorator)" },
+      { major: "", minor: "퍼사드 · 프록시 · 컴포지트 · 플라이웨이트", desc: "복잡한 서브시스템에 단순 통합 창구 제공(Facade), 대리 객체로 접근 제어·지연로딩(Proxy), 트리 구조(Composite), 객체 공유 메모리 절약(Flyweight)" },
+      { major: "행위 패턴 (11개)", minor: "전략 · 옵저버 · 템플릿 메서드 · 커맨드", desc: "알고리즘 런타임 교체(Strategy), 상태 변화 시 구독자에 자동 통지(Observer), 상위 골격 정의 후 하위 구체화(Template Method), 요청 캡슐화(Command)" }
+    ]
+  },
+  {
+    domain: "소공",
     topic: "마이크로서비스 아키텍처 (MSA)",
     mnemonic: "독·분·자·격 / 폴·데·C",
-    definition: "독립 개발·배포 위해 단일 앱을 소규모로 분리한 구조",
+    definition: "독립 개발·배포 위해 단일 앱을 소규모 비즈니스 단위로 분리한 구조",
     keywords: [
-      "API 게이트웨이",
-      "서비스 메시 (Sidecar)",
-      "사가 패턴 (Saga)",
-      "CQRS & 이벤트 소싱",
-      "서킷 브레이커",
-      "두음: 독분자격 폴데C"
+      "모놀리식(Monolithic) 한계 극복 & 도메인 주도 설계(DDD Bounded Context)",
+      "폴리글랏(Polyglot) 프로그래밍 & 서비스별 개별 DB (Database per Service)",
+      "서비스 디스커버리 (Eureka) & 컨피그 서버",
+      "벌크헤드(Bulkhead) 장애 격리"
     ],
-    diagram: `[클라이언트] → [API 게이트웨이] → [주문 서비스(DB)] / [결제 서비스(DB)] / [배송 서비스(DB)] (이벤트 브로커 연동)`,
+    diagram: `[클라이언트] → [API 게이트웨이] → [주문 서비스(DB)] / [결제 서비스(DB)] / [배송 서비스(DB)] (서비스 메시 & 이벤트 브로커 연동)`,
     tableRows: [
-      { major: "진입·통신", minor: "API 게이트웨이", desc: "단일 진입점 역할을 수행하며 인증, 라우팅, 속도 제한, 로드밸런싱을 통합 처리" },
-      { major: "진입·통신", minor: "서비스 메시 (Service Mesh)", desc: "비즈니스 코드 수정 없이 사이드카 프록시를 통해 서비스 간 통신·암호화(mTLS)·추적 제어" },
-      { major: "데이터 정합성", minor: "사가 패턴 (Saga)", desc: "분산된 DB 간 트랜잭션을 이벤트로 순차 실행하고, 실패 시 보상 트랜잭션으로 취소" },
-      { major: "데이터 정합성", minor: "CQRS 패턴", desc: "데이터 변경(Command) 모델과 조회(Query) 모델을 분리하여 조회 성능 극대화" },
-      { major: "장애 복원력", minor: "서킷 브레이커", desc: "특정 서비스 장애 시 호출을 즉시 차단(두꺼비집 원리)하여 전체 시스템 연쇄 장애 방지" }
+      { major: "진입·통신", minor: "API 게이트웨이", desc: "단일 진입점 역할을 수행하며 인증·인가, 라우팅, 속도 제한(Rate Limiting), 프로토콜 변환을 통합 처리" },
+      { major: "", minor: "서비스 메시 (Service Mesh)", desc: "비즈니스 코드 수정 없이 사이드카 프록시(Envoy/Istio)를 통해 서비스 간 통신·암호화(mTLS)·분산 추적을 제어" },
+      { major: "데이터 정합성", minor: "사가 패턴 (Saga)", desc: "분산된 DB 간 트랜잭션을 이벤트로 순차 실행하고, 도중 실패 시 보상 트랜잭션으로 역순 원상복구" },
+      { major: "", minor: "CQRS 패턴", desc: "데이터 변경(Command) 모델과 조회(Query) 모델을 분리하여 복잡한 다중 서비스 조인 조회 성능을 극대화" },
+      { major: "장애 복원력", minor: "서킷 브레이커", desc: "특정 서비스 장애 시 호출을 즉시 차단(Closed→Open→Half-Open)하여 전체 시스템 연쇄 장애(Cascading Failure) 방지" }
     ]
   },
   {
     domain: "소공",
     topic: "클린 아키텍처 (Clean Architecture)",
     mnemonic: "엔·유·어·프 / 단·역",
-    definition: "도메인 규칙 보호 위해 의존성을 안쪽으로만 향한 구조",
+    definition: "도메인 규칙 보호 위해 의존성을 안쪽으로만 향하게 한 동심원 구조",
     keywords: [
-      "관심사 분리",
-      "단방향 의존성 규칙 (바깥 → 안쪽)",
-      "의존성 역전 원칙 (DIP)",
-      "엔티티 · 유스케이스 · 어댑터 · 인프라"
+      "관심사 분리 (Separation of Concerns)",
+      "단방향 의존성 규칙 (바깥 저수준 기술 → 안쪽 고수준 정책)",
+      "프레임워크·UI·DB 독립성",
+      "높은 단위 테스트 용이성"
     ],
     diagram: `[외부 프레임워크/DB/UI] ──(의존성 방향)──▶ [인터페이스 어댑터] ──▶ [유스케이스(응용 규칙)] ──▶ [엔티티(핵심 비즈니스 도메인)]`,
     tableRows: [
       { major: "핵심 철학", minor: "단방향 의존성 규칙", desc: "모든 소스코드 의존성은 반드시 바깥쪽(저수준 기술·인프라)에서 안쪽(고수준 도메인 규칙)으로만 향해야 함" },
-      { major: "내부 코어", minor: "엔티티 & 유스케이스", desc: "외부 DB나 웹 프레임워크가 교체되어도 절대 변하지 않는 핵심 비즈니스 규칙과 애플리케이션 시나리오" },
-      { major: "경계 분리", minor: "의존성 역전 (DIP)", desc: "내부 유스케이스가 외부 DB를 직접 호출하지 않고 추상 인터페이스에 의존하여 비즈니스 로직의 순수성 및 테스트 용이성 보장" }
+      { major: "내부 코어 계층", minor: "엔티티 & 유스케이스", desc: "외부 DB나 웹 프레임워크가 교체되어도 절대 변하지 않는 전사 핵심 비즈니스 규칙(Entity)과 애플리케이션 시나리오(Use Case)" },
+      { major: "외부 경계 계층", minor: "어댑터 & 프레임워크", desc: "유스케이스와 외부 세계의 데이터 형식을 변환하는 컨트롤러·프레젠터(Adapter) 및 가장 바깥의 DB·웹 프레임워크" },
+      { major: "", minor: "의존성 역전 (DIP)", desc: "내부 유스케이스가 외부 DB를 직접 호출하지 않고 내부가 정의한 추상 인터페이스를 외부가 구현하여 제어 흐름과 의존 방향을 분리" }
     ]
   },
   {
     domain: "소공",
     topic: "헥사고날 아키텍처 (포트 앤 어댑터)",
     mnemonic: "인·아·포·어",
-    definition: "외부 종속 제거 위해 도메인 내외부를 포트·어댑터 연결",
+    definition: "외부 기술 종속 제거 위해 도메인 내외부를 포트·어댑터로 연결",
     keywords: [
-      "도메인 중심 육각형 구조",
-      "인바운드 / 아웃바운드 포트 (Port)",
-      "프라이머리 / 세컨더리 어댑터 (Adapter)",
-      "외부 기술 교체 용이성"
+      "알리스터 콕번 (Alistair Cockburn)",
+      "도메인 중심 육각형 대칭 구조",
+      "Driving(Primary) vs Driven(Secondary)",
+      "외부 레거시·DB·메시지큐 무중단 교체 용이"
     ],
     diagram: `[외부 요청 (REST/웹 UI: 인바운드 어댑터)] ──▶ (인바운드 포트) ──▶ [도메인 코어] ──▶ (아웃바운드 포트) ──▶ [DB/외부 API: 아웃바운드 어댑터]`,
     tableRows: [
       { major: "핵심 개념", minor: "포트 앤 어댑터 패턴", desc: "비즈니스 도메인 코어를 중앙에 두고, 모든 외부 세계(UI, DB, 메시지큐)와의 연결을 포트와 어댑터로 분리하는 아키텍처" },
-      { major: "규격 정의", minor: "포트 (Port)", desc: "내부 애플리케이션 코어가 외부와 소통하기 위해 정의한 추상 인터페이스 규격 (인바운드 UseCase 포트 / 아웃바운드 SPI 포트)" },
-      { major: "기술 구현", minor: "어댑터 (Adapter)", desc: "포트 인터페이스를 실제 외부 기술에 맞게 구현한 모듈 (웹 컨트롤러, JPA Repository 구현체, 외부 API 클라이언트 등)" }
+      { major: "규격 정의 (내부)", minor: "인바운드 / 아웃바운드 포트", desc: "내부 애플리케이션 코어가 외부와 소통하기 위해 정의한 추상 인터페이스 규격 (인바운드 UseCase 호출용 / 아웃바운드 영속성·외부연동 SPI)" },
+      { major: "기술 구현 (외부)", minor: "프라이머리 / 세컨더리 어댑터", desc: "포트를 호출하는 인바운드 구현체(웹 컨트롤러, CLI)와 아웃바운드 포트를 구현한 인프라 모듈(JPA Repository, Kafka 클라이언트)" }
+    ]
+  },
+  {
+    domain: "소공",
+    topic: "이벤트 기반 아키텍처 (EDA) & SAGA 패턴",
+    mnemonic: "생·중·소 / 코·오·보·멱",
+    definition: "상태 변화를 이벤트로 발행해 비동기 처리하고 분산 정합성 보장",
+    keywords: [
+      "느슨한 결합 (Loosely Coupled) & 비동기 Pub/Sub",
+      "Kafka · RabbitMQ 이벤트 브로커",
+      "결과적 일관성 (Eventual Consistency, BASE)",
+      "트랜잭셔널 아웃박스 패턴 (Transactional Outbox)"
+    ],
+    diagram: "se_eda.png",
+    tableRows: [
+      { major: "EDA 3대 구성요소", minor: "Producer (이벤트 생성자)", desc: "비즈니스 도메인의 상태 변화(주문 생성, 결제 완료 등)를 감지하여 이벤트를 발행하는 주체" },
+      { major: "", minor: "Broker / Router (중개자)", desc: "발행된 이벤트를 영속 저장·필터링하고 구독자에게 전달하는 메시지 파이프라인 (Apache Kafka, RabbitMQ)" },
+      { major: "", minor: "Consumer (이벤트 소비자)", desc: "관심 있는 토픽의 이벤트를 비동기 구독하여 후속 비즈니스 로직을 독립적으로 수행하는 서비스" },
+      { major: "SAGA 분산 트랜잭션", minor: "코레오그래피 (Choreography)", desc: "중앙 제어자 없이 각 마이크로서비스가 서로의 이벤트를 구독·발행하며 자율적으로 로컬 트랜잭션과 보상 트랜잭션 수행" },
+      { major: "", minor: "오케스트레이션 (Orchestration)", desc: "중앙 오케스트레이터(사가 매니저)가 전체 참여 서비스의 실행 순서와 실패 시 보상 트랜잭션 호출을 집중 통제" },
+      { major: "", minor: "격리성 보완 & 멱등성", desc: "ACID 중 격리성(I) 부재를 시맨틱 락(Semantic Lock)으로 보완하고, 네트워크 재전송에 대비해 중복 처리 방지(멱등성) 구현" }
+    ]
+  },
+  {
+    domain: "소공",
+    topic: "SOAP vs REST & OpenAPI Specification (OAS)",
+    mnemonic: "U·W·S / 자·행·표·응 / 명·문·목·자",
+    definition: "XML 프로토콜(SOAP)과 HTTP 자원 아키텍처(REST) 및 표준 API 명세",
+    keywords: [
+      "HTTP 프로토콜 · 무상태성(Stateless) · 캐시 처리",
+      "HATEOAS (하이퍼미디어 기반 상태 전이, 리차드슨 성숙도 3단계)",
+      "Swagger / OAS 3.0 (기계 판독 가능 YAML/JSON API 계약)",
+      "Design-First (API 명세 선행 설계)"
+    ],
+    diagram: `<img src="se_soap1.png" alt="SOAP 구조"><img src="se_rest.png" alt="REST 구조">`,
+    tableRows: [
+      { major: "SOAP 프로토콜", minor: "UDDI · WSDL · Envelope", desc: "서비스 등록·검색(UDDI), XML 기반 인터페이스 명세(WSDL), Header/Body/Fault로 구성된 엄격한 XML 메시지 프로토콜(WS-Security·ACID 지원)" },
+      { major: "REST 아키텍처", minor: "자원(URI) · 행위(Method) · 표현", desc: "자원은 명사형 URI(/users/1)로 식별하고, 행위는 HTTP 메서드(GET/POST/PUT/DELETE), 표현은 JSON/XML 페이로드와 상태코드로 응답" },
+      { major: "OpenAPI (OAS)", minor: "API 표준 명세 & 자동화", desc: "REST API의 엔드포인트, 파라미터, 인증, 응답 스키마를 YAML/JSON으로 정의하여 문서 자동화(Swagger UI), Mock 서버, 클라이언트 SDK 코드 자동 생성" },
+      { major: "개방형 API 보안", minor: "인증·트래픽·버전 관리", desc: "OAuth 2.0/JWT 토큰 검증, API 게이트웨이 처리량 제한(Rate Limit), 데이터 익명화 및 하위 호환성을 위한 버전 관리(/v1, /v2)" }
+    ]
+  },
+  {
+    domain: "소공",
+    topic: "데브옵스 (DevOps) & CI/CD 파이프라인 (DevSecOps)",
+    mnemonic: "C·A·L·M·S / 정·구·동·자 (SAST·SCA·DAST·RASP)",
+    definition: "개발·운영·보안을 통합하고 빌드·테스트·배포 전 과정을 자동화한 체계",
+    keywords: [
+      "Shift-Left Security (개발 초기부터 보안 내재화)",
+      "DORA 4대 지표 (배포 빈도 · 리드타임 · 변경 실패율 · MTTR)",
+      "GitOps (ArgoCD 선언적 배포) & IaC (Terraform)",
+      "공급망 보안 (SBOM 연계)"
+    ],
+    diagram: `<img src="se_cicd.png" alt="CI/CD 파이프라인"><img src="se_devsecops.png" alt="DevSecOps 파이프라인">`,
+    tableRows: [
+      { major: "DevOps 5대 원칙", minor: "CALMS 프레임워크", desc: "협업 문화(Culture), 파이프라인 자동화(Automation), 낭비 제거·소규모 배치(Lean), 지표 측정(Measurement), 책임·지식 공유(Sharing)" },
+      { major: "CI/CD 자동화", minor: "CI (지속적 통합)", desc: "개발자가 코드 커밋 시 형상관리(Git)와 연동해 자동 빌드, 정적 분석(SonarQube), 단위 테스트를 수행하여 통합 오류 조기 발견" },
+      { major: "", minor: "CD (지속적 제공/배포)", desc: "검증된 빌드 아티팩트를 스테이징 및 운영 환경(K8s/클라우드)에 수동 승인(Delivery) 또는 완전 자동(Deployment)으로 릴리스" },
+      { major: "DevSecOps 보안 내재화", minor: "SAST & SCA (정적·구성 분석)", desc: "코딩·빌드 단계에서 실행 없이 소스코드 취약점 점검(SAST) 및 오픈소스 라이브러리 취약점·라이선스 위반·SBOM 검증(SCA)" },
+      { major: "", minor: "DAST & RASP (동적·런타임 보호)", desc: "스테이징 실행 환경에서 모의 해킹으로 런타임 취약점 탐지(DAST) 및 운영 애플리케이션 내부에서 실시간 공격 감지·차단(RASP)" }
+    ]
+  },
+  {
+    domain: "소공",
+    topic: "플랫폼 엔지니어링 (Platform Engineering & IDP)",
+    mnemonic: "골·셀·추·자 (Golden Path · 셀프서비스 · 추상화 · 자동화)",
+    definition: "개발자 인지 부하 절감 위해 셀프서비스 내부 개발자 플랫폼 구축 기법",
+    keywords: [
+      "You build it, you run it의 개발자 번아웃 해결",
+      "IDP (Internal Developer Platform, 내부 개발자 플랫폼)",
+      "플랫폼을 제품으로 관리 (Platform as a Product)",
+      "개발자 경험 (DevEx, Developer Experience) 극대화"
+    ],
+    diagram: `[인프라·보안·배포 복잡성 (K8s, IaC, CI/CD, 모니터링)] ──(플랫폼 팀이 추상화·표준화)──▶ [내부 개발자 플랫폼 (IDP: Golden Path & 셀프서비스 포털)] ──▶ [서비스 개발팀: 비즈니스 로직 집중]`,
+    tableRows: [
+      { major: "등장 배경", minor: "개발자 인지 부하(Cognitive Load) 해소", desc: "클라우드 네이티브·MSA 확산으로 개발자가 인프라(K8s, Terraform, 보안)까지 모두 다루며 겪는 생산성 저하와 그림자 운영(Shadow Ops) 해결" },
+      { major: "핵심 구성요소", minor: "내부 개발자 플랫폼 (IDP)", desc: "인프라 프로비저닝, CI/CD, 모니터링, 보안 정책을 하나로 묶어 개발자가 버튼 클릭이나 템플릿으로 즉시 사용하는 셀프서비스 플랫폼 (Backstage 등)" },
+      { major: "", minor: "골든 패스 (Golden Path / Paved Road)", desc: "조직의 보안·아키텍처 모범 사례가 기본 내장된 표준 개발 경로를 제공하여, 강제 통제 없이도 자연스럽게 거버넌스를 준수하도록 유도" },
+      { major: "DevOps와의 비교", minor: "철학(DevOps)의 공학적 구현체", desc: "DevOps가 개발·운영 협업 문화와 철학이라면, 플랫폼 엔지니어링은 이를 대규모 조직에서 확장 가능하게 실현하는 표준 도구·플랫폼 제공 체계" }
+    ]
+  },
+  {
+    domain: "소공",
+    topic: "소프트웨어 무중단 배포 (Zero-Downtime Deployment)",
+    mnemonic: "롤·블·카 (롤링 · 블루그린 · 카나리)",
+    definition: "서비스 중단 없이 구버전에서 신버전으로 트래픽을 안전 전환하는 기술",
+    keywords: [
+      "비즈니스 연속성 보장 & 다운타임 제로(0)",
+      "리버스 프록시 (Nginx, Envoy) & 로드밸런서 라우팅",
+      "하위 호환성(Backward Compatibility) 유지",
+      "신속한 롤백(Rollback) 전략"
+    ],
+    diagram: "se_zero_downtime.png",
+    tableRows: [
+      { major: "배포 전략 3유형", minor: "롤링 배포 (Rolling)", desc: "가동 중인 서버 인스턴스를 하나씩 순차적으로 신버전으로 교체 → 추가 인프라 비용이 없으나 배포 중 구·신버전이 공존하여 호환성 주의 필요" },
+      { major: "", minor: "블루-그린 배포 (Blue-Green)", desc: "구버전(Blue)과 동일한 규모의 신버전(Green) 환경을 구축해 테스트 후 로드밸런서 트래픽을 일괄 전환 → 즉각적인 롤백이 가능하나 인프라 비용 2배 소요" },
+      { major: "", minor: "카나리 배포 (Canary)", desc: "소수 사용자(예: 5%)에게만 먼저 신버전 트래픽을 라우팅해 오류율·성능을 검증한 뒤 점진적 확대 → 실사용자 위험 최소화 및 A/B 테스트에 최적" },
+      { major: "핵심 지원 기술", minor: "로드밸런서 & 헬스체크", desc: "L4/L7 스위치·인그레스 컨트롤러가 신규 파드(Pod)의 Readiness Probe(준비 상태) 정상 응답을 확인한 후에만 트래픽을 유입시키고 기존 연결은 우아하게 종료(Graceful Shutdown)" }
+    ]
+  },
+  {
+    domain: "소공",
+    topic: "로우코드·노코드 (LCNC) & 바이브 코딩 (Vibe Coding)",
+    mnemonic: "의·생·실·피·반 (의도전달 · 코드생성 · 실행검증 · 피드백 · 반복개선)",
+    definition: "GUI 드래그앤드롭(LCNC) 및 자연어 LLM 대화로 SW를 생성하는 패러다임",
+    keywords: [
+      "시민 개발자 (Citizen Developer) & 안드레이 카파시 (Andrej Karpathy)",
+      "자연어 프롬프트 중심 개발 (AI 에이전트 코딩)",
+      "섀도우 IT (Shadow IT) 및 벤더 종속성(Lock-in)",
+      "AI 생성 코드 보안 취약점 및 기술부채 리스크"
+    ],
+    diagram: "se_vibecoding.png",
+    tableRows: [
+      { major: "패러다임 비교", minor: "노코드 / 로우코드 (LCNC)", desc: "사전 구축된 GUI 컴포넌트와 순서도를 조합해 코딩 없이(No-Code) 또는 최소한의 스크립트(Low-Code)로 업무용 앱을 신속 제작" },
+      { major: "", minor: "바이브 코딩 (Vibe Coding)", desc: "개발자가 구문(Syntax)을 직접 타이핑하는 대신 자연어로 의도(Vibe)와 요구사항을 전달하고 LLM 에이전트가 코드 작성·수정·디버깅을 수행" },
+      { major: "바이브 코딩 절차", minor: "의·생·실·피·반", desc: "1.자연어 의도 전달 → 2.AI 멀티파일 코드 생성 → 3.즉시 실행 및 동작 확인 → 4.오류 로그·개선점 피드백 → 5.반복 정제 후 배포" },
+      { major: "핵심 리스크 및 대책", minor: "보안 취약점 & 블랙박스 부채", desc: "원리를 모른 채 수용한 AI 코드의 취약점·아키텍처 일관성 훼손 방지를 위해 SAST/SCA 자동 검증, 테스트케이스 선행(TDD), 인간 아키텍트 코드 리뷰 필수" }
+    ]
+  },
+  {
+    domain: "소공",
+    topic: "오픈소스 라이선스 & OSS 거버넌스 (OSPO · SBOM)",
+    mnemonic: "퍼·약·강·네 / 전·조·컴·기 (전략·조직·컴플라이언스·기여)",
+    definition: "오픈소스 사용 조건 규약과 법적·보안 리스크 통제 위한 관리 체계",
+    keywords: [
+      "저작권(Copyright) vs 카피레프트(Copyleft, 파생물 소스코드 공개 의무)",
+      "OSPO (Open Source Program Office, 오픈소스 전담 조직)",
+      "ISO/IEC 5230 (OpenChain, 컴플라이언스 국제표준) & ISO/IEC 18974 (보안 보증)",
+      "AI 생성 코드 저작권 오염 및 오픈웨이트(Open-weight) 상업용 제한 검증"
+    ],
+    diagram: `[OSS/오픈웨이트 도입] ──▶ [SCA 도구 스캔 & SBOM(SPDX/CycloneDX) 명세화] ──▶ [라이선스 의무 검증 (MIT/Apache vs LGPL vs GPL/AGPL)] ──▶ [OSPO 승인 및 배포]`,
+    tableRows: [
+      { major: "라이선스 계열 비교", minor: "Permissive (MIT · Apache 2.0 · BSD)", desc: "저작권 고지 및 라이선스 사본만 포함하면 수정 후 독점 상용 SW로 재배포 가능 (소스코드 공개 의무 없음, Apache는 특허 보복 조항 포함)" },
+      { major: "", minor: "약한 Copyleft (LGPL · MPL)", desc: "오픈소스 자체 수정분은 공개하되, 동적 링크(LGPL)나 별도 파일(MPL)로 결합한 독점 애플리케이션 코드는 비공개 허용" },
+      { major: "", minor: "강한/네트워크 Copyleft (GPL · AGPL)", desc: "정적·동적 링크 결합 시 전체 파생 소스코드를 공개해야 하며(GPL), 네트워크/클라우드(SaaS)로만 서비스해도 소스 공개 강제(AGPL)" },
+      { major: "OSS 거버넌스 체계", minor: "OSPO & SBOM 공급망 관리", desc: "전담 조직(OSPO)을 통해 도입 정책을 수립하고, 소프트웨어 자재명세서(SBOM)를 자동 생성해 Log4Shell 등 제로데이 취약점과 라이선스 분쟁 상시 통제" }
+    ]
+  },
+  {
+    domain: "소공",
+    topic: "SW 품질 표준 (ISO/IEC 25010) & 품질인증 (GS · SP)",
+    mnemonic: "기·성·호·사·신·보·유·이 / 프·기·지 (프로젝트·개발·지원)",
+    definition: "SW 제품 품질 8대 주특성 국제표준(SQuaRE)과 국가 제품·프로세스 인증",
+    keywords: [
+      "ISO 9126(품질모델) + ISO 14598(평가절차) 통합 → ISO/IEC 25000 (SQuaRE)",
+      "25010(품질모델) · 2502n(품질측정) · 2503n(품질요구) · 2504n(품질평가)",
+      "ISO 9126 대비 '보안성(Security)'과 '호환성(Compatibility)' 주특성 격상",
+      "공공기관 우선구매 제도 혜택"
+    ],
+    diagram: `[ISO/IEC 25000 (SQuaRE)] ──▶ [제품 품질 (ISO 25010): 기·성·호·사·신·보·유·이 8대 주특성 → GS인증(1·2등급)] + [프로세스 품질 (CMMI/SPICE) → SP인증(1~3등급)]`,
+    tableRows: [
+      { major: "ISO/IEC 25010 8대 주특성", minor: "기능적합성 · 성능효율성", desc: "명시·내재된 요구 충족(완전성·정확성·적절성) 및 자원 대비 처리 성능(시간반응성·자원효율성·용량)" },
+      { major: "", minor: "호환성 · 사용성", desc: "타 시스템과 정보 교환 및 동일 환경 공유(공존성·상호운용성) 및 사용자 학습·조작 편의성(학습성·오류방지·접근성)" },
+      { major: "", minor: "신뢰성 · 보안성", desc: "지정 조건에서 무결함 동작(성숙성·가용성·결함허용성·복구성) 및 정보 보호(기밀성·무결성·부인방지·책임추적성·인증성)" },
+      { major: "", minor: "유지보수성 · 이식성", desc: "수정·개선의 용이성(모듈성·재사용성·분석성·수정/시험용이성) 및 타 환경 이전 능력(적응성·설치용이성·대체성)" },
+      { major: "국내 SW 품질인증", minor: "GS인증 (제품) vs SP인증 (프로세스)", desc: "ISO 25010 기반으로 완성된 SW 제품과 문서를 실제 테스트해 부여하는 인증(GS) vs SW 기업·조직의 개발·관리 프로세스 역량을 심사하는 인증(SP)" }
+    ]
+  },
+  {
+    domain: "소공",
+    topic: "SW 품질보증 (SQA) & 품질비용 (CoQ)",
+    mnemonic: "예·평·내·외 (적합비용: 예방·평가 / 비적합비용: 내부실패·외부실패)",
+    definition: "품질 목표 달성 위한 체계적 감시 활동과 품질 확보·실패 제반 비용",
+    keywords: [
+      "결함 예방 중심 (Shift-Left 품질 관리)",
+      "정형 기술 검토 (FTR: 동료검토 · 워크스루 · 인스펙션)",
+      "품질보증(SQA, 프로세스 중심 예방) vs 품질통제(QC, 산출물 중심 결함 적발)",
+      "초기 예방·평가 투자 시 후반 외부실패 비용 기하급수적 감소"
+    ],
+    diagram: "se_sqa.png",
+    tableRows: [
+      { major: "SQA 정적 검토 (FTR)", minor: "동료검토 · 워크스루 · 인스펙션", desc: "작성자 동료 간 비공식 검토(Peer Review), 회의 전 자료 배포 후 시나리오 기반 검토(Walkthrough), 공식 체크리스트와 역할(주재자·낭독자·기록자) 기반 정밀 검증(Inspection)" },
+      { major: "적합 비용 (Cost of Conformance)", minor: "예방 비용 (Prevention Cost)", desc: "결함 발생 자체를 사전에 막기 위한 투자 비용 (품질 계획 수립, 개발자 교육, 표준·가이드 제정, CASE 도구 도입)" },
+      { major: "", minor: "평가 비용 (Appraisal Cost)", desc: "산출물이 품질 기준을 충족하는지 측정·검사하는 비용 (인스펙션, 코드 리뷰, 단위·통합·시스템 테스트 수행비, 외부 감리·인증비)" },
+      { major: "비적합 비용 (Non-conformance)", minor: "내부 실패 비용 (Internal Failure)", desc: "고객 인도(출시) 전에 발견된 결함을 수정하는 비용 (디버깅, 재작업, 결함 수정 후 회귀 테스트 비용)" },
+      { major: "", minor: "외부 실패 비용 (External Failure)", desc: "고객 인도(출시) 후에 운영 장애로 발생한 치명적 비용 (긴급 패치, 손해배상·클레임, 리콜, 기업 신뢰도 추락 — 가장 비용이 큼)" }
+    ]
+  },
+  {
+    domain: "소공",
+    topic: "SW 테스트 7원리 & V-모델 · 테스트 케이스 (ISO 29119)",
+    mnemonic: "결·완·초·집·살·정·오 / 요·분·설·개-단·통·시·인 / 아·항·조·절·입·예·실·성",
+    definition: "효과적 검증 위한 테스트 불변 7원칙과 개발 단계별 대응 테스트 체계",
+    keywords: [
+      "결함 존재 증명 (무결함 증명 불가)",
+      "파레토 법칙 (80%의 결함이 20%의 핵심 모듈에 집중)",
+      "테스트 오라클 (참·샘플링·휴리스틱·일관성 오라클)",
+      "ISO/IEC/IEEE 29119 (개·프·문·테·키 5대 파트 국제표준)"
+    ],
+    diagram: `[요구사항 정의] ◀──▶ [인수 테스트 (알파/베타)]
+  [시스템 분석/설계] ◀──▶ [시스템 테스트 (기능/비기능)]
+    [아키텍처/상세설계] ◀──▶ [통합 테스트 (모듈 인터페이스)]
+      [구현 (코딩)] ───────▶ [단위 테스트 (모듈 내부 로직)]`,
+    tableRows: [
+      { major: "테스트 7대 원리", minor: "결·완·초·집", desc: "1.결함 존재 증명(무결함 증명 불가), 2.완벽한 테스팅 불가능(무한 경로), 3.초기 테스팅 집중(호미로 막기), 4.결함 집중(파레토 법칙 80:20)" },
+      { major: "", minor: "살·정·오", desc: "5.살충제 패러독스(동일 TC 반복 시 신규 결함 미발견 → 지속 갱신), 6.정황 의존성(도메인별 전략 상이), 7.오류-부재의 궤변(요구사항 미충족 시 무용지물)" },
+      { major: "V-모델 테스트 단계", minor: "단위 · 통합 · 시스템 · 인수", desc: "개별 모듈 검증(단위) → 인터페이스 연동 검증(통합) → 전체 기능·성능·보안 검증(시스템) → 사용자·발주자 최종 승인 검증(인수: 알파/베타)" },
+      { major: "테스트 케이스 (TC)", minor: "아·항·조·절·입·예·실·성", desc: "식별자(ID), 테스트 항목, 사전 조건, 실행 절차, 입력 데이터, 예상 결과(Oracle), 실제 결과, 성공/실패 여부 (ISO 29119-3 명세 표준)" }
+    ]
+  },
+  {
+    domain: "소공",
+    topic: "블랙박스 테스트 & 화이트박스 테스트 (코드 커버리지)",
+    mnemonic: "동·경·의·상·페·원·오 / 구·결·조·변(MC/DC)",
+    definition: "명세 기반 입출력 기능 검증(블랙)과 내부 제어흐름 경로 검증(화이트)",
+    keywords: [
+      "명세 기반 기법 (ISO 29119-4) vs 구조 기반 기법",
+      "제어 흐름 그래프 (CFG) & 데이터 흐름 테스트 (Def-Use)",
+      "루프 테스트 (단순 · 중첩 · 연결 · 비구조적 루프)",
+      "항공(DO-178B/C)·자동차(ISO 26262 ASIL-D) 안전 필수 시스템 MC/DC 의무화"
+    ],
+    diagram: `[블랙박스 (내부 코드 비공개): 입력값 ──▶ [명세 동작 검증] ──▶ 출력값] vs [화이트박스 (내부 코드 공개): 구문(Statement) ⊂ 결정(Branch) ⊂ 조건(Condition) ⊂ 변경조건/결정(MC/DC)]`,
+    tableRows: [
+      { major: "블랙박스 테스트 기법", minor: "동등분할 & 경계값 분석", desc: "입력 도메인을 유효/무효집합으로 나누어 대표값 추출(동등분할) 및 결함이 몰리는 경계치(최솟값·최댓값 ±1) 집중 테스트(경계값 분석)" },
+      { major: "", minor: "결정테이블 & 원인-결과 그래프", desc: "복잡한 논리 조건 조합과 그에 따른 행위를 표로 정리(결정테이블)하거나 입력(원인)과 출력(결과)의 논리 관계를 그래프로 모델링" },
+      { major: "", minor: "상태전이 & 페어와이즈(All-Pairs)", desc: "이벤트에 따른 상태 변화와 비정상 전이 검증(상태전이) 및 두 파라미터 간 모든 조합을 최소 횟수로 커버하는 직교배열 기반 테스트(페어와이즈)" },
+      { major: "화이트박스 커버리지", minor: "구문(Statement) · 결정(Branch)", desc: "코드의 모든 실행 구문이 최소 1회 실행(구문/라인 커버리지) 및 조건문의 전체 결과가 True/False 모두 실행(결정/분기 커버리지)" },
+      { major: "", minor: "조건(Condition) · MC/DC", desc: "개별 조건식의 참/거짓 검증(조건) 및 각 개별 조건식이 다른 조건과 무관하게 독립적으로 전체 결정 결과에 영향을 미치는 조합만 선별 검증(MC/DC: N+1개 TC로 고신뢰 달성)" }
+    ]
+  },
+  {
+    domain: "소공",
+    topic: "맥케이브 순환복잡도 (McCabe Cyclomatic Complexity)",
+    mnemonic: "V(G) = E - N + 2 = P + 1 = 폐구간 + 1",
+    definition: "제어 흐름 그래프의 독립 실행 경로 수로 코드 복잡도를 정량 측정한 지표",
+    keywords: [
+      "토마스 맥케이브 (Thomas J. McCabe)",
+      "기초 경로 테스트 (Basis Path Testing) 최소 테스트 케이스 수 도출",
+      "간선(Edge, 흐름 화살표) · 노드(Node, 처리 블록) · 조건분기(Predicate)",
+      "복잡도 10 이하 권장 (리팩토링 기준점)"
+    ],
+    diagram: "se_mccabe.png",
+    tableRows: [
+      { major: "3가지 산출 공식", minor: "V(G) = E - N + 2", desc: "제어 흐름 그래프의 총 간선 수(Edge)에서 총 노드 수(Node)를 뺀 뒤 2를 더하여 계산" },
+      { major: "", minor: "V(G) = P + 1", desc: "그래프 내 조건 분기문(if, while, for, case 등 Predicate 노드, 단 default 제외)의 개수에 1을 더하여 신속 계산" },
+      { major: "", minor: "V(G) = 내부 폐구간(Region) + 1", desc: "간선과 노드로 둘러싸인 닫힌 영역(폐구간)의 개수에 외부 영역 1을 더하여 계산" },
+      { major: "복잡도 평가 및 활용", minor: "1~10(안정) vs 11~20(복잡) vs 21+(위험)", desc: "V(G)가 10을 초과하면 결함 발생 확률이 급증하고 단위 테스트가 어려워지므로 메서드 분리(Extract Method) 리팩토링 수행" }
+    ]
+  },
+  {
+    domain: "소공",
+    topic: "통합 테스트 (하향식 Stub · 상향식 Driver) & TDD",
+    mnemonic: "스·드·빅·샌 (하향식 Stub · 상향식 Driver) / 적·녹·리 (Red · Green · Refactor)",
+    definition: "가짜 모듈(Stub/Driver) 기반 인터페이스 검증과 테스트 선행 개발 기법",
+    keywords: [
+      "인터페이스 파라미터 · 전역변수 · 예외 전달 오류 검출",
+      "테스트 더블 (Dummy · Stub · Spy · Mock · Fake)",
+      "켄트 벡 (Kent Beck) 테스트 주도 개발",
+      "FIRST 단위 테스트 원칙 (Fast·Independent·Repeatable·Self-Validating·Timely)"
+    ],
+    diagram: `[상위 제어 모듈] ──(하향식: 미완성 하위 모듈을 Stub으로 대체)──▶ [하위 모듈] / [하위 모듈] ◀──(상향식: 미완성 상위 호출자를 Driver로 대체)── [테스트 드라이버]`,
+    tableRows: [
+      { major: "점진적 통합 테스트", minor: "하향식 통합 & 스텁 (Stub)", desc: "메인 제어 모듈부터 아래로(깊이/너비 우선) 통합하며, 아직 개발되지 않은 하위 피호출 모듈 역할을 대신하는 가짜 껍데기 객체(Stub) 사용" },
+      { major: "", minor: "상향식 통합 & 드라이버 (Driver)", desc: "최하위 모듈들을 클러스터로 묶어 위로 통합하며, 아직 없는 상위 호출 모듈을 대신해 파라미터를 넘기고 결과를 출력하는 제어 프로그램(Driver) 사용" },
+      { major: "비점진/절충형 통합", minor: "빅뱅(Big-Bang) & 샌드위치(Sandwich)", desc: "모든 모듈을 한꺼번에 결합(소규모 외 원인 파악 곤란)하거나, 목표 계층 기준 상위는 하향식(Stub), 하위는 상향식(Driver)을 동시 결합(샌드위치)" },
+      { major: "테스트 주도 개발 (TDD)", minor: "Red → Green → Refactor 주기", desc: "1.실패하는 단위 테스트 코드 선작성(Red) → 2.테스트를 통과하는 최소한의 프로덕션 코드 작성(Green) → 3.중복 제거 및 구조 개선 리팩토링(Refactor)" }
+    ]
+  },
+  {
+    domain: "소공",
+    topic: "특수 목적 테스트 (뮤테이션 · 메타모픽 · 회귀 · 몽키 · A/B · BMT)",
+    mnemonic: "돌·관·재·무·비·성 (돌연변이·관계검증·재검증·무작위·비교실험·성능검증)",
+    definition: "테스트케이스 품질·AI 오라클 부재·변경 부작용·성능을 검증하는 기법군",
+    keywords: [
+      "죽은 뮤턴트(Killed Mutant) / 살아남은 뮤턴트(Survived Mutant)",
+      "Test Oracle Problem (정답을 알 수 없는 AI/초거대 과학 연산)",
+      "선택적 회귀 테스트 (변경 영향도 기반 TC 선별 자동화)",
+      "PoC(기술 타당성 검증) vs BMT(성능 비교 시험) vs Pilot(소규모 실전 검증)"
+    ],
+    diagram: `[뮤테이션: 원본 코드에 인위적 결함(Mutant) 주입 → TC가 결함 잡는지 검증] / [메타모픽: 원본 입력(x)과 변환 입력(T(x))의 출력 관계(MR) 일관성으로 AI 신뢰성 검증]`,
+    tableRows: [
+      { major: "TC 품질 & AI 검증", minor: "뮤테이션 테스트 (Mutation)", desc: "원본 프로그램에 연산자 변형 등 인위적 결함(Mutant)을 주입한 뒤 기존 테스트케이스가 이를 적발(Kill)하는 비율(Mutation Score)로 테스트 스위트의 충분성 평가" },
+      { major: "", minor: "메타모픽 테스트 (Metamorphic)", desc: "정답(Oracle)을 사전 정의하기 어려운 AI·딥러닝 시스템에서 입력 변환 시 출력 간 성립해야 할 대수적·불변 관계(Metamorphic Relation, 예: 이미지 회전 시 동일 객체 인식)로 결함 검출" },
+      { major: "유지보수 & 강건성", minor: "회귀 테스트 (Regression)", desc: "결함 수정이나 기능 추가 후 기존 정상 동작하던 기능에 의도치 않은 부작용(Side-effect)이 유입되지 않았는지 자동화 스크립트로 반복 재검증" },
+      { major: "", minor: "몽키 테스트 (Monkey / Fuzzing)", desc: "시나리오 없이 무작위 난수 입력과 비정상 터치·이벤트를 대량 주입하여 시스템 크래시, 메모리 누수, 예외 처리 누락을 검증" },
+      { major: "의사결정 & 도입 검증", minor: "A/B 테스트 & BMT (벤치마크)", desc: "실사용자를 대조군(A)과 실험군(B)으로 나누어 전환율 등 UX 효과 비교(A/B) 및 공공·기업 도입 전 후보 제품들을 동일 환경에서 정량 성능 비교 시험(BMT)" }
+    ]
+  },
+  {
+    domain: "소공",
+    topic: "SW 안전성 분석 (FTA · FMEA · HAZOP) & STPA",
+    mnemonic: "사·제·유·원 (사고/손실 정의 · 제어구조 모델링 · UCA 식별 · 손실시나리오 도출)",
+    definition: "고장 연쇄(FTA/FMEA)를 넘어 시스템 상호작용 제어 결함을 분석하는 기법",
+    keywords: [
+      "Safety-I (개별 부품 고장 중심) vs Safety-II / STAMP (시스템 이론·상호작용 중심)",
+      "MIT 낸시 레브슨 (Nancy Leveson) 교수 제안",
+      "개별 컴포넌트가 정상이어도 상호작용 오류로 사고 발생하는 현대 SW 특성",
+      "UCA (Unsafe Control Action, 불안전 제어 행위 4유형)"
+    ],
+    diagram: `<img src="se_safety2.png" alt="안전성 분석 비교"><img src="se_stpa1.png" alt="STPA 제어 루프"><img src="se_stpa2.png" alt="STPA 4단계 절차">`,
+    tableRows: [
+      { major: "전통적 안전성 분석", minor: "FTA (결함 트리 분석, 연역적)", desc: "최상위 사고(Top Event)로부터 원인이 되는 하위 결함들을 AND/OR 논리 게이트 트리로 하향식(Top-Down) 추적" },
+      { major: "", minor: "FMEA (고장모드 영향분석, 귀납적)", desc: "개별 부품의 고장 형태가 상위 시스템에 미치는 영향을 상향식(Bottom-Up)으로 분석하고 RPN(심각도×발생도×검출도) 산출" },
+      { major: "", minor: "HAZOP (위험과 운전분석)", desc: "가이드워드(No, More, Less, Reverse 등)를 설계 파라미터에 결합하여 공정·시스템 이탈 위험을 브레인스토밍으로 도출" },
+      { major: "STPA (시스템 이론 기반)", minor: "1. 분석 목적 정의 & 2. 제어구조 모델링", desc: "수용 불가한 손실(Loss)과 시스템 위험(Hazard)을 정의하고, 제어기(Controller)-액추에이터-프로세스-센서 간 피드백 제어 루프를 작성" },
+      { major: "", minor: "3. 불안전 제어행위(UCA) 식별", desc: "제어 명령의 4가지 위험 조건(미제공, 오제공, 타이밍 빠름/늦음, 지속시간 너무 김/짧음)을 체계적으로 도출" },
+      { major: "", minor: "4. 손실 시나리오 도출", desc: "제어 알고리즘 결함, 부적절한 프로세스 모델(인식 불일치), 피드백 지연·누락 등 UCA가 발생하는 인과 시나리오를 규명해 안전 요구사항 명세" }
+    ]
+  },
+  {
+    domain: "소공",
+    topic: "카오스 엔지니어링 & 관찰 가능성 (Observability · SLO)",
+    mnemonic: "정·가·주·검·개 / 메·로·트 (Metrics · Logs · Traces)",
+    definition: "운영 환경에 의도적 장애를 주입해 복원력을 검증하고 내부 상태를 추론",
+    keywords: [
+      "넷플릭스 Chaos Monkey / Chaos Mesh / Gremlin",
+      "폭발 반경 (Blast Radius) 최소화",
+      "모니터링(Known Unknowns, 사전에 정의한 임계치 감시) vs 관찰가능성(Unknown Unknowns, 예측 못한 분산 장애 원인 탐색)",
+      "SRE: SLI(지표) · SLO(목표) · SLA(계약) · 에러 버짓(Error Budget)"
+    ],
+    diagram: `[정상 상태(Steady State) 정의 및 가설 수립] ──▶ [통제된 장애 주입 (서버 다운·네트워크 지연)] ──▶ [관찰가능성 3요소(메트릭·로그·트레이스)로 회복탄력성 검증 및 개선]`,
+    tableRows: [
+      { major: "카오스 엔지니어링 절차", minor: "정·가·주·검·개", desc: "1.정상 상태 지표 정의 → 2.장애 시에도 정상 유지된다는 가설 수립 → 3.실제 장애 주입(폭발 반경 통제) → 4.시스템 복원력 검증 → 5.취약점 아키텍처 개선" },
+      { major: "관찰 가능성 3대 축", minor: "Metrics (메트릭 - 무엇이 이상한가)", desc: "CPU, 메모리, RPS, 에러율 등 시계열 수치 데이터를 수집하여 시스템의 전반적 상태와 이상 징후 감지 (Prometheus, Grafana)" },
+      { major: "", minor: "Logs (로그 - 왜 발생했는가)", desc: "개별 서비스 내부에서 발생한 이벤트와 예외 스택 트레이스를 타임스탬프와 함께 구조화(JSON) 기록 (ELK, Fluentd, Loki)" },
+      { major: "", minor: "Traces (분산 추적 - 어디서 지연됐는가)", desc: "단일 요청에 고유 Trace ID와 Span ID를 부여해 다수의 마이크로서비스를 거치는 전체 호출 경로와 병목 구간을 시각화 (OpenTelemetry, Jaeger)" },
+      { major: "SRE 신뢰성 관리", minor: "SLO & 에러 버짓 (Error Budget)", desc: "목표 가용성(예: SLO 99.9%)의 여집합인 허용 장애 시간(0.1%, 에러 버짓)이 남아있으면 신규 기능 배포를 가속하고, 소진 시 안정화에만 집중" }
+    ]
+  },
+  {
+    domain: "소공",
+    topic: "형상관리 (SCM) & 형상관리 기준선 (Baseline)",
+    mnemonic: "식·통·감·기 / 기·분·설·시·제·운",
+    definition: "SW 전 생명주기 산출물의 변경을 통제·추적하고 단계별 승인 기준점을 확립",
+    keywords: [
+      "가시성(Visibility)과 추적성(Traceability) 확보",
+      "형상 항목 (CI, Configuration Item: 코드·문서·모델·설정파일)",
+      "형상통제위원회 (CCB) 공식 승인 절차",
+      "분산 버전 관리 (Git: Branch · Merge · Pull Request)"
+    ],
+    diagram: "se_scm.png",
+    tableRows: [
+      { major: "형상관리 4대 절차", minor: "식별 (Identification) & 통제 (Control)", desc: "관리 대상 산출물(CI)에 고유 식별번호를 부여(식별)하고, 변경 요청 시 CCB가 영향도를 평가하여 승인·거절(통제)" },
+      { major: "", minor: "감사 (Audit) & 기록 (Accounting)", desc: "기준선 산출물의 물리적·기능적 무결성과 일관성을 검증(감사)하고, 모든 변경 내역과 상태를 이력으로 보존·보고(기록)" },
+      { major: "개발 단계별 기준선", minor: "기능적(계획) · 분배적(분석) 기준선", desc: "시스템 차원의 기능·성능 요구사항 확정(기능적 기준선) 및 서브시스템별 요구사항 분할 명세 확정(분배적 기준선: SRS)" },
+      { major: "", minor: "설계(설계) · 시험(구현) 기준선", desc: "아키텍처·DB·상세 설계서 완성 시점(설계 기준선) 및 단위 코딩 완료 후 통합·시스템 시험 진입 시점(시험 기준선)" },
+      { major: "", minor: "제품(시험완료) · 운용(이관) 기준선", desc: "시스템·인수 테스트 완료 후 출시 직전 산출물(제품 기준선) 및 실제 운영 환경 설치·이관 완료 시점(운용 기준선)" }
+    ]
+  },
+  {
+    domain: "소공",
+    topic: "SW 유지보수 (리먼의 법칙) & 3R (역공학 · 재공학 · 재사용)",
+    mnemonic: "수·완·예·적 / 계·복·자·조·친·지·감·피 / 논·자·구·모·의·부·모·기",
+    definition: "인도 후 SW를 지속 진화시키고 레거시 자산을 분석·현대화·활용하는 기법",
+    keywords: [
+      "전체 생명주기 비용의 60~70% 이상 차지 (완전적 유지보수 비중 최대)",
+      "Lehman의 SW 진화 8법칙 (계속적 변화 · 복잡도 증가 · 품질 감소 등)",
+      "외계인 코드(Alien Code) 및 레거시 시스템 현대화",
+      "정방향 공학(Forward) ↔ 역공학(Reverse) ↔ 재공학(Re-engineering)"
+    ],
+    diagram: `<img src="se_3r1.png" alt="3R 개념도"><img src="se_3r2.png" alt="재공학 프로세스">`,
+    tableRows: [
+      { major: "유지보수 4대 유형", minor: "수정 · 적응 · 완전 · 예방 (수완예적)", desc: "잠재 결함·오류 패치(수정, 20%), OS·HW·법규 등 외부 환경 변화 대응(적응, 25%), 신규 기능 추가·성능 개선(완전, 50% 최대), 미래 유지보수성 향상을 위한 선제 리팩토링(예방, 5%)" },
+      { major: "리먼의 SW 진화 법칙", minor: "계·복·자·조·친·지·감·피", desc: "SW는 계속 변경되어야 유용하며(계속적 변화), 변경할수록 구조가 복잡해지고(복잡도 증가), 리팩토링하지 않으면 품질이 저하됨(감소하는 품질)" },
+      { major: "3R 현대화 기법", minor: "역공학 (Reverse: 논·자)", desc: "기존 소스코드나 실행 파일로부터 역으로 분석하여 소실된 설계 문서·비즈니스 규칙(논리 역공학) 및 DB 스키마·ERD(자료 역공학)를 추출" },
+      { major: "", minor: "재공학 (Re-engineering: 구·모·의)", desc: "역공학으로 파악한 기존 시스템을 재구조화·재모듈화·의미론적 추출을 거쳐 MSA나 클라우드 네이티브 등 현대적 아키텍처·언어로 재구축" },
+      { major: "", minor: "재사용 (Reuse: 부·모·기)", desc: "검증된 소프트웨어 자산이나 컴포넌트·프레임워크를 부품조립(합성 중심), 모형화(생성 중심), 기존 SW 수정 방식으로 신규 개발에 활용" }
+    ]
+  },
+  {
+    domain: "소공",
+    topic: "기술 부채 (Technical Debt) & 코드 스멜 · 리팩토링",
+    mnemonic: "설·코·테·문 / 이·분·일·통·재 (이동·분리·일반화·통합·재명명)",
+    definition: "단기 개발 속도 위해 타협한 추가 비용(부채)을 외적 동작 유지 채로 개선",
+    keywords: [
+      "워드 커닝햄 (Ward Cunningham, 기술 부채와 복리 이자 비유)",
+      "마틴 파울러 (Martin Fowler, 코드 스멜과 리팩토링)",
+      "샷건 서저리(Shotgun Surgery, 한 곳 수정 시 다수 클래스 연쇄 수정) & 거대 클래스(God Class)",
+      "정적 분석 도구(SonarQube, ESLint, Sparrow) 및 CI/CD 연동"
+    ],
+    diagram: `[기술 부채 누적 (설계·코드·테스트·문서 부채)] ──▶ [코드 스멜 탐지 (중복 코드·긴 메서드·과도한 결합)] ──▶ [리팩토링 (외부 기능 불변 + 내부 구조 개선: 이·분·일·통·재)]`,
+    tableRows: [
+      { major: "기술 부채 4유형", minor: "설계 · 코드 · 테스트 · 문서 부채", desc: "아키텍처 원칙 위반(설계), 스파게티 코드·컨벤션 위반(코드), 자동화 테스트·커버리지 부재(테스트), 산출물 미현행화(문서)로 미래 변경 비용(이자) 가중" },
+      { major: "주요 코드 스멜", minor: "클래스 수준 & 코드 수준 악취", desc: "단일책임(SRP)을 어긴 거대 클래스, 산탄총 수술(Shotgun Surgery), 기능 편애(Feature Envy) 및 중복 코드, 긴 파라미터 목록, 모호한 변수명" },
+      { major: "리팩토링 해결 기법", minor: "결합도 완화 (이동 · 분리)", desc: "책임에 맞는 클래스로 메서드·필드 이동(Move Method) 및 거대 함수를 단일 기능 단위로 쪼개기(Extract Method/Class)" },
+      { major: "", minor: "응집도·가독성 향상 (일반화 · 통합 · 재명명)", desc: "공통 로직을 상위 클래스로 올림(Pull Up), 불필요한 위임 통합(Inline), 의도가 드러나도록 식별자 변경(Rename)" }
+    ]
+  },
+  {
+    domain: "소공",
+    topic: "SW 규모·비용 산정 & 기능점수 (FP: 정규법 vs 간이법)",
+    mnemonic: "I·E·E·I·E (내외외내외: ILF·EIF·EI·EO·EQ) / 하·전·유·기",
+    definition: "사용자 관점 데이터·트랜잭션 기능점수(FP)로 SW 개발 규모와 대가를 산정",
+    keywords: [
+      "ISO/IEC 20926 (IFPUG 기능점수 국제표준) & SW사업 대가산정 가이드",
+      "LOC(코드라인)·COCOMO(초기 경험적 산정) 한계 극복 (프로그래밍 언어 독립적)",
+      "정규법(상세 복잡도 가중치) vs 간이법(평균 복잡도 가중치, 초기 예산·발주 단계)",
+      "보정 후 개발원가 = 총 기능점수(FP) × FP당 단가 × 보정계수(규모·복잡도·언어 등)"
+    ],
+    diagram: "se_size_cost.png",
+    tableRows: [
+      { major: "데이터 기능 (2개)", minor: "내부논리파일 (ILF, Internal Logical File)", desc: "애플리케이션 경계 내부에서 생성·유지보수되는 사용자 식별 가능 논리적 데이터 그룹 (시스템 내부 DB 테이블군)" },
+      { major: "", minor: "외부연계파일 (EIF, External Interface File)", desc: "타 애플리케이션 내부에서 유지보수되며 현재 시스템에서는 오직 조회·참조만 하는 외부 데이터 그룹" },
+      { major: "트랜잭션 기능 (3개)", minor: "외부입력 (EI, External Input)", desc: "경계 외부에서 데이터가 유입되어 내부논리파일(ILF)을 등록·수정·삭제하거나 시스템 동작을 변경하는 처리" },
+      { major: "", minor: "외부출력 (EO) vs 외부조회 (EQ)", desc: "수식 계산·파생 데이터 생성·ILF 갱신 등 가공 로직을 포함해 외부로 표출(EO) vs 단순 검색 후 가공 없이 그대로 출력(EQ)" },
+      { major: "산정 방식 비교", minor: "정규법 vs 간이법", desc: "요구사항이 구체화된 단계에서 DET/RET/FTR 개수로 복잡도(낮음/보통/높음)를 정밀 평가(정규법) vs 기획·예산 수립 단계에서 기능 유형별 평균 가중치를 일괄 적용(간이법)" }
+    ]
+  },
+  {
+    domain: "소공",
+    topic: "SW사업 영향평가 & 과업심의위원회 · 정보시스템 감리 vs PMO",
+    mnemonic: "계·발·공 (계획·발주·결과공시) / 전·착·중·완 (감리) / 제3자 독립 vs 발주자 위탁",
+    definition: "공공 SW 민간침해 방지·적정 과업 통제 제도 및 제3자 감리와 상시 PMO",
+    keywords: [
+      "소프트웨어 진흥법 제43조(영향평가) · 제50조(과업심의위원회 의무화)",
+      "전자정부법 제57조(정보시스템 감리) · 제64조(전자정부사업관리 위탁 PMO)",
+      "무분별한 공공 무료 SW 배포에 따른 민간 상용 SW 시장 위축 방지",
+      "불명확한 과업 및 부당한 무상 과업변경(추가 요구) 근절"
+    ],
+    diagram: `<img src="se_impact.png" alt="SW사업 영향평가 절차"><img src="se_audit_pmo.png" alt="정보시스템 감리와 PMO 비교">`,
+    tableRows: [
+      { major: "공공 SW 생태계 보호", minor: "SW사업 영향평가 (계·발·공)", desc: "공공이 SW사업 추진 시 민간 상용 SW 존재 여부·시장 침해 가능성을 사전 검토 (예산계획 수립 전 1단계 → 입찰공고 30일 전 2단계 → 결과 공개)" },
+      { major: "", minor: "과업심의위원회", desc: "과업 내용 확정, 과업변경 발생 시 계약금액·기간의 적정한 조정을 심의하여 발주기관의 부당한 무상 추가 요구를 차단" },
+      { major: "감리 vs PMO 비교", minor: "정보시스템 감리 (제3자 독립 점검)", desc: "발주자·사업자와 독립된 제3자 감리법인이 특정 시점(착수·중간·완료 단계)에 산출물과 시스템 안전성·적법성을 객관적으로 진단·시정조치 (일정 규모 이상 의무)" },
+      { major: "", minor: "PMO (발주기관 위탁 상시 관리)", desc: "발주기관의 부족한 전문성을 보완하기 위해 외부 전문조직에 사업 전 주기의 일정·위험·요구사항·품질 관리를 위탁하여 상시 수행" }
     ]
   },
 
