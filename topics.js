@@ -1,6 +1,6 @@
 /**
  * 기술사 암기장 - 전 도메인 토픽 데이터 (1교시형 3단락 완제형 CAOS 전면 보강)
- * 총 161개 토픽 (CAOS 57개, AI 9개)
+ * 총 177개 토픽 (CAOS 57개, AI 25개)
  */
 
 const topics = [
@@ -6565,7 +6565,306 @@ const topics = [
         }
       ],
       "differentiation": "[비교] CoT vs ToT 비교\n구분 | CoT | ToT\n추론 구조 | 선형(단일 경로) | 트리(다중 경로 분기)\n탐색 방식 | 순차 추론 | 분기·평가·가지치기(백트래킹)\n비용 | 상대적 낮음 | 다수 호출로 높음\n적합 문제 | 수리·논리 단계 추론 | 계획·탐색이 필요한 복합 문제\n[기술사적 제언] 프롬프트만으로는 환각·최신성 한계가 있으므로 RAG·파인튜닝과 병행하고, 프롬프트 템플릿의 버전 관리와 평가 체계(Prompt Ops)를 구축"
-    }
+    },
+  // ===== AI 도메인 Batch 2 (생성형 AI / LLM) =====
+  {
+    domain: "AI",
+    topic: "파인튜닝 (Fine-tuning)",
+    mnemonic: "사·데·학·평 (사전학습→데이터→학습→평가)",
+    definition: "도메인 적합 위해 사전학습 가중치를 재학습하는 기법",
+    keywords: ["사전학습 모델 (PLM)", "도메인 특화 데이터", "Full Fine-tuning", "SFT (지도 미세조정)", "Instruction Tuning", "Catastrophic Forgetting", "하이퍼파라미터 (LR·Epoch)", "과적합 방지"],
+    diagram: `[대규모 사전학습 모델(범용)] ─ 가중치 초기화 ─→ [도메인 라벨 데이터로 추가 학습(낮은 LR)] ─→ [특화 모델]
+                                              ↑ 평가셋 검증 / 조기 종료(Early Stopping)`,
+    tableRows: [
+      { major: "핵심 개념", minor: "정의", desc: "범용 사전학습 모델의 가중치를 목표 도메인·작업 데이터로 추가 학습하여 성능을 특화시키는 전이학습 기법" },
+      { major: "방식", minor: "Full Fine-tuning", desc: "모델 전체 파라미터를 갱신, 성능은 높으나 GPU 메모리·저장 비용이 매우 큼" },
+      { major: "방식", minor: "SFT·Instruction Tuning", desc: "지시-응답 쌍 데이터로 지도학습하여 지시 수행 능력 향상" },
+      { major: "방식", minor: "PEFT 계열", desc: "일부 파라미터만 학습(LoRA 등)하여 비용 절감" },
+      { major: "리스크", minor: "망각·과적합", desc: "기존 지식 소실(Catastrophic Forgetting), 소량 데이터 과적합 → 낮은 학습률·정규화·Replay 데이터로 완화" },
+      { major: "프로세스", minor: "데이터·평가", desc: "데이터 정제·품질검증 → 학습 → 벤치마크·휴먼 평가 → 배포·모니터링" }
+    ],
+    differentiation: "[비교] RAG vs 파인튜닝\n구분 | RAG | 파인튜닝\n지식 반영 | 외부 문서 검색(실시간 갱신) | 가중치에 내재화(재학습 필요)\n적합 상황 | 최신성·근거 제시 필요 | 말투·형식·도메인 추론 특화\n비용 | 검색 인프라 | 학습 GPU·데이터 구축\n환각 | 근거 기반 완화 | 학습 범위 밖 환각 잔존\n[기술사적 제언] 실무에서는 RAG와 파인튜닝을 병행(RAFT)하고, 먼저 프롬프트·RAG로 검증한 뒤 필요 시 PEFT 기반 파인튜닝을 선택하는 단계적 접근이 비용 효율적"
+  },
+  {
+    domain: "AI",
+    topic: "파라미터 효율적 미세조정 (PEFT)",
+    mnemonic: "어·재·프·접 (Adapter·Reparam·Prompt·접두사)",
+    definition: "학습 비용 절감 위해 일부 파라미터만 갱신하는 기법",
+    keywords: ["Parameter-Efficient Fine-Tuning", "Frozen Backbone (원본 고정)", "Adapter Tuning", "LoRA (재매개변수화)", "Prefix·Prompt Tuning", "학습 파라미터 1% 미만", "Task별 모듈 교체", "GPU 메모리 절감"],
+    diagram: `[Pre-trained LLM (Freeze, 수십억 파라미터)]
+   ├─ Adapter  : 층 사이에 작은 병목 모듈 삽입 ─┐
+   ├─ LoRA     : 가중치 변화량 ΔW = B·A (저차)   ├→ 추가된 소량 파라미터만 학습
+   └─ Prefix/Prompt Tuning : 입력/층에 학습 벡터 부착 ┘`,
+    tableRows: [
+      { major: "핵심 개념", minor: "정의", desc: "원본 모델은 고정(Freeze)하고 소량의 추가·선택 파라미터만 학습하여 Full Fine-tuning 대비 비용을 대폭 절감하는 방법론" },
+      { major: "유형", minor: "Adapter Tuning", desc: "트랜스포머 층 사이에 작은 병목(Bottleneck) 모듈을 삽입해 학습, 추론 지연 소폭 증가" },
+      { major: "유형", minor: "LoRA", desc: "가중치 갱신량을 저차 행렬 두 개의 곱으로 근사, 추론 시 원본에 병합 가능" },
+      { major: "유형", minor: "Prefix·Prompt Tuning", desc: "입력 임베딩 또는 각 층 앞에 학습 가능한 가상 토큰(벡터)을 붙여 학습" },
+      { major: "효과", minor: "비용·운영", desc: "학습 파라미터 1% 내외, 체크포인트 수 MB 수준, Task별 어댑터 교체로 멀티테넌트 운영 용이" },
+      { major: "한계", minor: "성능 격차", desc: "복잡한 도메인 전환 시 Full Fine-tuning 대비 성능 열세 가능, 랭크·위치 하이퍼파라미터 튜닝 필요" }
+    ],
+    differentiation: "[비교] Full Fine-tuning vs PEFT\n구분 | Full FT | PEFT\n학습 파라미터 | 100% | 0.1~수 %\nGPU 메모리 | 매우 높음 | 낮음\n저장 | 모델 전체 복제 | 어댑터만 저장\n망각 위험 | 높음 | 상대적 낮음\n[기술사적 제언] 다수 업무별 모델이 필요한 기업 환경에서는 기반 LLM 1개 + 업무별 PEFT 어댑터 구조로 비용·거버넌스를 동시에 확보"
+  },
+  {
+    domain: "AI",
+    topic: "LoRA (Low-Rank Adaptation)",
+    mnemonic: "고·저·합 (고정·저차분해·병합)",
+    definition: "메모리 절감 위해 저차 행렬만 추가 학습하는 기법",
+    keywords: ["Low-Rank Decomposition", "ΔW = B × A", "Rank (r) 하이퍼파라미터", "원본 가중치 Freeze", "Attention(Q·V) 적용", "추론 시 가중치 병합", "α 스케일링", "어댑터 교체"],
+    diagram: `   입력 x ─┬──────────→ [W (고정, d×d)] ──────────┐
+           └→ [A (d×r)] → [B (r×d)] (학습) × α/r ─┴→ 합산 → 출력 h = Wx + BAx
+                  (r ≪ d : 학습 파라미터 대폭 감소)`,
+    tableRows: [
+      { major: "핵심 개념", minor: "정의", desc: "가중치 변화량 ΔW를 저차(Low-rank) 행렬 B·A로 분해해 근사하고, 원본 W는 고정한 채 B·A만 학습하는 PEFT 기법" },
+      { major: "구성요소", minor: "행렬 A·B", desc: "A(d×r)는 가우시안 초기화, B(r×d)는 0 초기화하여 초기 출력 변화 없음" },
+      { major: "구성요소", minor: "랭크 r·스케일 α", desc: "r이 클수록 표현력↑·파라미터↑, α/r로 갱신 크기 조정" },
+      { major: "적용 위치", minor: "Attention 투영층", desc: "주로 Query·Value(또는 전 선형층)에 삽입" },
+      { major: "운영", minor: "병합·교체", desc: "학습 후 W + BA 병합 시 추론 지연 없음, 작업별 LoRA 파일(수십 MB) 교체로 다중 작업 지원" },
+      { major: "효과", minor: "자원 절감", desc: "학습 파라미터·옵티마이저 상태 메모리 대폭 절감 (예: 175B 모델 학습 파라미터 약 1만분의 1)" }
+    ],
+    differentiation: "[비교] LoRA vs Adapter\n구분 | LoRA | Adapter\n추론 지연 | 병합 시 없음 | 모듈 추가로 증가\n구조 | 선형층 병렬 저차 경로 | 층 사이 병목 모듈\n저장량 | 매우 작음 | 작음\n[기술사적 제언] 랭크 r과 적용 층은 과업 복잡도에 맞춰 실험적으로 결정하고, 어댑터 버전·출처 관리(모델 거버넌스)가 필요"
+  },
+  {
+    domain: "AI",
+    topic: "QLoRA (Quantized LoRA)",
+    mnemonic: "엔·더·페 (NF4·Double Quant·Paged)",
+    definition: "GPU 절감 위해 4비트 양자화 후 LoRA 적용 기법",
+    keywords: ["4-bit NormalFloat (NF4)", "Double Quantization", "Paged Optimizer", "LoRA 어댑터 학습", "단일 GPU 대형 모델 튜닝", "BF16 연산", "양자화 모델 Freeze", "성능 유지"],
+    diagram: `[Base LLM] ─ NF4 4비트 양자화(Freeze, 메모리 1/4) ─┐
+                                                      ├→ 순전파: 역양자화(BF16) + LoRA(BF16) → 학습은 LoRA만
+[Paged Optimizer] : 메모리 스파이크 시 CPU로 페이징 ─┘`,
+    tableRows: [
+      { major: "핵심 개념", minor: "정의", desc: "기반 모델을 4비트로 양자화해 고정하고 그 위에 LoRA 어댑터만 학습하여 단일 GPU로 수십~수백억 파라미터 모델을 미세조정하는 기법" },
+      { major: "핵심 기술", minor: "NF4", desc: "정규분포 가중치에 최적화된 4비트 데이터 타입, 정보 이론적으로 최적" },
+      { major: "핵심 기술", minor: "Double Quantization", desc: "양자화 상수 자체를 다시 양자화하여 추가 메모리 절감" },
+      { major: "핵심 기술", minor: "Paged Optimizer", desc: "옵티마이저 상태를 CPU 메모리로 페이징하여 OOM 방지" },
+      { major: "연산 방식", minor: "역양자화 + LoRA", desc: "순전파 시 4비트 → BF16 역양자화 후 연산, 그래디언트는 LoRA 파라미터에만 전달" },
+      { major: "한계", minor: "속도·정밀도", desc: "역양자화 오버헤드로 학습 속도 저하, 극단적 양자화 시 미세한 성능 손실 가능" }
+    ],
+    differentiation: "[비교] LoRA vs QLoRA\n구분 | LoRA | QLoRA\n기반 모델 정밀도 | FP16/BF16 | 4비트(NF4)\nGPU 메모리 | 중간 | 매우 낮음(단일 GPU)\n학습 속도 | 빠름 | 역양자화로 다소 느림\n성능 | 기준 | 거의 동등\n[기술사적 제언] 온프레미스·소형 GPU 환경에서 폐쇄망 sLLM 튜닝이 필요할 때 QLoRA가 유효하며, 배포 시에는 병합·재양자화 전략을 별도 검증"
+  },
+  {
+    domain: "AI",
+    topic: "RLHF (Reinforcement Learning from Human Feedback)",
+    mnemonic: "에·보·피 (SFT·보상모델·PPO)",
+    definition: "인간 선호 정렬 위해 보상모델로 강화학습하는 기법",
+    keywords: ["SFT (지도 미세조정)", "보상 모델 (Reward Model)", "인간 선호 랭킹 데이터", "PPO (정책 최적화)", "KL 페널티", "Alignment (정렬)", "Helpful·Honest·Harmless", "보상 해킹"],
+    diagram: `① SFT : 지시-응답 데이터로 지도 미세조정
+② 보상모델(RM) : 같은 질문의 응답 N개를 사람이 랭킹 → 선호 점수 예측 모델 학습
+③ RL(PPO) : 정책(LLM) 응답 → RM 보상 ↑ 최대화 (KL 페널티로 SFT 모델에서 이탈 억제)`,
+    tableRows: [
+      { major: "핵심 개념", minor: "정의", desc: "사람의 선호 피드백으로 보상 모델을 학습하고 강화학습으로 LLM을 최적화해 유용성·정직성·무해성에 맞게 정렬하는 기법" },
+      { major: "1단계", minor: "SFT", desc: "고품질 시연(Demonstration) 데이터로 기본 지시 수행 능력 확보" },
+      { major: "2단계", minor: "보상 모델 학습", desc: "응답 쌍/랭킹 비교 데이터로 사람 선호를 스칼라 보상으로 근사" },
+      { major: "3단계", minor: "PPO 강화학습", desc: "보상 극대화 + KL Divergence 페널티로 정책 급변·언어 붕괴 방지" },
+      { major: "리스크", minor: "보상 해킹·비용", desc: "보상 모델의 허점을 이용한 과최적화, 라벨러 편향·고비용 → 헌법적 AI(RLAIF) 등 보완" },
+      { major: "효과", minor: "안전·품질", desc: "유해 응답 감소, 지시 이행·대화 품질 향상 (ChatGPT 계열 핵심 기술)" }
+    ],
+    differentiation: "[비교] SFT vs RLHF\n구분 | SFT | RLHF\n학습 신호 | 정답 응답 모방 | 선호(상대 비교) 보상\n목적 | 지시 수행 | 선호·안전 정렬\n비용 | 낮음 | 높음(랭킹 라벨·RL 불안정)\n[기술사적 제언] 사람 라벨 비용·편향을 줄이기 위해 RLAIF·DPO 등 대안과 레드팀 평가를 병행하고, 정렬 기준(원칙·정책)을 문서화"
+  },
+  {
+    domain: "AI",
+    topic: "DPO (Direct Preference Optimization)",
+    mnemonic: "보·강·無 (보상모델·강화학습 불필요)",
+    definition: "RLHF 단순화 위해 선호쌍으로 정책 직접 최적화 기법",
+    keywords: ["선호 쌍 (Chosen·Rejected)", "보상모델 불필요", "강화학습 루프 제거", "분류형 손실 (Bradley-Terry)", "참조 모델 (Reference)", "β 하이퍼파라미터", "학습 안정성", "정렬 (Alignment)"],
+    diagram: `[RLHF] 선호데이터 → 보상모델 학습 → PPO 샘플링·강화학습 (복잡·불안정)
+[DPO ] 선호데이터(Chosen y_w, Rejected y_l) ──→ 단일 손실로 정책 직접 학습
+        L = -log σ( β·[log π(y_w)/π_ref(y_w) - log π(y_l)/π_ref(y_l)] )`,
+    tableRows: [
+      { major: "핵심 개념", minor: "정의", desc: "RLHF의 보상 모델·강화학습 단계를 수식 변환으로 제거하고 선호 쌍 데이터로 정책을 직접 학습하는 정렬 기법" },
+      { major: "입력", minor: "선호 쌍 데이터", desc: "프롬프트별 선택(Chosen)·거부(Rejected) 응답 쌍" },
+      { major: "손실 함수", minor: "로그 시그모이드 손실", desc: "참조 모델 대비 선택 응답 확률 비를 높이고 거부 응답 비를 낮춤" },
+      { major: "제어 변수", minor: "β·참조 모델", desc: "β가 클수록 참조 모델에서 덜 이탈, 급격한 정책 변화 방지" },
+      { major: "효과", minor: "단순·안정", desc: "샘플링·PPO 불필요 → 구현 단순, 메모리·학습 안정성 향상" },
+      { major: "한계", minor: "데이터 의존", desc: "오프라인 선호 데이터 품질·분포에 민감, 온라인 탐색 부재로 성능 한계 가능" }
+    ],
+    differentiation: "[비교] RLHF vs DPO\n구분 | RLHF | DPO\n보상 모델 | 별도 학습 필요 | 불필요(암묵적)\n최적화 | PPO 강화학습 | 지도형 단일 손실\n안정성·비용 | 불안정·고비용 | 안정·저비용\n탐색 | 온라인 샘플링 | 오프라인 데이터 고정\n[기술사적 제언] 소규모 팀은 DPO로 빠른 정렬, 대규모·고위험 서비스는 RLHF/온라인 방식과 안전성 평가를 병행하는 하이브리드가 현실적"
+  },
+  {
+    domain: "AI",
+    topic: "양자화 (Quantization)",
+    mnemonic: "PTQ·QAT / 대·비·교 (대칭·비대칭·교정)",
+    definition: "메모리 절감 위해 가중치 비트 폭을 축소하는 기법",
+    keywords: ["FP32→INT8·INT4 변환", "PTQ (사후 양자화)", "QAT (양자화 인지 학습)", "Scale·Zero-point", "Calibration (교정)", "대칭·비대칭 양자화", "GPTQ·AWQ", "정확도 손실 보정"],
+    diagram: `[FP32 가중치: -1.27 … 3.42] ── Scale·Zero-point ──→ [INT8: -128 … 127]
+  q = round(x / s) + z      x ≈ s·(q - z)      (메모리 1/4, 정수 연산 가속)
+  PTQ: 학습 후 교정 데이터로 변환 │ QAT: 학습 중 가짜 양자화 노드 삽입`,
+    tableRows: [
+      { major: "핵심 개념", minor: "정의", desc: "고정밀(FP32/FP16) 가중치·활성값을 INT8·INT4 등 저비트로 표현하여 모델 크기·메모리·연산량을 줄이는 경량화 기법" },
+      { major: "방식", minor: "PTQ", desc: "재학습 없이 소량 교정(Calibration) 데이터로 Scale·Zero-point 산출, 빠르고 간단하나 저비트에서 정확도 하락" },
+      { major: "방식", minor: "QAT", desc: "학습 단계에서 양자화 오차를 모사(Fake Quant)하여 정확도 보존, 학습 비용 필요" },
+      { major: "범위", minor: "대칭·비대칭", desc: "대칭은 Zero-point=0으로 단순, 비대칭은 분포 편향 데이터에 정밀" },
+      { major: "LLM 기법", minor: "GPTQ·AWQ", desc: "층별 오차 보정(GPTQ), 중요 채널 보호(AWQ)로 4비트 LLM 품질 유지" },
+      { major: "효과·한계", minor: "속도·정확도", desc: "메모리 절감·추론 가속(NPU 지원), 이상치(Outlier) 가중치에서 정확도 손실 가능" }
+    ],
+    differentiation: "[비교] PTQ vs QAT\n구분 | PTQ | QAT\n재학습 | 불필요 | 필요\n정확도 | 저비트에서 하락 가능 | 상대적 우수\n소요 | 수 분~시간 | 학습 시간·데이터\n[기술사적 제언] 온디바이스·엣지 배포는 PTQ로 시작해 정확도 허용 오차를 벗어나면 QAT·혼합정밀(Mixed Precision)로 전환하고 타깃 하드웨어의 지원 정밀도를 사전 확인"
+  },
+  {
+    domain: "AI",
+    topic: "지식 증류 (Knowledge Distillation)",
+    mnemonic: "교·학·소 (교사·학생·소프트라벨)",
+    definition: "경량화 위해 교사 출력을 학생 모델에 전이하는 기법",
+    keywords: ["Teacher-Student 구조", "Soft Label (소프트 타깃)", "Temperature (T)", "KL Divergence 손실", "Response·Feature·Relation 증류", "sLLM 최적화", "모델 압축", "Hard Label 병용"],
+    diagram: `[Teacher: 대형 모델] ─ 입력 x ─→ Soft Label (Temperature T로 완화된 확률분포)
+                                         ↓ KL Divergence 최소화
+[Student: 소형 모델] ─ 입력 x ─→ 예측 분포 ──(+ Hard Label CE 손실)──→ 경량 고성능 모델`,
+    tableRows: [
+      { major: "핵심 개념", minor: "정의", desc: "대형 교사(Teacher) 모델의 출력 분포(지식)를 소형 학생(Student) 모델이 모방하도록 학습시켜 경량화하면서 성능을 유지하는 기법" },
+      { major: "구성요소", minor: "Soft Label·Temperature", desc: "온도 T로 확률분포를 완화해 클래스 간 유사도(Dark Knowledge) 전달" },
+      { major: "구성요소", minor: "손실 함수", desc: "KL Divergence(증류 손실) + 정답 Cross-Entropy(Hard Label) 가중 합" },
+      { major: "유형", minor: "Response·Feature·Relation", desc: "출력(Logit), 중간 표현(Feature), 샘플 간 관계 증류" },
+      { major: "LLM 활용", minor: "sLLM 생성", desc: "대형 LLM이 생성한 응답·추론 과정을 데이터로 소형 모델 학습(DistilBERT 등)" },
+      { major: "한계", minor: "교사 의존·라이선스", desc: "교사 편향·오류 전이, 상용 모델 출력 사용 시 약관·저작권 이슈" }
+    ],
+    differentiation: "[비교] 양자화 vs 가지치기 vs 지식 증류\n구분 | 양자화 | 가지치기 | 지식 증류\n원리 | 비트 폭 축소 | 불필요 가중치 제거 | 지식 전이 학습\n구조 변경 | 없음 | 희소화 | 소형 구조 신규\n재학습 | 선택 | 대체로 필요 | 필수\n[기술사적 제언] 온디바이스 AI는 증류로 소형 구조를 만들고 양자화·가지치기를 조합 적용하는 다단계 경량화 파이프라인이 표준이며, 교사 모델의 라이선스를 사전 검토"
+  },
+  {
+    domain: "AI",
+    topic: "온디바이스 AI (On-Device AI)",
+    mnemonic: "NPU·경량화·런타임 / 지연·보안·비용",
+    definition: "지연·유출 방지 위해 단말에서 직접 추론하는 기술",
+    keywords: ["엣지 도메인 로컬 추론", "초저지연", "외부 반출 차단 (프라이버시)", "NPU·PIM 가속기", "양자화·가지치기·지식증류", "TFLite·ONNX Runtime", "sLLM·SLM", "하이브리드 AI"],
+    diagram: "ai_ondevice.png",
+    tableRows: [
+      { major: "핵심 개념", minor: "정의", desc: "클라우드 연결 없이 스마트폰·자동차·로봇 등 단말 자체에서 데이터 수집과 AI 추론을 직접 수행하는 기술" },
+      { major: "하드웨어", minor: "NPU·PIM·가속기", desc: "고효율 MAC(GEMM) 연산 NPU, 메모리 내 연산 PIM, TPU·NNP·뉴럴엔진 등 저전력 AI 전용 프로세서" },
+      { major: "모델 경량화", minor: "양자화·가지치기·증류", desc: "비트 축소, 불필요 가중치 제거, 교사→학생 지식 전이로 sLLM 최적화" },
+      { major: "소프트웨어", minor: "런타임·컴파일러", desc: "TFLite·ONNX Runtime·CoreML 등 추론 엔진, TVM·MLIR 기반 기종별 최적화 컴파일" },
+      { major: "경량 모델", minor: "sLLM·SLM", desc: "수억~수십억 파라미터로 축소되어 단말 탑재 가능한 언어모델" },
+      { major: "효과", minor: "지연·보안·연속성", desc: "네트워크 지연 제거, 개인정보 외부 반출 차단, 오프라인 서비스 연속성, 서버 비용 절감" }
+    ],
+    differentiation: "[비교] 클라우드 AI vs 온디바이스 AI\n구분 | 클라우드 AI | 온디바이스 AI\n연산 위치 | 원격 데이터센터 | 사용자 단말(엣지)\n네트워크 | 필수 | 불필요(오프라인 가능)\n지연 | 전송·큐잉 지연 | 즉각 처리\n보안 | 전송 중 유출 위험 | 외부 반출 차단\n모델 규모 | 초대형 LLM | sLLM·경량 모델\n[기술사적 제언] 고난도 추론은 클라우드, 실시간·민감 정보는 온디바이스로 분담하는 하이브리드 AI 아키텍처와 단말 모델 업데이트·보안(모델 탈취 방지) 체계를 함께 설계"
+  },
+  {
+    domain: "AI",
+    topic: "환각 현상 (Hallucination)",
+    mnemonic: "내·외·근 (내재적·외재적·근거검증)",
+    definition: "사실 오류 방지 위해 RAG·검증으로 완화하는 기법",
+    keywords: ["그럴듯한 거짓 생성", "내재적 환각 (Intrinsic)", "외재적 환각 (Extrinsic)", "RAG 근거 기반 생성", "Self-Consistency·CoVe 검증", "Temperature 조정", "인용·출처 제시", "Human-in-the-Loop"],
+    diagram: `[원인] 학습데이터 오류·편향 / 확률적 다음 토큰 예측 / 지식 단절(Cut-off) / 모호한 프롬프트
+   ↓
+[유형] 내재적(입력·문맥과 모순) │ 외재적(검증 불가한 내용 생성)
+   ↓
+[대응] RAG·인용 → 프롬프트 제약 → 자기검증 → 출력 가드레일 → 휴먼 검토`,
+    tableRows: [
+      { major: "핵심 개념", minor: "정의", desc: "LLM이 사실과 다르거나 근거 없는 내용을 그럴듯하게 생성하는 현상으로 신뢰성·안전성의 핵심 저해 요인" },
+      { major: "원인", minor: "데이터·모델 구조", desc: "학습 데이터의 오류·편향, 확률적 토큰 예측, 지식 단절 시점, 불충분한 정렬" },
+      { major: "유형", minor: "내재적·외재적", desc: "내재적: 주어진 문맥과 모순 / 외재적: 문맥으로 검증 불가한 사실 생성" },
+      { major: "대응 기술", minor: "RAG·인용", desc: "외부 신뢰 지식 검색 결과를 근거로 생성하고 출처를 명시" },
+      { major: "대응 기술", minor: "검증·프롬프트", desc: "Self-Consistency, CoVe(검증 질문), 모른다고 답하게 하는 프롬프트 제약, 낮은 Temperature" },
+      { major: "대응 운영", minor: "가드레일·HITL", desc: "출력 사실 검증 레이어, 고위험 분야 사람 검토, 환각률 지표 모니터링" }
+    ],
+    differentiation: "[비교] 환각 vs 편향 vs 오류\n구분 | 환각 | 편향 | 단순 오류\n본질 | 근거 없는 사실 생성 | 학습 데이터의 치우침 | 계산·추론 실수\n탐지 | 사실 검증 필요 | 공정성 지표 | 정답 비교\n대응 | RAG·검증 | 데이터 균형·정렬 | 재추론\n[기술사적 제언] 환각은 완전 제거가 불가능하므로 도메인 위험 등급에 따라 RAG·검증·휴먼 검토를 계층화하고 환각률을 서비스 KPI로 관리"
+  },
+  {
+    domain: "AI",
+    topic: "탈옥 (Jailbreak)",
+    mnemonic: "역·우·다 (역할극·우회인코딩·다중턴)",
+    definition: "안전장치 우회 위해 조작 프롬프트 입력하는 공격 기법",
+    keywords: ["안전 정렬(Alignment) 우회", "역할극·DAN 프롬프트", "인코딩·난독화 우회", "다중 턴(Many-shot) 유도", "적대적 접미사(GCG)", "Red Teaming", "입출력 가드레일", "Safety Classifier"],
+    diagram: `[공격자] ─ 역할극/가정/인코딩/다중턴 ─→ [LLM 안전 정책(거부 응답)] ─ 우회 성공 ─→ [유해 응답 생성]
+[방어]  입력 필터 → 안전 정렬 강화(RLHF·적대적 학습) → 출력 분류기 → 레드팀·모니터링`,
+    tableRows: [
+      { major: "핵심 개념", minor: "정의", desc: "LLM의 안전 정책·콘텐츠 제한을 우회하여 금지된 응답(유해 정보·악성코드 등)을 유도하는 공격" },
+      { major: "공격 유형", minor: "역할극·시나리오", desc: "DAN 등 제약 없는 페르소나·가상 상황 설정으로 거부 회피" },
+      { major: "공격 유형", minor: "인코딩·난독화", desc: "Base64·다국어·문자 치환으로 필터 우회" },
+      { major: "공격 유형", minor: "다중 턴·Many-shot", desc: "대화를 점진적으로 유도하거나 다수 예시로 컨텍스트 오염" },
+      { major: "공격 유형", minor: "적대적 접미사", desc: "최적화로 생성한 무의미 문자열 접미사로 거부 응답 억제(GCG)" },
+      { major: "방어", minor: "다층 방어", desc: "입력 필터, 안전 정렬·적대적 학습, 출력 분류기, 레드팀 테스트, 사용 로그 모니터링" }
+    ],
+    differentiation: "[비교] 탈옥 vs 프롬프트 인젝션\n구분 | 탈옥 | 프롬프트 인젝션\n공격 대상 | 모델의 안전 정책 | 애플리케이션의 지시 체계\n공격자 | 사용자 직접 | 사용자 또는 외부 데이터(간접)\n목표 | 금지 콘텐츠 생성 | 지시 탈취·데이터 유출·도구 오남용\n[기술사적 제언] 모델 단독 방어는 한계가 있어 입력·출력 가드레일과 지속적 레드팀, OWASP LLM Top 10 기반 점검을 개발 수명주기에 내재화"
+  },
+  {
+    domain: "AI",
+    topic: "프롬프트 인젝션 (Prompt Injection)",
+    mnemonic: "직·간 / 격·최·검 (직접·간접 / 격리·최소권한·검증)",
+    definition: "지시 탈취 위해 악성 명령어를 주입하는 공격 기법",
+    keywords: ["직접 프롬프트 인젝션", "간접 프롬프트 인젝션 (외부 데이터)", "시스템 프롬프트 유출", "도구 호출 악용 (Excessive Agency)", "OWASP LLM01", "입력 검증·가드레일", "권한 최소화", "컨텍스트 격리"],
+    diagram: `[시스템 프롬프트: 신뢰 지시] + [사용자 입력 / 웹·문서·RAG 데이터: 비신뢰] → 동일 컨텍스트로 결합
+        └ 악성 지시("이전 지시 무시…")가 섞이면 LLM이 지시와 데이터를 구분 못함 → 지시 탈취·정보 유출·도구 오남용`,
+    tableRows: [
+      { major: "핵심 개념", minor: "정의", desc: "신뢰 지시와 비신뢰 입력이 구분되지 않는 LLM 특성을 악용해 악성 명령을 주입, 의도하지 않은 동작을 유발하는 공격 (OWASP LLM01)" },
+      { major: "유형", minor: "직접 인젝션", desc: "사용자가 입력창에 직접 시스템 지시 무시·변경을 요구" },
+      { major: "유형", minor: "간접 인젝션", desc: "웹 페이지·이메일·문서·RAG 데이터에 숨겨진 악성 지시를 에이전트가 파싱·실행" },
+      { major: "피해", minor: "유출·오남용", desc: "시스템 프롬프트·기밀 유출, 과도한 권한의 도구 호출(메일 전송·삭제 등), 출력 조작" },
+      { major: "대응(기술)", minor: "입력·출력 가드레일", desc: "인젝션 패턴 탐지, 구분자·스포트라이팅, 출력 검증, 별도 안전 LLM 분류" },
+      { major: "대응(구조)", minor: "권한 최소화·격리", desc: "도구 최소 권한, 민감 작업 HITL 승인, 데이터 등급별 컨텍스트 격리" }
+    ],
+    differentiation: "[비교] 직접 vs 간접 프롬프트 인젝션\n구분 | 직접 | 간접\n주입 경로 | 사용자 입력 | 외부 콘텐츠(웹·문서·DB)\n탐지 난이도 | 상대적 쉬움 | 어려움(사용자 비인지)\n주요 위협 | 정책 우회 | 에이전트 권한 탈취\n[기술사적 제언] SQL 인젝션처럼 완전 차단이 어려우므로 신뢰 경계 분리, 최소 권한, 고위험 행동 사람 승인을 설계 원칙으로 삼고 지속적 레드팀을 수행"
+  },
+  {
+    domain: "AI",
+    topic: "에이전틱 AI (Agentic AI)",
+    mnemonic: "계·도·메·자 (계획·도구·메모리·자율)",
+    definition: "목표 달성 위해 계획·도구로 자율 수행하는 프레임워크",
+    keywords: ["자율적 목표 달성", "계획(Planning)·분해", "도구 호출 (Tool Use)", "메모리 (단기·장기)", "다중 에이전트 (MAS)", "A2A·MCP 프로토콜", "HITL·가드레일", "합리성·환경인지·자율행동"],
+    diagram: "ai_agent.png",
+    tableRows: [
+      { major: "핵심 개념", minor: "정의", desc: "환경과 상호작용하며 데이터를 수집하고 스스로 판단해 목표를 달성하는 자율 주체. 챗봇과 달리 사용자가 원하는 목표를 위해 작업을 계획·실행" },
+      { major: "작동 방식", minor: "목표설정→정보획득→작업구현", desc: "목표를 작업 단위로 분할 → 필요한 정보 수집(외부·에이전트) → 작업 실행" },
+      { major: "구성요소", minor: "아키텍처·기능·프로그램", desc: "물리적 작동 기반(아키텍처), 작업 가능 요소·지원 기능(에이전트 기능), 실제 구현(에이전트 프로그램)" },
+      { major: "확장 구조", minor: "다중 에이전트 시스템(MAS)", desc: "단일 에이전트 한계 극복, 분산 협업 구조로 복잡 업무 처리, A2A로 에이전트 간 협업·MCP로 도구·컨텍스트 연동" },
+      { major: "보안 위협", minor: "간접 주입·목표 탈취", desc: "외부 데이터 내 악성 프롬프트, 목표 변조, 불완전한 도구 호출 통제, 오케스트레이션 탈취, 벡터 DB 오염" },
+      { major: "방어 대책", minor: "권한 최소화·검증·격리", desc: "도구 권한 최소화·민감 조작 HITL, 입력 이중 검증 가드레일, 메모리·컨텍스트 격리와 AI 공급망 보안" }
+    ],
+    differentiation: "[비교] 챗봇(LLM) vs AI 에이전트(Agentic AI)\n구분 | 챗봇·LLM | AI 에이전트\n동작 | 질의-응답 | 목표 기반 계획·실행 반복\n도구 사용 | 제한적 | API·검색·코드 등 적극 활용\n자율성 | 낮음 | 높음(권한·위험 동반)\n상태 | 대화 단위 | 메모리로 장기 맥락 유지\n[기술사적 제언] 자율성이 높을수록 위험도 커지므로 권한 최소화, 행동 로그 감사, HITL 승인 절차와 에이전트 거버넌스 체계를 도입 단계부터 설계"
+  },
+  {
+    domain: "AI",
+    topic: "ReAct (Reasoning and Acting)",
+    mnemonic: "생·행·관 (Thought·Action·Observation)",
+    definition: "추론 정확도 위해 사고·행동을 교차 수행하는 프레임워크",
+    keywords: ["Thought (추론)", "Action (도구 호출)", "Observation (관찰)", "추론·행동 교차 루프", "외부 지식 접지(Grounding)", "환각 감소", "해석 가능한 추론 궤적", "LangChain Agent"],
+    diagram: `질문 → [Thought] 무엇이 필요한가? → [Action] 검색/계산/API 호출 → [Observation] 결과 확인
+          ↑──────────────── 반복 (목표 달성 시까지) ────────────────┘ → [Final Answer]`,
+    tableRows: [
+      { major: "핵심 개념", minor: "정의", desc: "LLM이 추론(Reasoning) 과정과 도구 사용 행동(Acting)을 번갈아 수행하며 관찰 결과를 다음 추론에 반영하는 에이전트 프레임워크" },
+      { major: "구성요소", minor: "Thought", desc: "현재 상황 분석과 다음 행동 계획을 자연어로 생성" },
+      { major: "구성요소", minor: "Action", desc: "검색·계산기·API·코드 실행 등 외부 도구 호출" },
+      { major: "구성요소", minor: "Observation", desc: "도구 실행 결과를 컨텍스트에 추가하여 추론 보정" },
+      { major: "효과", minor: "접지·해석성", desc: "외부 정보로 환각 감소, 추론 궤적이 드러나 디버깅·감사 용이" },
+      { major: "한계", minor: "비용·루프 오류", desc: "호출 반복으로 지연·토큰 비용 증가, 잘못된 관찰에 의한 오류 누적·무한 루프 → 최대 스텝·가드레일 필요" }
+    ],
+    differentiation: "[비교] CoT vs ReAct\n구분 | CoT | ReAct\n외부 정보 | 사용 안 함(내부 지식) | 도구로 실시간 획득\n구성 | 추론만 | 추론 + 행동 + 관찰 루프\n환각 | 내부 지식 한계 | 관찰로 완화\n적합 | 수리·논리 추론 | 검색·API 연동 에이전트\n[기술사적 제언] ReAct는 에이전트의 기본 패턴이므로 도구 권한 제한, 최대 반복 횟수, 로그 감사로 비용·보안 위험을 통제"
+  },
+  {
+    domain: "AI",
+    topic: "CoT (Chain of Thought)",
+    mnemonic: "단·연·답 (단계 추론·연결·답)",
+    definition: "복잡 추론 위해 중간 단계를 순차 도출하는 기법",
+    keywords: ["단계별 추론", "중간 추론 과정", "Few-shot CoT", "Zero-shot CoT (Let's think step by step)", "Self-Consistency", "산술·논리 추론 향상", "대형 모델에서 효과", "토큰 비용 증가"],
+    diagram: `[일반] 질문 ───────────────────────────→ 답 (추론 생략, 오답 위험)
+[CoT ] 질문 → 단계1 → 단계2 → 단계3 → 답 (중간 추론을 명시적으로 생성)`,
+    tableRows: [
+      { major: "핵심 개념", minor: "정의", desc: "모델이 복잡한 문제를 단계별로 추론하고 각 단계를 연결하여 최종 결과를 도출하도록 유도하는 프롬프트 기법" },
+      { major: "유형", minor: "Few-shot CoT", desc: "추론 과정이 포함된 예시를 함께 제공" },
+      { major: "유형", minor: "Zero-shot CoT", desc: "단계적으로 생각하라는 지시문만으로 추론 유도" },
+      { major: "확장", minor: "Self-Consistency", desc: "여러 추론 경로를 샘플링해 다수결로 최종 답 선택" },
+      { major: "효과", minor: "추론 성능·설명성", desc: "산술·상식·논리 문제 정확도 향상, 추론 근거 확인 가능" },
+      { major: "한계", minor: "비용·오류 전파", desc: "토큰·지연 증가, 중간 단계 오류가 결과에 전파, 작은 모델에선 효과 미미" }
+    ],
+    differentiation: "[비교] CoT vs ToT\n구분 | CoT | ToT\n구조 | 선형 단일 경로 | 트리 다중 경로\n오류 복구 | 불가(되돌림 없음) | 가지치기·백트래킹\n비용 | 낮음 | 높음\n[기술사적 제언] 일반 업무는 CoT로 충분하며 비용이 큰 ToT는 계획·탐색형 고난도 과제에 한정하고, 추론 과정 노출 시 민감정보 포함 여부를 점검"
+  },
+  {
+    domain: "AI",
+    topic: "ToT (Tree of Thoughts)",
+    mnemonic: "분·평·탐 (분기·평가·탐색)",
+    definition: "탐색 추론 위해 사고 경로를 트리로 분기 평가하는 기법",
+    keywords: ["사고(Thought) 단위 분기", "트리 구조 탐색", "상태 평가 (Value·Vote)", "BFS·DFS 탐색", "가지치기·백트래킹", "Lookahead", "계획·퍼즐 문제", "다중 LLM 호출 비용"],
+    diagram: `                 ┌→ 사고 A1 ──→ A2 (평가 ↑ 유망) ──→ 최종 답
+문제(Root) ──────┼→ 사고 B1 (평가 ↓) ✕ 가지치기
+                 └→ 사고 C1 ──→ C2 (평가 ↑) ──→ (대안)   ※ BFS/DFS로 탐색, 막히면 백트래킹`,
+    tableRows: [
+      { major: "핵심 개념", minor: "정의", desc: "다양한 사고 경로를 나무 형태로 분기하여 여러 가능성을 탐색하고, 평가를 통해 최적 경로를 선택하는 추론 프레임워크" },
+      { major: "구성요소", minor: "사고 생성기", desc: "현재 상태에서 다음 사고 후보 k개를 생성" },
+      { major: "구성요소", minor: "상태 평가기", desc: "각 사고의 유망도를 LLM이 점수화(Value) 또는 투표(Vote)" },
+      { major: "구성요소", minor: "탐색 알고리즘", desc: "BFS·DFS·빔 서치로 트리를 확장하며 가지치기와 백트래킹 수행" },
+      { major: "효과", minor: "계획·탐색 성능", desc: "24 게임·창작·미니 크로스워드 등 선행 탐색이 필요한 과제에서 CoT 대비 성능 향상" },
+      { major: "한계", minor: "비용·지연", desc: "다수의 LLM 호출로 토큰·시간 비용 급증, 평가 신뢰도가 성능을 좌우" }
+    ],
+    differentiation: "[비교] CoT vs ToT vs ReAct\n구분 | CoT | ToT | ReAct\n경로 | 단일 선형 | 다중 분기 트리 | 추론·행동 루프\n핵심 | 단계 추론 | 탐색·평가 | 도구 접지\n외부 도구 | 없음 | 없음(기본) | 필수\n비용 | 낮음 | 높음 | 중간\n[기술사적 제언] 문제 복잡도와 비용 예산에 따라 CoT→ReAct→ToT 순으로 단계 적용하고, 평가 함수(휴리스틱) 품질과 호출 횟수 상한을 설계 단계에서 정의"
+  }
 ];
 
 if (typeof module !== 'undefined' && module.exports) {
