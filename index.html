@@ -87,6 +87,13 @@
         .subnote-table td.col-minor { width: 24%; font-weight: 600; color: #bae6fd; background: rgba(30, 41, 59, 0.5); text-align: center; }
         .subnote-table td.col-desc { width: 56%; color: #e2e8f0; text-align: left; white-space: pre-line; }
 
+        /* ③ 3단락 실전 차별화 콜아웃 및 ASCII 다이어그램 스타일 */
+        .diff-callout { display: none; flex-direction: column; gap: 6px; background: linear-gradient(135deg, rgba(245, 158, 11, 0.16), rgba(244, 63, 94, 0.1)); border: 1px solid rgba(251, 191, 36, 0.55); border-left: 4px solid #f59e0b; border-radius: 10px; padding: 11px 13px; margin-top: 8px; box-shadow: 0 0 0 1px rgba(251, 191, 36, 0.08) inset; }
+        .diff-title { font-size: 0.8rem; font-weight: 800; color: #fbbf24; letter-spacing: 0.02em; }
+        .diff-text { font-size: 0.84rem; color: #fef3c7; line-height: 1.55; white-space: pre-line; word-break: keep-all; }
+        .details-ascii { background: rgba(2, 6, 23, 0.65); border: 1px solid rgba(56, 189, 248, 0.25); padding: 9px 10px; border-radius: 8px; font-family: "D2Coding", "Consolas", "Malgun Gothic", monospace; font-size: 0.72rem; line-height: 1.35; white-space: pre; overflow-x: auto; color: #e2e8f0; margin: 0; }
+        .details-note { font-size: 0.8rem; color: #cbd5e1; line-height: 1.45; white-space: pre-line; margin-top: 6px; }
+
         /* Controls */
         .controls { display: flex; gap: 8px; margin-top: 10px; padding-bottom: 10px; }
         .ctrl-btn { flex: 1; background: var(--card-bg); border: 1px solid var(--border-color); color: var(--text-primary); padding: 13px 8px; border-radius: 10px; font-weight: 700; font-size: 0.92rem; cursor: pointer; transition: all 0.15s; white-space: nowrap; }
@@ -172,6 +179,11 @@
                                     </thead>
                                     <tbody id="back-table-body"></tbody>
                                 </table>
+                            
+                            <!-- ③ 최하단: 3단락 실전 차별화 영역 -->
+                            <div class="diff-callout" id="diff-wrapper">
+                                <div class="diff-title">🎯 [3단락] 기술사적 차별화 포인트</div>
+                                <div class="diff-text" id="back-diff"></div>
                             </div>
                         </div>
 
@@ -299,6 +311,29 @@
             }
         }
 
+        
+        function parseMdTableRows(mdText) {
+            if (!mdText) return null;
+            const lines = mdText.split('\n').map(l => l.trim()).filter(l => l.startsWith('|'));
+            if (lines.length < 3) return null;
+            const parseCells = l => {
+                let t = l;
+                if (t.startsWith('|')) t = t.slice(1);
+                if (t.endsWith('|')) t = t.slice(0, -1);
+                return t.split('|').map(c => c.trim());
+            };
+            const header = parseCells(lines[0]);
+            const body = lines.slice(2).map(parseCells);
+            return body.map(row => {
+                if (row.length >= 3) {
+                    return { major: row[0], minor: row[1], desc: row.slice(2).join(' | ') };
+                } else if (row.length === 2) {
+                    return { major: row[0], minor: '', desc: row[1] };
+                }
+                return { major: row[0] || '', minor: '', desc: '' };
+            });
+        }
+
         function renderSubnoteTable(rows) {
             const tableWrapper = document.getElementById('table-wrapper');
             const tbody = document.getElementById('back-table-body');
@@ -410,7 +445,7 @@
                 defBox.innerText = '';
             }
 
-            // ① 상단 다이어그램 영역 (이미지 또는 텍스트 렌더링)
+            // ① 상단 다이어그램 영역 (이미지, ASCII 아키텍처 또는 텍스트 렌더링)
             const diagWrapper = document.getElementById('diagram-wrapper');
             const diagBox = document.getElementById('back-diagram');
             diagBox.classList.remove('has-image');
@@ -418,14 +453,36 @@
 
             const imgSrc = card.diagramImg || (typeof card.diagram === 'string' && /\.(png|jpe?g|gif|webp|svg)$/i.test(card.diagram.trim()) ? card.diagram.trim() : null);
 
+            let asciiPart = '';
+            let mdTableRows = null;
+
+            if (card.details && typeof card.details === 'string') {
+                const lines = card.details.replace(/\r\n/g, '\n').split('\n');
+                const sepIdx = lines.findIndex(l => /^\s*\|\s*:?-{2,}/.test(l));
+                if (sepIdx > 0) {
+                    asciiPart = lines.slice(0, sepIdx - 1).join('\n').trim();
+                    const tableText = lines.slice(sepIdx - 1).join('\n');
+                    mdTableRows = parseMdTableRows(tableText);
+                } else {
+                    asciiPart = card.details.trim();
+                }
+            }
+
             if (imgSrc) {
                 diagWrapper.style.display = 'flex';
                 diagBox.classList.add('has-image');
-                diagBox.innerHTML = `<img src="${imgSrc}" alt="${card.topic} 구성도">`;
+                let imgHtml = `<img src="${imgSrc}" alt="${card.topic} 구성도">`;
+                if (asciiPart) {
+                    imgHtml += `<pre class="details-ascii" style="width:100%; margin-top:8px;">${asciiPart}</pre>`;
+                }
+                diagBox.innerHTML = imgHtml;
             } else if (typeof card.diagram === 'string' && card.diagram.trim().startsWith('<img')) {
                 diagWrapper.style.display = 'flex';
                 diagBox.classList.add('has-image');
                 diagBox.innerHTML = card.diagram;
+            } else if (asciiPart) {
+                diagWrapper.style.display = 'flex';
+                diagBox.innerHTML = `<pre class="details-ascii">${asciiPart}</pre>`;
             } else if (card.diagram && card.diagram.trim() !== '') {
                 diagWrapper.style.display = 'flex';
                 diagBox.innerText = card.diagram;
@@ -433,8 +490,20 @@
                 diagWrapper.style.display = 'none';
             }
 
-            // ② 하단 서브노트 표 영역 (tableRows가 있을 때만 동적 렌더링)
-            renderSubnoteTable(card.tableRows);
+            // ② 하단 서브노트 표 영역 (tableRows 또는 details 마크다운 표 동적 렌더링)
+            const finalTableRows = card.tableRows || mdTableRows;
+            renderSubnoteTable(finalTableRows);
+
+            // ③ 최하단: 3단락 실전 차별화 콜아웃 렌더링
+            const diffWrapper = document.getElementById('diff-wrapper');
+            const diffBox = document.getElementById('back-diff');
+            if (card.differentiation && card.differentiation.trim() !== '') {
+                diffWrapper.style.display = 'flex';
+                diffBox.innerText = card.differentiation;
+            } else {
+                diffWrapper.style.display = 'none';
+                diffBox.innerText = '';
+            }
 
             const backScroll = document.getElementById('back-scroll-body');
             if (backScroll) backScroll.scrollTop = 0;
