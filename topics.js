@@ -1,6 +1,6 @@
 /**
  * 기술사 암기장 - 전 도메인 토픽 데이터 (1교시형 3단락 완제형 CAOS 전면 보강)
- * 총 155개 토픽 (CAOS 57개)
+ * 총 161개 토픽 (CAOS 57개, AI 9개)
  */
 
 const topics = [
@@ -6261,7 +6261,311 @@ const topics = [
       }
     ],
     "differentiation": "[유형 C] 에이전틱 AI(Agentic AI) 확산과 AI 거버넌스(TRiSM) 및 하이브리드 인프라 전략\n① 자율적 에이전트: 단순 질의응답을 넘어 목표를 스스로 계획·추론하고 API 도구를 사용해 복합 업무를 완수하는 에이전틱 AI가 핵심 트렌드 선도.\n② 신뢰 및 리스크 거버넌스 (AI TRiSM): 자율 에이전트의 환각, 탈옥, 편향을 통제하기 위해 신뢰성, 위험, 보안 모델을 인프라 전 계층에 내재화.\n③ 차세대 컴퓨팅: AI 전력 소모 폭증을 감당하기 위해 뉴로모픽, PQC, 에너지 효율적 클라우드 인프라로의 체질 개선 필수."
-  }
+  },
+  {
+      "domain": "AI",
+      "topic": "전문가 혼합 (MoE, Mixture of Experts)",
+      "mnemonic": "게·전·희 (Gating·Expert·Sparse)",
+      "definition": "연산 효율 위해 게이팅 전문가만 선택 활성화하는 모델",
+      "keywords": [
+        "Sparse Activation (희소 활성화)",
+        "Gating Network (Router)",
+        "Expert (FFN 서브네트워크)",
+        "Top-K 라우팅",
+        "Load Balancing Loss",
+        "활성 파라미터 ≪ 총 파라미터",
+        "Dense 모델 대비 추론 효율"
+      ],
+      "diagram": "[입력 토큰] → [Self-Attention] → [Gating Network(Router)] ─ Top-K 선택 ─┬→ [Expert 1] ─┐\n                                                                      ├→ [Expert 2] ─┼→ [가중합 결합] → [출력]\n                                    (선택되지 않은 Expert 3…N은 연산 생략) ┴→ [Expert N] ─┘",
+      "tableRows": [
+        {
+          "major": "핵심 개념",
+          "minor": "희소 활성(Sparse) 구조",
+          "desc": "입력 토큰마다 전체 전문가 중 일부(Top-K)만 활성화하여 모델 용량(파라미터)은 키우고 실제 연산량은 억제하는 구조"
+        },
+        {
+          "major": "구성요소",
+          "minor": "게이팅 네트워크 (Router)",
+          "desc": "토큰별로 적합한 전문가를 선택하고 선택 가중치(Softmax 확률)를 산출"
+        },
+        {
+          "major": "구성요소",
+          "minor": "전문가 (Expert)",
+          "desc": "트랜스포머의 FFN 층을 N개로 복제한 독립 서브네트워크로, 선택된 전문가만 순전파 수행"
+        },
+        {
+          "major": "구성요소",
+          "minor": "결합기 (Combiner)",
+          "desc": "선택된 전문가 출력을 게이팅 가중치로 가중합하여 다음 층으로 전달"
+        },
+        {
+          "major": "학습·운영",
+          "minor": "로드 밸런싱 손실",
+          "desc": "특정 전문가로 토큰이 쏠리는 현상 방지를 위한 보조 손실(Auxiliary Loss) 및 용량 한도(Capacity Factor) 적용"
+        },
+        {
+          "major": "핵심 원리",
+          "minor": "활성 파라미터 효율",
+          "desc": "총 파라미터 대비 활성 파라미터가 작아 추론 FLOPs 절감, 단 전체 전문가를 메모리에 적재해야 하는 부담은 잔존"
+        }
+      ],
+      "differentiation": "[비교] Dense Transformer vs MoE 비교\n구분 | Dense Transformer | MoE\n활성 파라미터 | 전체 100% 활성 | Top-K 전문가만 활성 (일부)\n연산량(FLOPs) | 파라미터에 비례 증가 | 총 파라미터 대비 낮음\n메모리 요구 | 모델 크기만큼 | 전체 전문가 적재 필요 (높음)\n학습 난이도 | 상대적 안정 | 라우팅 쏠림·불안정 (로드 밸런싱 필요)\n확장성 | 연산량 비례 확장 | 용량 대비 비용 효율적 확장\n[기술사적 제언] MoE는 연산 효율은 높으나 메모리·통신(All-to-All) 병목이 있으므로 전문가 병렬화와 라우팅 안정화(로드 밸런싱) 설계를 함께 고려해야 함"
+    },
+    {
+      "domain": "AI",
+      "topic": "임베딩 (Embedding)",
+      "mnemonic": "TTO WFB",
+      "definition": "단어 유사도 파악 위해 벡터로 매핑하는 표현 기법",
+      "keywords": [
+        "단어의 벡터화",
+        "TDM (Term-Document Matrix)",
+        "TF-IDF",
+        "One-hot Encoding",
+        "Word2Vec (CBOW·Skip-gram)",
+        "FastText (n-gram)",
+        "ELMo·BERT (문맥 기반)"
+      ],
+      "diagram": "ai_embedding.png",
+      "tableRows": [
+        {
+          "major": "핵심 개념",
+          "minor": "정의",
+          "desc": "단어 간 유사도·중요도 파악을 위해 단어를 고차원 벡터 공간에 매핑하여 배치하는 기술"
+        },
+        {
+          "major": "통계 기반",
+          "minor": "TDM (BoW)",
+          "desc": "단어 등장 빈도로 단어 사전(주머니)을 만들고 빈도를 행렬로 표현"
+        },
+        {
+          "major": "통계 기반",
+          "minor": "TF-IDF",
+          "desc": "TF(문서 내 빈도)와 IDF(문서 빈도 DF의 역수)로 단어 중요도 산출, DF가 높으면 흔한 단어로 판단"
+        },
+        {
+          "major": "통계 기반",
+          "minor": "One-hot Encoding",
+          "desc": "해당 컬럼만 1, 나머지는 0으로 표시 (희소·고차원, 유사도 표현 불가)"
+        },
+        {
+          "major": "신경망 기반",
+          "minor": "Word2Vec",
+          "desc": "CBOW: 주변 단어로 해당 위치 단어 추론 / Skip-gram: 입력 단어로 주변 단어 추론"
+        },
+        {
+          "major": "신경망 기반",
+          "minor": "FastText",
+          "desc": "단어를 n-gram(부분 단어)으로 분해하여 처리, 미등록어(OOV) 대응"
+        },
+        {
+          "major": "문맥 기반",
+          "minor": "ELMo·BERT",
+          "desc": "ELMo: 사전 훈련된 양방향 언어모델 / BERT: 트랜스포머 인코더 적용 문맥 임베딩"
+        }
+      ],
+      "differentiation": "[비교] 통계 기반 vs 인공신경망 기반 임베딩\n구분 | 통계 기반 (TDM·TF-IDF·One-hot) | 신경망 기반 (Word2Vec·FastText·BERT)\n표현 방식 | 희소(Sparse) 고차원 벡터 | 밀집(Dense) 저차원 벡터\n의미 반영 | 빈도 중심, 의미 유사도 반영 한계 | 주변 문맥 학습으로 의미 유사도 반영\n다의어 처리 | 불가 | BERT·ELMo는 문맥별 벡터로 가능\n비용 | 구현 단순·연산 저렴 | 사전 학습 필요 (데이터·연산 비용)\n[기술사적 제언] RAG·벡터 DB 환경에서는 문맥 임베딩 품질이 검색 정확도를 좌우하므로 도메인 특화 임베딩 모델과 차원·유사도(Cosine) 지표 선정이 중요"
+    },
+    {
+      "domain": "AI",
+      "topic": "멀티모달 인공지능 (Multimodal AI)",
+      "mnemonic": "지청시추",
+      "definition": "다양한 데이터 통합 이해 위해 융합 모듈 사용하는 모델",
+      "keywords": [
+        "이질적 데이터 통합 처리",
+        "맥락적 이해",
+        "입력·융합·출력 모듈",
+        "지식/언어 (NLP·NLU·NLG)",
+        "청각/음성 (STT)",
+        "시각/이미지 (CNN·YOLO·ViT)",
+        "표현성·변환성·정렬성"
+      ],
+      "diagram": "ai_multimodal.png",
+      "tableRows": [
+        {
+          "major": "핵심 개념",
+          "minor": "정의",
+          "desc": "텍스트·이미지·음성·영상 등 서로 다른 형태(모달리티)의 데이터를 함께 처리·이해하는 인공지능 기술"
+        },
+        {
+          "major": "구조",
+          "minor": "입력·융합·출력 모듈",
+          "desc": "입력 모듈(모달별 인코딩) → 융합 모듈(특징 통합) → 출력 모듈(추론·생성)로 구성"
+        },
+        {
+          "major": "지식/언어",
+          "minor": "NLP·NLU·NLG",
+          "desc": "워드임베딩, 어텐션, 트랜스포머 기반 언어 이해·생성"
+        },
+        {
+          "major": "청각/음성",
+          "minor": "STT·신호처리",
+          "desc": "음성을 텍스트로 변환(STT)하고 Signal Processing으로 음향 특징 추출"
+        },
+        {
+          "major": "시각/이미지",
+          "minor": "CNN·YOLO·ViT",
+          "desc": "CNN 특징 추출, YOLO 객체 탐지, Image Scaling 전처리, ViT 트랜스포머 기반 비전 처리"
+        },
+        {
+          "major": "추론/학습",
+          "minor": "회귀·시계열·클러스터링",
+          "desc": "회귀분석, 시계열분석, 클러스터링, 연관분석 등 전통 분석 기법 결합"
+        },
+        {
+          "major": "데이터 품질",
+          "minor": "표현성·변환성·정렬성",
+          "desc": "표현성(모달별 개체 식별·라벨 참값 부합), 변환(일치)성, 정렬(관계)성 확보"
+        }
+      ],
+      "differentiation": "[비교] 유니모달 AI vs 멀티모달 AI\n구분 | 유니모달 AI | 멀티모달 AI\n입력 데이터 | 단일 모달 (텍스트 또는 이미지) | 복수 모달 동시 입력\n이해 수준 | 단일 정보 내 패턴 인식 | 모달 간 교차 맥락 이해\n핵심 기술 | 단일 인코더 | 융합(Fusion) 모듈·정렬(Alignment)\n데이터 요구 | 모달별 라벨링 | 모달 간 정렬·동기화 품질 필요\n[기술사적 제언] 모달 간 시간·의미 정렬 불량이 성능 저하의 주원인이므로 멀티모달 학습 데이터의 표현성·변환성·정렬성 품질검증 체계를 선행 구축해야 함"
+    },
+    {
+      "domain": "AI",
+      "topic": "변분 오토인코더 (VAE, Variational AutoEncoder)",
+      "mnemonic": "인잠디",
+      "definition": "새 데이터 생성 위해 평균·표준편차를 학습하는 모델",
+      "keywords": [
+        "인코더·잠재공간·디코더",
+        "평균·표준편차 (가우시안 분포)",
+        "Sample Latent Vector",
+        "재매개변수화 (Reparameterization)",
+        "사후확률 최대화",
+        "MSE 재구성 손실",
+        "ADAM 경사하강법"
+      ],
+      "diagram": "ai_vae.png",
+      "tableRows": [
+        {
+          "major": "핵심 개념",
+          "minor": "정의",
+          "desc": "입력을 평균과 표준편차로 이루어진 확률분포로 인코딩하고, 샘플링한 잠재 벡터를 디코딩하여 입력과 유사한 새로운 데이터를 생성하는 생성 모델"
+        },
+        {
+          "major": "인코더",
+          "minor": "속성 추출·차원 축소",
+          "desc": "입력 데이터를 축소하여 평균(μ)과 표준편차(σ) 추출"
+        },
+        {
+          "major": "잠재공간",
+          "minor": "평균/표준편차",
+          "desc": "입력의 가우시안 확률분포 파라미터 보유 (연속적·정규화된 공간)"
+        },
+        {
+          "major": "잠재공간",
+          "minor": "Sample Latent Vector",
+          "desc": "평균·표준편차와 가우시안 노이즈로 샘플링하여 사후확률 추론"
+        },
+        {
+          "major": "디코더",
+          "minor": "손실 재구성·신규 생성",
+          "desc": "잠재 벡터로부터 입력 특징을 가진 새로운 데이터를 생성"
+        },
+        {
+          "major": "학습 방법",
+          "minor": "MSE·ADAM",
+          "desc": "MSE: 입력과 출력 오차 측정 손실 함수 / ADAM: RMSProp과 Momentum을 혼합한 경사하강법 알고리즘"
+        }
+      ],
+      "differentiation": "[비교] AE(AutoEncoder) vs VAE 비교\n구분 | AE | VAE\n잠재 표현 | 고정된 점(Point) 벡터 | 확률분포 (평균·표준편차)\n목적 | 차원 축소·입력 복원 | 새로운 데이터 생성\n잠재공간 | 불연속·해석 어려움 | 연속적·정규분포 근사\n손실 함수 | 재구성 오차 | 재구성 오차 + KL Divergence\n두음 | 인·잠·디 | 인·잠(평균·표준편차)·디\n[기술사적 제언] VAE는 학습이 안정적이나 결과물이 흐릿한 한계가 있어, 고품질 생성이 필요하면 GAN·확산 모델과의 하이브리드 구성을 검토"
+    },
+    {
+      "domain": "AI",
+      "topic": "전이학습 (Transfer Learning)",
+      "mnemonic": "특·미 (특징추출·미세조정)",
+      "definition": "학습 효율 위해 사전학습 모델 지식을 재사용하는 기법",
+      "keywords": [
+        "사전학습 모델 (Pre-trained Model)",
+        "지식 재사용 (가중치·특징 표현)",
+        "Feature Extraction (Freeze)",
+        "Fine-tuning (미세 조정)",
+        "데이터 부족 해결",
+        "과적합 방지",
+        "학습 비용 절감"
+      ],
+      "diagram": "[Source 도메인 대규모 데이터] ── 사전 학습 ──→ [Pre-trained Model]\n                                                    │ 가중치·특징 표현 전이\n                         ┌──────────────────────────┴────────────────────────┐\n              ① Feature Extraction                              ② Fine-tuning\n        (기존 층 Freeze, 마지막 층만 학습)             (일부/전체 층을 재학습)\n                         └──────────────→ [Target 도메인 소량 데이터] ←──────┘",
+      "tableRows": [
+        {
+          "major": "핵심 개념",
+          "minor": "정의",
+          "desc": "하나의 문제에서 학습한 모델의 지식(가중치, 특징 표현)을 다른 관련 문제에 재사용하여 학습 효율과 성능을 향상시키는 기법"
+        },
+        {
+          "major": "필요성",
+          "minor": "데이터 부족·학습 비용",
+          "desc": "신규 도메인은 데이터가 적고 딥러닝 학습 비용이 큼"
+        },
+        {
+          "major": "필요성",
+          "minor": "과적합·초기 학습",
+          "desc": "소량 데이터에서 Overfitting 발생, 랜덤 초기화는 비효율적"
+        },
+        {
+          "major": "방식",
+          "minor": "Feature Extraction",
+          "desc": "사전학습 모델은 고정(Freeze)하고 마지막 레이어만 새로 학습"
+        },
+        {
+          "major": "방식",
+          "minor": "Fine-tuning",
+          "desc": "사전학습 모델의 일부 또는 전체를 재학습하여 기존 지식과 새로운 데이터를 함께 반영"
+        },
+        {
+          "major": "효과",
+          "minor": "성능·효율 개선",
+          "desc": "적은 데이터로도 높은 성능 확보, 학습 시간·자원 절감"
+        }
+      ],
+      "differentiation": "[비교] Feature Extraction vs Fine-tuning vs 처음부터 학습\n구분 | Feature Extraction | Fine-tuning | From Scratch\n사전학습 층 | 고정 (Freeze) | 일부/전체 재학습 | 없음 (랜덤 초기화)\n학습 파라미터 | 마지막 층만 | 많음 | 전체\n필요 데이터 | 소량 | 중간 | 대량\n적합 상황 | Source·Target 유사 | Target 특수·데이터 충분 | 유사 사전모델 부재\n[기술사적 제언] Source와 Target 도메인 차이가 크면 부정적 전이(Negative Transfer)가 발생하므로 도메인 유사도 사전 검증 후 방식 선택"
+    },
+    {
+      "domain": "AI",
+      "topic": "프롬프트 엔지니어링 (Prompt Engineering)",
+      "mnemonic": "단·분 (CoT 단계 / ToT 분기)",
+      "definition": "응답 품질 위해 CoT·ToT 프롬프트 설계하는 기법",
+      "keywords": [
+        "AI 인터페이스 설계",
+        "CoT (Chain of Thought)",
+        "ToT (Tree of Thought)",
+        "단계별 추론",
+        "Zero-shot·Few-shot",
+        "역할·출력형식 지정",
+        "프롬프트 인젝션 대응"
+      ],
+      "diagram": "[CoT] 문제 → 추론1 → 추론2 → 추론3 → 최종 답   (단일 경로, 단계 연결)\n\n[ToT]              ┌→ 사고 A1 → 사고 A2 ┐\n        문제 ─────┼→ 사고 B1 ✕(가지치기) ├→ 평가·선택 → 최종 답\n                   └→ 사고 C1 → 사고 C2 ┘   (다중 경로 탐색)",
+      "tableRows": [
+        {
+          "major": "핵심 개념",
+          "minor": "정의",
+          "desc": "사용자를 위한 AI 인터페이스 개발 분야로, 높은 수준의 결과물을 얻기 위해 적절한 프롬프트를 구상하는 작업·엔지니어링 기법"
+        },
+        {
+          "major": "주요 기법",
+          "minor": "CoT (Chain of Thought)",
+          "desc": "복잡한 문제를 단계별로 추론하고 각 단계를 연결하여 최종 결과 도출"
+        },
+        {
+          "major": "주요 기법",
+          "minor": "ToT (Tree of Thought)",
+          "desc": "다양한 사고 경로를 나무 형태로 분기하여 여러 가능성을 탐색하고 최적 경로 선택"
+        },
+        {
+          "major": "기본 기법",
+          "minor": "Zero-shot·Few-shot",
+          "desc": "예시 없이 지시만 제공(Zero-shot) 또는 소수 예시를 함께 제공(Few-shot)하여 출력 유도"
+        },
+        {
+          "major": "구성 요소",
+          "minor": "역할·맥락·출력형식",
+          "desc": "역할(Role) 부여, 배경 맥락 제공, 출력 형식·제약 조건 명시로 응답 일관성 확보"
+        },
+        {
+          "major": "리스크",
+          "minor": "프롬프트 인젝션",
+          "desc": "악의적 지시로 시스템 프롬프트를 우회하는 공격에 대비한 입력 검증·권한 분리 필요"
+        }
+      ],
+      "differentiation": "[비교] CoT vs ToT 비교\n구분 | CoT | ToT\n추론 구조 | 선형(단일 경로) | 트리(다중 경로 분기)\n탐색 방식 | 순차 추론 | 분기·평가·가지치기(백트래킹)\n비용 | 상대적 낮음 | 다수 호출로 높음\n적합 문제 | 수리·논리 단계 추론 | 계획·탐색이 필요한 복합 문제\n[기술사적 제언] 프롬프트만으로는 환각·최신성 한계가 있으므로 RAG·파인튜닝과 병행하고, 프롬프트 템플릿의 버전 관리와 평가 체계(Prompt Ops)를 구축"
+    }
 ];
 
 if (typeof module !== 'undefined' && module.exports) {
