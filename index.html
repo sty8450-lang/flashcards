@@ -978,19 +978,39 @@
         /* ==========================================
          * ⚡ 초고속 실시간 스트리밍(SSE) 공통 호출기
          * ========================================== */
-        async function streamGeminiSSE({ apiKey, systemPrompt, contents, generationConfig, onChunk, signal }) {
-            const safeGenerationConfig = {
-                temperature: generationConfig?.temperature ?? 0.3,
-                maxOutputTokens: generationConfig?.maxOutputTokens ?? 1000
+        const marked = window.marked || { parse: (md) => renderMarkdown(md) };
+
+        async function streamGeminiSSE({ apiKey, systemPrompt, contents, generationConfig, resultContainer, onChunk, signal }) {
+            const temp = generationConfig?.temperature ?? 0.2;
+            const maxTokens = generationConfig?.maxOutputTokens ?? 2500;
+
+            const configWithNoThinking = {
+                temperature: temp,
+                maxOutputTokens: maxTokens,
+                thinkingConfig: {
+                    thinkingBudget: 0
+                }
             };
 
-            const models = ['gemini-3.8-flash', 'gemini-2.5-flash'];
+            const fallbackBasicConfig = {
+                temperature: temp,
+                maxOutputTokens: maxTokens
+            };
+
+            const attempts = [
+                { model: 'gemini-2.5-flash', config: configWithNoThinking },
+                { model: 'gemini-2.5-flash', config: fallbackBasicConfig },
+                { model: 'gemini-2.0-flash', config: fallbackBasicConfig },
+                { model: 'gemini-3.8-flash', config: configWithNoThinking },
+                { model: 'gemini-3.8-flash', config: fallbackBasicConfig }
+            ];
+
             let response = null;
             let lastError = null;
 
-            for (let i = 0; i < models.length; i++) {
-                const modelName = models[i];
-                const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:streamGenerateContent?key=${encodeURIComponent(apiKey)}&alt=sse`;
+            for (let i = 0; i < attempts.length; i++) {
+                const { model, config } = attempts[i];
+                const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:streamGenerateContent?key=${encodeURIComponent(apiKey)}&alt=sse`;
 
                 response = await fetch(url, {
                     method: 'POST',
@@ -999,7 +1019,7 @@
                     body: JSON.stringify({
                         system_instruction: { parts: [{ text: systemPrompt }] },
                         contents,
-                        generationConfig: safeGenerationConfig
+                        generationConfig: config
                     })
                 });
 
@@ -1022,7 +1042,8 @@
                         errMsg = `[HTTP ${response.status}] ${rawErrorText.trim() || response.statusText || '요청 실패'}`;
                     }
                     lastError = new Error(errMsg);
-                    if (response.status === 404 && i < models.length - 1) {
+                    // thinkingConfig 400 에러 또는 모델명 404 에러 시 다음 폴백 설정으로 즉시 재시도
+                    if ((response.status === 400 || response.status === 404) && i < attempts.length - 1) {
                         continue;
                     }
                     throw lastError;
@@ -1042,7 +1063,7 @@
             const reader = response.body.getReader();
             const decoder = new TextDecoder('utf-8');
             let buffer = '';
-            let fullText = '';
+            let fullResponseText = '';
             let isStreamDone = false;
 
             const handleSseLine = (rawLine) => {
@@ -1060,7 +1081,6 @@
                 try {
                     parsed = JSON.parse(dataStr);
                 } catch (jsonErr) {
-                    // 분할 청크 또는 비정형 라인 파싱 실패 시 크래시 없이 무시
                     return;
                 }
 
@@ -1070,12 +1090,20 @@
 
                 const parts = parsed?.candidates?.[0]?.content?.parts;
                 if (Array.isArray(parts)) {
+                    let newChunkText = '';
                     for (const p of parts) {
+                        if (p?.thought === true) continue;
                         if (typeof p?.text === 'string' && p.text.length > 0) {
-                            fullText += p.text;
-                            if (typeof onChunk === 'function') {
-                                onChunk(fullText, p.text);
-                            }
+                            newChunkText += p.text;
+                        }
+                    }
+                    if (newChunkText.length > 0) {
+                        fullResponseText += newChunkText;
+                        if (resultContainer) {
+                            resultContainer.innerHTML = marked.parse(fullResponseText);
+                        }
+                        if (typeof onChunk === 'function') {
+                            onChunk(fullResponseText, newChunkText);
                         }
                     }
                 }
@@ -1117,7 +1145,7 @@
                 } catch (e) {}
             }
 
-            return fullText;
+            return fullResponseText;
         }
 
         async function gradeTestAnswer() {
@@ -1138,14 +1166,14 @@
             const systemPrompt = buildExaminerSystemPrompt(card);
 
             const gradingBox = document.getElementById('test-grading-box');
-            const gradingContent = document.getElementById('test-grading-content');
+            const resultContainer = document.getElementById('test-grading-content');
             const gradingStatus = document.getElementById('test-grading-status');
             const gradingElapsed = document.getElementById('test-grading-elapsed');
             const gradeBtn = document.getElementById('test-grade-btn');
 
             gradingBox.classList.add('is-visible');
             gradingStatus.innerHTML = '<span class="streaming-dot"></span>실전 채점위원 실시간 스트리밍 첨삭 중...';
-            gradingContent.innerHTML = '<span id="grading-stream-loading" style="color:#94a3b8;">⚡ 채점 스트림 연결 중...</span>';
+            resultContainer.innerHTML = '<span id="grading-stream-loading" style="color:#94a3b8;">⚡ 채점 스트림 연결 중...</span>';
             gradingElapsed.innerText = '';
 
             isTestGrading = true;
@@ -1158,6 +1186,7 @@
             activeStreamAbortController = new AbortController();
             const startTime = performance.now();
             let firstTokenTime = null;
+            let fullResponseText = '';
 
             try {
                 const finalText = await streamGeminiSSE({
@@ -1170,36 +1199,45 @@
                         }
                     ],
                     generationConfig: {
-                        temperature: 0.3,
-                        maxOutputTokens: 1000
+                        temperature: 0.2,
+                        maxOutputTokens: 2500,
+                        thinkingConfig: {
+                            thinkingBudget: 0
+                        }
                     },
+                    resultContainer,
                     signal: activeStreamAbortController.signal,
-                    onChunk: (accumulated) => {
+                    onChunk: (accumulatedText, newChunkText) => {
                         if (firstTokenTime === null) {
                             firstTokenTime = ((performance.now() - startTime) / 1000).toFixed(2);
                             gradingElapsed.innerText = `첫 응답 ${firstTokenTime}초`;
                         }
-                        gradingContent.innerHTML = renderMarkdown(accumulated);
+                        fullResponseText = accumulatedText;
+                        resultContainer.innerHTML = marked.parse(fullResponseText);
                     }
                 });
 
+                if (finalText && finalText.length > fullResponseText.length) {
+                    fullResponseText = finalText;
+                }
+
                 const totalSec = ((performance.now() - startTime) / 1000).toFixed(2);
-                if (finalText && finalText.trim()) {
+                if (fullResponseText && fullResponseText.trim()) {
                     gradingStatus.innerHTML = '✅ 실전 채점 완료';
                     gradingElapsed.innerText = firstTokenTime ? `첫 글자 ${firstTokenTime}s · 완료 ${totalSec}s` : `완료 ${totalSec}s`;
-                    gradingContent.innerHTML = renderMarkdown(finalText);
+                    resultContainer.innerHTML = marked.parse(fullResponseText);
                 } else {
                     gradingStatus.innerHTML = '<span style="color:#ef4444;">⚠️ 빈 응답 수신</span>';
-                    gradingContent.innerHTML = '<div style="color:#ef4444; font-weight:600;">응답이 비어 있습니다. 다시 시도해 주세요.</div>';
+                    resultContainer.innerHTML = '<div style="color:#ef4444; font-weight:600;">응답이 비어 있습니다. 다시 시도해 주세요.</div>';
                 }
             } catch (err) {
                 if (err.name === 'AbortError') {
                     gradingStatus.innerHTML = '⏹️ 채점 중단됨';
-                    gradingContent.innerHTML = '<span style="color:#94a3b8;">채점 스트림이 취소되었습니다.</span>';
+                    resultContainer.innerHTML = '<span style="color:#94a3b8;">채점 스트림이 취소되었습니다.</span>';
                     return;
                 }
                 gradingStatus.innerHTML = '<span style="color:#ef4444;">❌ 채점 호출 오류</span>';
-                gradingContent.innerHTML = `<div style="color:#ef4444; background:rgba(239, 68, 68, 0.12); border:1px solid rgba(239, 68, 68, 0.45); padding:10px 12px; border-radius:8px; font-weight:700; line-height:1.5; word-break:break-word;">❌ 오류: ${escapeHtml(err.message || String(err))}</div><div style="margin-top:6px; font-size:0.78rem; color:#fca5a5;">우측 상단 ⚙️ 버튼을 눌러 Gemini API 키 및 요청 상태를 확인해 주세요.</div>`;
+                resultContainer.innerHTML = `<div style="color:#ef4444; background:rgba(239, 68, 68, 0.12); border:1px solid rgba(239, 68, 68, 0.45); padding:10px 12px; border-radius:8px; font-weight:700; line-height:1.5; word-break:break-word;">❌ 오류: ${escapeHtml(err.message || String(err))}</div><div style="margin-top:6px; font-size:0.78rem; color:#fca5a5;">우측 상단 ⚙️ 버튼을 눌러 Gemini API 키 및 요청 상태를 확인해 주세요.</div>`;
             } finally {
                 isTestGrading = false;
                 if (gradeBtn) {
@@ -1210,8 +1248,8 @@
                 if (loadingSpan) {
                     loadingSpan.remove();
                 }
-                if (gradingContent && gradingContent.innerText.includes('채점 스트림 연결 중')) {
-                    gradingContent.innerHTML = '<div style="color:#ef4444; font-weight:600;">⚠️ 채점 스트림 연결이 종료되었습니다. 다시 시도해 주세요.</div>';
+                if (resultContainer && resultContainer.innerText.includes('채점 스트림 연결 중')) {
+                    resultContainer.innerHTML = '<div style="color:#ef4444; font-weight:600;">⚠️ 채점 스트림 연결이 종료되었습니다. 다시 시도해 주세요.</div>';
                 }
                 if (gradingStatus && gradingStatus.innerText.includes('스트리밍 첨삭 중')) {
                     gradingStatus.innerHTML = '⏹️ 채점 대기';
@@ -1597,9 +1635,13 @@
                     systemPrompt,
                     contents: tutorChatHistory,
                     generationConfig: {
-                        temperature: 0.3,
-                        maxOutputTokens: 1000
+                        temperature: 0.2,
+                        maxOutputTokens: 2500,
+                        thinkingConfig: {
+                            thinkingBudget: 0
+                        }
                     },
+                    resultContainer: loadingBubble,
                     onChunk: (accumulated) => {
                         loadingBubble.innerHTML = renderMarkdown(accumulated);
                         logEl.scrollTop = logEl.scrollHeight;
