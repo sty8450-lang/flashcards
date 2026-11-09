@@ -699,7 +699,7 @@
         }
 
         /* ==========================================
-         * 🤖 AI 튜터 (Gemini 2.5 Flash) 모달 & API 로직
+         * 🤖 AI 튜터 (Gemini 3.8 Flash) 모달 & API 로직
          * ========================================== */
         function getSavedApiKey() {
             try {
@@ -975,7 +975,7 @@
             const loadingBubble = appendChatBubble('assistant', '⏳ 수석 코치가 실전 채점 기준으로 분석 중입니다...', false);
 
             try {
-                const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${encodeURIComponent(apiKey)}`;
+                const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${encodeURIComponent(apiKey)}`;
                 const response = await fetch(endpoint, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
