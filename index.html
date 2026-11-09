@@ -126,34 +126,79 @@
         /* ==========================================
          * 📝 실전 백지 테스트 세션 화면 (#test-view)
          * ========================================== */
-        #test-view { display: none; flex-direction: column; flex: 1; min-height: 0; gap: 12px; padding-bottom: 20px; }
+        #test-view { display: none; flex-direction: column; flex: 1; min-height: 0; gap: 10px; padding-bottom: 20px; }
         .test-header { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: nowrap; width: 100%; }
         .test-domain-badge { background: rgba(192, 132, 252, 0.18); border: 1px solid rgba(192, 132, 252, 0.55); color: #e9d5ff; padding: 5px 14px; border-radius: 999px; font-size: 0.84rem; font-weight: 800; white-space: nowrap; box-shadow: 0 0 12px rgba(168, 85, 247, 0.25); }
         .test-header-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
 
-        .test-prompt-card { background: linear-gradient(145deg, #1e1b4b 0%, #1e293b 100%); border: 1px solid rgba(192, 132, 252, 0.5); border-radius: 16px; padding: 22px 18px; text-align: center; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35), 0 0 18px rgba(168, 85, 247, 0.14); display: flex; flex-direction: column; align-items: center; gap: 12px; }
-        .test-prompt-sub { font-size: 0.78rem; font-weight: 700; color: #fcd34d; letter-spacing: 0.04em; text-transform: uppercase; }
-        .test-prompt-title { font-size: clamp(1.55rem, 5.2vw, 2.25rem); font-weight: 900; color: #ffffff; line-height: 1.32; word-break: keep-all; }
+        /* 상단 네비게이션 서브 헤더 (작성 현황 뱃지 + 푼 답안 복사 + 일괄 채점하기) */
+        .test-batch-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 6px; background: rgba(15, 23, 42, 0.92); border: 1px solid rgba(192, 132, 252, 0.35); border-radius: 12px; padding: 8px 10px; flex-wrap: wrap; }
+        .test-written-badge { font-size: 0.8rem; font-weight: 800; color: #e9d5ff; background: rgba(168, 85, 247, 0.18); border: 1px solid rgba(192, 132, 252, 0.45); padding: 5px 10px; border-radius: 999px; white-space: nowrap; }
+        .test-written-badge.has-items { color: #fde68a; border-color: rgba(251, 191, 36, 0.65); background: rgba(245, 158, 11, 0.18); }
+        .test-toolbar-actions { display: flex; align-items: center; gap: 6px; flex-wrap: nowrap; margin-left: auto; }
+        .test-copy-btn { background: rgba(30, 41, 59, 0.95); border: 1px solid rgba(56, 189, 248, 0.45); color: #bae6fd; padding: 7px 11px; border-radius: 9px; font-size: 0.78rem; font-weight: 800; cursor: pointer; white-space: nowrap; transition: all 0.15s; }
+        .test-copy-btn:hover { background: rgba(56, 189, 248, 0.2); border-color: #38bdf8; color: #fff; }
+        .test-copy-btn:active { transform: scale(0.97); }
+        .test-batch-grade-btn { background: rgba(51, 65, 85, 0.65); border: 1px solid rgba(148, 163, 184, 0.35); color: #94a3b8; padding: 7px 12px; border-radius: 9px; font-size: 0.8rem; font-weight: 800; cursor: pointer; white-space: nowrap; transition: all 0.18s; }
+        .test-batch-grade-btn.is-active { background: var(--test-gradient); border: 1px solid rgba(251, 191, 36, 0.7); color: #ffffff; box-shadow: 0 0 14px rgba(168, 85, 247, 0.45); }
+        .test-batch-grade-btn.is-active:hover { filter: brightness(1.08); transform: translateY(-1px); }
+        .test-batch-grade-btn:active { transform: scale(0.97); }
 
-        .test-textarea-wrapper { display: flex; flex-direction: column; gap: 6px; }
-        .test-textarea { width: 100%; min-height: 155px; background: #0b1120; border: 1.5px solid rgba(192, 132, 252, 0.45); border-radius: 14px; padding: 14px; color: #f8fafc; font-size: 0.92rem; line-height: 1.55; resize: vertical; outline: none; transition: border-color 0.2s, box-shadow 0.2s; }
+        .test-prompt-card { background: linear-gradient(145deg, #1e1b4b 0%, #1e293b 100%); border: 1px solid rgba(192, 132, 252, 0.5); border-radius: 16px; padding: 20px 18px; text-align: center; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35), 0 0 18px rgba(168, 85, 247, 0.14); display: flex; flex-direction: column; align-items: center; gap: 10px; }
+        .test-prompt-sub { font-size: 0.78rem; font-weight: 700; color: #fcd34d; letter-spacing: 0.04em; text-transform: uppercase; }
+        .test-prompt-title { font-size: clamp(1.5rem, 5vw, 2.2rem); font-weight: 900; color: #ffffff; line-height: 1.32; word-break: keep-all; }
+
+        .test-textarea-wrapper { display: flex; flex-direction: column; gap: 5px; }
+        .test-autosave-hint { display: flex; justify-content: space-between; align-items: center; font-size: 0.73rem; color: #94a3b8; padding: 0 4px; }
+        .test-textarea { width: 100%; min-height: 160px; background: #0b1120; border: 1.5px solid rgba(192, 132, 252, 0.45); border-radius: 14px; padding: 14px; color: #f8fafc; font-size: 0.92rem; line-height: 1.55; resize: vertical; outline: none; transition: border-color 0.2s, box-shadow 0.2s; }
         .test-textarea:focus { border-color: #f59e0b; box-shadow: 0 0 14px rgba(245, 158, 11, 0.25); }
         .test-textarea::placeholder { color: #64748b; }
 
-        .test-action-row { display: grid; grid-template-columns: 1.35fr 1fr; gap: 8px; }
-        .test-grade-btn { background: var(--test-gradient); border: none; color: #ffffff; padding: 13px 12px; border-radius: 12px; font-size: 0.92rem; font-weight: 800; cursor: pointer; box-shadow: 0 4px 15px rgba(168, 85, 247, 0.35); transition: all 0.15s; white-space: nowrap; }
-        .test-grade-btn:hover { filter: brightness(1.08); transform: translateY(-1px); }
-        .test-grade-btn:active { transform: scale(0.98); }
-        .test-grade-btn:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
-        .test-reveal-btn { background: rgba(30, 41, 59, 0.9); border: 1px solid rgba(251, 191, 36, 0.55); color: #fde68a; padding: 13px 10px; border-radius: 12px; font-size: 0.88rem; font-weight: 800; cursor: pointer; transition: all 0.15s; white-space: nowrap; }
+        .test-action-row { display: flex; gap: 8px; }
+        .test-reveal-btn { flex: 1; background: rgba(30, 41, 59, 0.9); border: 1px solid rgba(251, 191, 36, 0.55); color: #fde68a; padding: 12px 10px; border-radius: 12px; font-size: 0.88rem; font-weight: 800; cursor: pointer; transition: all 0.15s; white-space: nowrap; }
         .test-reveal-btn:hover { background: rgba(251, 191, 36, 0.15); }
 
-        /* Streaming Grading Result Area */
-        .test-grading-box { display: none; flex-direction: column; gap: 8px; background: #090d16; border: 1px solid rgba(192, 132, 252, 0.55); border-left: 4px solid #c084fc; border-radius: 14px; padding: 14px 16px; box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4); }
-        .test-grading-box.is-visible { display: flex; }
-        .test-grading-header { display: flex; align-items: center; justify-content: space-between; font-size: 0.8rem; font-weight: 800; color: #e9d5ff; border-bottom: 1px solid rgba(51, 65, 85, 0.7); padding-bottom: 6px; }
-        .streaming-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #4ade80; box-shadow: 0 0 8px #4ade80; animation: pulseDot 1s infinite alternate; margin-right: 5px; }
-        @keyframes pulseDot { from { opacity: 0.3; } to { opacity: 1; } }
+        /* 일괄 채점 종합 성적표 모달 (#batch-grade-modal) */
+        .batch-modal { width: 100%; max-width: 740px; height: min(90dvh, 820px); background: #0f172a; border: 1px solid rgba(192, 132, 252, 0.55); border-radius: 18px; box-shadow: 0 18px 50px rgba(0, 0, 0, 0.75), 0 0 28px rgba(168, 85, 247, 0.22); display: flex; flex-direction: column; overflow: hidden; }
+        .batch-modal-header { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 12px 14px; background: linear-gradient(90deg, rgba(88, 28, 135, 0.65) 0%, rgba(15, 23, 42, 0.96) 100%); border-bottom: 1px solid rgba(192, 132, 252, 0.35); flex-wrap: wrap; }
+        .batch-modal-title { font-size: 0.96rem; font-weight: 900; color: #f3e8ff; display: flex; align-items: center; gap: 6px; white-space: nowrap; }
+        .batch-header-actions { display: flex; align-items: center; gap: 6px; margin-left: auto; }
+        .batch-raw-copy-btn { background: linear-gradient(135deg, #0284c7 0%, #2563eb 100%); border: 1px solid rgba(125, 211, 252, 0.6); color: #ffffff; padding: 7px 11px; border-radius: 9px; font-size: 0.78rem; font-weight: 800; cursor: pointer; white-space: nowrap; box-shadow: 0 2px 10px rgba(2, 132, 199, 0.35); transition: all 0.15s; }
+        .batch-raw-copy-btn:hover { filter: brightness(1.1); }
+        .batch-raw-copy-btn:active { transform: scale(0.97); }
+        .batch-close-btn { background: rgba(30, 41, 59, 0.9); border: 1px solid var(--border-color); color: #e2e8f0; padding: 7px 11px; border-radius: 9px; font-size: 0.78rem; font-weight: 800; cursor: pointer; white-space: nowrap; }
+        .batch-close-btn:hover { border-color: #f87171; color: #fca5a5; }
+
+        .batch-progress-bar-wrap { padding: 10px 14px; background: rgba(15, 23, 42, 0.95); border-bottom: 1px solid rgba(51, 65, 85, 0.75); display: flex; flex-direction: column; gap: 6px; }
+        .batch-progress-text { font-family: monospace; font-size: 0.82rem; font-weight: 800; color: #fde68a; display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+        .batch-progress-track { width: 100%; height: 8px; background: #1e293b; border-radius: 999px; overflow: hidden; border: 1px solid rgba(192, 132, 252, 0.3); }
+        .batch-progress-fill { height: 100%; width: 0%; background: linear-gradient(90deg, #a855f7 0%, #f59e0b 100%); transition: width 0.25s ease; }
+
+        .batch-summary-card { display: none; margin: 12px 14px 0 14px; padding: 12px 16px; background: linear-gradient(135deg, rgba(88, 28, 135, 0.4) 0%, rgba(30, 58, 138, 0.4) 100%); border: 1px solid rgba(251, 191, 36, 0.65); border-radius: 14px; align-items: center; justify-content: space-around; gap: 10px; text-align: center; box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3); }
+        .batch-summary-card.is-visible { display: flex; }
+        .batch-stat-item { display: flex; flex-direction: column; gap: 2px; }
+        .batch-stat-label { font-size: 0.74rem; color: #cbd5e1; font-weight: 700; }
+        .batch-stat-value { font-size: 1.2rem; font-weight: 900; color: #fde047; }
+
+        .batch-results-list { flex: 1; overflow-y: auto; padding: 12px 14px; display: flex; flex-direction: column; gap: 12px; background: #0b1120; }
+        .batch-item-card { background: #111827; border: 1px solid rgba(148, 163, 184, 0.3); border-left: 4px solid #a855f7; border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; }
+        .batch-item-card.is-done { border-left-color: #22c55e; }
+        .batch-item-card.is-error { border-left-color: #ef4444; border-color: rgba(239, 68, 68, 0.45); }
+        .batch-item-header { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 10px 13px; background: rgba(30, 41, 59, 0.75); cursor: pointer; user-select: none; }
+        .batch-item-title { font-size: 0.9rem; font-weight: 800; color: #f8fafc; word-break: keep-all; }
+        .batch-item-status { font-size: 0.78rem; font-weight: 800; color: #e9d5ff; white-space: nowrap; display: flex; align-items: center; gap: 6px; }
+        .batch-retry-btn { background: rgba(239, 68, 68, 0.2); border: 1px solid #ef4444; color: #fecaca; padding: 4px 9px; border-radius: 7px; font-size: 0.75rem; font-weight: 800; cursor: pointer; }
+        .batch-retry-btn:hover { background: #ef4444; color: #fff; }
+        .batch-item-body { padding: 12px 14px; display: flex; flex-direction: column; gap: 10px; border-top: 1px solid rgba(51, 65, 85, 0.6); }
+        .batch-item-body.is-collapsed { display: none; }
+        .batch-user-answer-box { background: rgba(15, 23, 42, 0.9); border: 1px dashed rgba(148, 163, 184, 0.35); border-radius: 8px; padding: 8px 10px; font-size: 0.8rem; color: #cbd5e1; white-space: pre-wrap; line-height: 1.5; }
+        .batch-user-answer-label { font-size: 0.72rem; font-weight: 800; color: #93c5fd; margin-bottom: 3px; }
+
+        .batch-modal-footer { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 10px 14px; background: #0f172a; border-top: 1px solid var(--border-color); }
+        .batch-footer-copy-btn { flex: 1; background: var(--accent-gradient); border: none; color: #ffffff; padding: 11px 12px; border-radius: 10px; font-size: 0.84rem; font-weight: 800; cursor: pointer; white-space: nowrap; }
+        .batch-footer-clear-btn { background: rgba(239, 68, 68, 0.16); border: 1px solid rgba(239, 68, 68, 0.45); color: #fca5a5; padding: 11px 12px; border-radius: 10px; font-size: 0.82rem; font-weight: 800; cursor: pointer; white-space: nowrap; }
+        .batch-footer-clear-btn:hover { background: rgba(239, 68, 68, 0.3); color: #fff; }
+
         .test-grading-content { font-size: 0.86rem; line-height: 1.6; color: #f1f5f9; word-break: keep-all; overflow-wrap: anywhere; }
         .test-grading-content h3, .test-grading-content h4 { color: #fcd34d; margin: 10px 0 4px 0; font-size: 0.94rem; }
         .test-grading-content h3:first-child, .test-grading-content h4:first-child { margin-top: 0; }
@@ -330,7 +375,7 @@
             </div>
         </div>
 
-        <!-- Test View (신규 실전 백지 테스트 모드) -->
+        <!-- Test View (연속 답안 작성 및 일괄 종합 채점 시스템) -->
         <div id="test-view">
             <div class="test-header">
                 <button class="back-btn" onclick="goHome()">← 홈으로</button>
@@ -341,30 +386,33 @@
                 </div>
             </div>
 
+            <!-- 상단 네비게이션 헤더 UI: 작성 현황 뱃지 + [📋 푼 답안 복사] + [🏁 일괄 채점하기 (N개)] -->
+            <div class="test-batch-toolbar">
+                <span class="test-written-badge" id="test-written-badge">✍️ 작성 완료: 0개</span>
+                <div class="test-toolbar-actions">
+                    <button class="test-copy-btn" id="test-copy-answers-btn" onclick="copyAllUserAnswers()">📋 푼 답안 복사</button>
+                    <button class="test-batch-grade-btn" id="test-batch-grade-btn" onclick="openBatchGradeModal()">🏁 일괄 채점하기 (0개)</button>
+                </div>
+            </div>
+
             <!-- 토픽명과 분류만 노출되는 문제 카드 (정의/키워드/표/차별화 완벽 숨김) -->
             <div class="test-prompt-card">
                 <span class="test-prompt-sub" id="test-domain-pill">DOMAIN · 백지 인출 문제</span>
                 <div class="test-prompt-title" id="test-topic-title">토픽 제목</div>
             </div>
 
-            <!-- 수험생 답안 작성 Textarea -->
+            <!-- 수험생 답안 작성 Textarea (토픽별 실시간 자동 저장) -->
             <div class="test-textarea-wrapper">
-                <textarea id="test-answer-input" class="test-textarea" placeholder="1단락 정의 요약, 두음, 개념도 구성요소, 3단락 차별화 포인트를 두서없이 자유롭게 적어보세요."></textarea>
-            </div>
-
-            <!-- 채점 및 정답 확인 액션 버튼 -->
-            <div class="test-action-row">
-                <button class="test-grade-btn" id="test-grade-btn" onclick="gradeTestAnswer()">🎯 AI 실전 채점 및 피드백</button>
-                <button class="test-reveal-btn" id="test-reveal-btn" onclick="toggleTestAnswerSheet()">👁️ 정답 카드 확인</button>
-            </div>
-
-            <!-- 실시간 스트리밍 채점 결과 영역 -->
-            <div class="test-grading-box" id="test-grading-box">
-                <div class="test-grading-header">
-                    <span id="test-grading-status"><span class="streaming-dot"></span>실전 채점위원 실시간 첨삭 결과 (gemini-3.8-flash SSE)</span>
-                    <span id="test-grading-elapsed" style="font-size:0.72rem; color:#94a3b8;"></span>
+                <div class="test-autosave-hint">
+                    <span>💡 입력 즉시 자동 저장 · 문제 이동 시에도 안전하게 보존됩니다</span>
+                    <span id="test-autosave-status" style="color:#4ade80; font-weight:700;"></span>
                 </div>
-                <div class="test-grading-content" id="test-grading-content"></div>
+                <textarea id="test-answer-input" class="test-textarea" oninput="handleTestAnswerInput()" placeholder="1단락 정의 요약, 두음, 개념도 구성요소, 3단락 차별화 포인트를 자유롭게 작성하세요. 작성 후 [다음 문제 →]로 연속 풀이하거나 상단 [🏁 일괄 채점하기]를 누르세요."></textarea>
+            </div>
+
+            <!-- 정답 확인 액션 버튼 (개별 실시간 채점 버튼 제거 - 딜레이 제로) -->
+            <div class="test-action-row">
+                <button class="test-reveal-btn" id="test-reveal-btn" onclick="toggleTestAnswerSheet()">👁️ 정답 카드 확인</button>
             </div>
 
             <!-- 정답 카드 확인 아코디언 영역 -->
@@ -409,6 +457,53 @@
             <div class="controls">
                 <button class="ctrl-btn" onclick="prevTestCard()">← 이전 문제</button>
                 <button class="ctrl-btn primary" style="background: var(--test-gradient); color:#fff;" onclick="nextTestCard()">다음 문제 →</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 일괄 채점 종합 성적표 모달 레이어 (#batch-grade-modal) -->
+    <div class="modal-overlay" id="batch-grade-modal" onclick="handleBatchModalOverlayClick(event)">
+        <div class="batch-modal" onclick="event.stopPropagation()">
+            <!-- 1) 모달 헤더: 타이틀 + 우측 상단 고정 [📋 내가 푼 원본 답안 복사], [✕ 닫기] -->
+            <div class="batch-modal-header">
+                <div class="batch-modal-title">📊 실전 백지 인출 종합 성적표</div>
+                <div class="batch-header-actions">
+                    <button class="batch-raw-copy-btn" onclick="copyAllUserAnswers()">📋 내가 푼 원본 답안 복사</button>
+                    <button class="batch-close-btn" onclick="closeBatchGradeModal()">✕ 닫기</button>
+                </div>
+            </div>
+
+            <!-- 2) 채점 진행률 프로그레스 바 -->
+            <div class="batch-progress-bar-wrap">
+                <div class="batch-progress-text">
+                    <span id="batch-progress-label">채점 준비 중...</span>
+                    <span id="batch-progress-ascii">[          ]</span>
+                </div>
+                <div class="batch-progress-track">
+                    <div class="batch-progress-fill" id="batch-progress-fill"></div>
+                </div>
+            </div>
+
+            <!-- 3) 전체 완료 시 상단 요약 카드: [평균 점수 / 합격권(6.0점 이상) 달성 개수] -->
+            <div class="batch-summary-card" id="batch-summary-card">
+                <div class="batch-stat-item">
+                    <span class="batch-stat-label">📊 평균 점수 (10점 만점)</span>
+                    <span class="batch-stat-value" id="batch-avg-score">0.0점</span>
+                </div>
+                <div style="width:1px; height:32px; background:rgba(148,163,184,0.3);"></div>
+                <div class="batch-stat-item">
+                    <span class="batch-stat-label">🏆 합격권(6.0점 이상) 달성 개수</span>
+                    <span class="batch-stat-value" id="batch-pass-count">0 / 0개</span>
+                </div>
+            </div>
+
+            <!-- 4) 토픽별 채점 결과 카드 리스트 -->
+            <div class="batch-results-list" id="batch-results-list"></div>
+
+            <!-- 5) 모달 하단 액션 버튼: [📋 채점 결과 전체 복사] 및 [🗑️ 작성 답안 초기화] -->
+            <div class="batch-modal-footer">
+                <button class="batch-footer-copy-btn" onclick="copyAllBatchResults()">📋 채점 결과 전체 복사</button>
+                <button class="batch-footer-clear-btn" onclick="clearAllTestAnswers()">🗑️ 작성 답안 초기화</button>
             </div>
         </div>
     </div>
@@ -861,32 +956,117 @@
         }
 
         /* ==========================================
-         * 📝 실전 백지 테스트 카드 렌더링 & 정답 아코디언
+         * 📝 실전 백지 테스트: 연속 답안 작성 & 일괄 종합 채점 시스템
          * ========================================== */
-        function renderTestCard() {
-            if (activeStreamAbortController) {
-                try { activeStreamAbortController.abort(); } catch (e) {}
-                activeStreamAbortController = null;
+        const TEST_ANSWERS_STORAGE_KEY = 'itpe_test_answers_v1';
+        let testAnswersMap = {}; // { [topicKey]: { topicKey, domain, topic, answer, updatedAt } }
+        let batchResultsMap = {}; // { [topicKey]: { status: 'pending'|'done'|'error', score: number|null, markdown: string, errorMsg: string } }
+        let isBatchGradingRunning = false;
+        let batchGradingAbortFlag = false;
+
+        function loadTestAnswers() {
+            try {
+                const raw = localStorage.getItem(TEST_ANSWERS_STORAGE_KEY);
+                if (raw) {
+                    const parsed = JSON.parse(raw);
+                    if (parsed && typeof parsed === 'object') {
+                        testAnswersMap = parsed;
+                    }
+                }
+            } catch (e) {
+                testAnswersMap = {};
             }
-            isTestGrading = false;
-            const gradeBtn = document.getElementById('test-grade-btn');
-            if (gradeBtn) {
-                gradeBtn.disabled = false;
-                gradeBtn.innerText = '🎯 AI 실전 채점 및 피드백';
+        }
+
+        function saveTestAnswers() {
+            try {
+                localStorage.setItem(TEST_ANSWERS_STORAGE_KEY, JSON.stringify(testAnswersMap));
+            } catch (e) {}
+        }
+
+        function getWrittenAnswerEntries() {
+            loadTestAnswers();
+            return Object.values(testAnswersMap)
+                .filter(item => item && typeof item.answer === 'string' && item.answer.trim().length > 0)
+                .sort((a, b) => (a.updatedAt || 0) - (b.updatedAt || 0));
+        }
+
+        function updateTestHeaderStatus() {
+            const entries = getWrittenAnswerEntries();
+            const count = entries.length;
+            const badgeEl = document.getElementById('test-written-badge');
+            const gradeBtn = document.getElementById('test-batch-grade-btn');
+
+            if (badgeEl) {
+                badgeEl.innerText = `✍️ 작성 완료: ${count}개`;
+                if (count > 0) {
+                    badgeEl.classList.add('has-items');
+                } else {
+                    badgeEl.classList.remove('has-items');
+                }
             }
 
+            if (gradeBtn) {
+                gradeBtn.innerText = `🏁 일괄 채점하기 (${count}개)`;
+                if (count > 0) {
+                    gradeBtn.classList.add('is-active');
+                } else {
+                    gradeBtn.classList.remove('is-active');
+                }
+            }
+        }
+
+        function handleTestAnswerInput() {
+            if (!currentDeck.length) return;
             const card = currentDeck[currentIndex];
+            const key = getTopicKey(card);
+            const inputEl = document.getElementById('test-answer-input');
+            const val = inputEl ? inputEl.value : '';
+
+            if (val.trim().length > 0) {
+                const existing = testAnswersMap[key];
+                testAnswersMap[key] = {
+                    topicKey: key,
+                    domain: card.domain,
+                    topic: card.topic,
+                    answer: val,
+                    updatedAt: existing && existing.updatedAt ? existing.updatedAt : Date.now()
+                };
+            } else {
+                delete testAnswersMap[key];
+            }
+
+            saveTestAnswers();
+            updateTestHeaderStatus();
+
+            const statusEl = document.getElementById('test-autosave-status');
+            if (statusEl) {
+                statusEl.innerText = val.trim().length > 0 ? '✓ 자동 저장됨' : '';
+            }
+        }
+
+        function renderTestCard() {
+            loadTestAnswers();
+            const card = currentDeck[currentIndex];
+            const key = getTopicKey(card);
+
             document.getElementById('test-domain-pill').innerText = `${card.domain} 도메인 · 실전 백지 인출`;
             document.getElementById('test-topic-title').innerText = card.topic;
             document.getElementById('test-progress-text').innerText = `${currentIndex + 1} / ${currentDeck.length}`;
 
-            // 입력창, 채점 결과창, 정답 아코디언 초기화 (모범 답안 완벽 숨김)
+            // 기존 작성 내용 즉시 복원 (딜레이 제로)
             const inputEl = document.getElementById('test-answer-input');
-            inputEl.value = '';
-            document.getElementById('test-grading-box').classList.remove('is-visible');
-            document.getElementById('test-grading-content').innerHTML = '';
-            document.getElementById('test-grading-elapsed').innerText = '';
+            const savedEntry = testAnswersMap[key];
+            inputEl.value = (savedEntry && typeof savedEntry.answer === 'string') ? savedEntry.answer : '';
 
+            const statusEl = document.getElementById('test-autosave-status');
+            if (statusEl) {
+                statusEl.innerText = inputEl.value.trim().length > 0 ? '✓ 저장된 답안 복원됨' : '';
+            }
+
+            updateTestHeaderStatus();
+
+            // 정답 아코디언 초기화 (모범 답안 완벽 숨김)
             const acc = document.getElementById('test-answer-accordion');
             acc.classList.remove('is-open');
             document.getElementById('test-reveal-btn').innerText = '👁️ 정답 카드 확인';
@@ -942,6 +1122,81 @@
             }
         }
 
+        /* ==========================================
+         * 📋 상시 답안 복사 기능 (채점 중/언제든 즉시 클립보드 복사)
+         * ========================================== */
+        async function copyTextToClipboard(text) {
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                try {
+                    await navigator.clipboard.writeText(text);
+                    return true;
+                } catch (e) {}
+            }
+            const ta = document.createElement('textarea');
+            ta.value = text;
+            ta.style.position = 'fixed';
+            ta.style.left = '-9999px';
+            document.body.appendChild(ta);
+            ta.select();
+            try {
+                document.execCommand('copy');
+                document.body.removeChild(ta);
+                return true;
+            } catch (e) {
+                document.body.removeChild(ta);
+                return false;
+            }
+        }
+
+        function buildFormattedUserAnswersText() {
+            const entries = getWrittenAnswerEntries();
+            if (!entries.length) return '';
+
+            const blocks = entries.map((item, idx) => {
+                return `${idx + 1}. 토픽명: ${item.topic}\n- 작성 내용:\n${item.answer.trim()}`;
+            }).join('\n\n');
+
+            return `======================================\n[정보관리기술사 실전 백지 인출 답안]\n\n${blocks}\n======================================`;
+        }
+
+        async function copyAllUserAnswers() {
+            const formatted = buildFormattedUserAnswersText();
+            if (!formatted) {
+                alert('아직 작성된 답안이 없습니다. 먼저 문제에 답안을 작성해 주세요!');
+                return;
+            }
+            const entries = getWrittenAnswerEntries();
+            const ok = await copyTextToClipboard(formatted);
+            if (ok) {
+                alert(`📋 내가 푼 원본 답안(${entries.length}개 토픽)이 클립보드에 복사되었습니다!\n외부(Gemini 웹 등)에 바로 붙여넣어 활용하실 수 있습니다.`);
+            } else {
+                alert('클립보드 복사에 실패했습니다.');
+            }
+        }
+
+        /* ==========================================
+         * 🏁 일괄 채점 모달 및 순차 API 호출 파이프라인 (Gemini 3.8 Flash)
+         * ========================================== */
+        function delay(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        function findCardByTopicKey(topicKey, fallbackItem) {
+            if (typeof topics !== 'undefined' && Array.isArray(topics)) {
+                const found = topics.find(t => getTopicKey(t) === topicKey || t.topic === (fallbackItem && fallbackItem.topic));
+                if (found) return found;
+            }
+            return {
+                domain: (fallbackItem && fallbackItem.domain) || '',
+                topic: (fallbackItem && fallbackItem.topic) || topicKey,
+                definition: '',
+                mnemonic: '',
+                keywords: [],
+                tableRows: [],
+                differentiation: ''
+            };
+        }
+
         function buildExaminerSystemPrompt(card) {
             const topic = card.topic || '';
             const definition = card.definition || '';
@@ -958,13 +1213,11 @@
                 tableSummary = card.details.trim();
             }
 
-            return `당신은 정보관리기술사 실전 채점위원입니다. 인사말, 서론, 맺음말(예: 안녕하세요 등)은 절대 금지하고 질문을 받자마자 1초의 지체 없이 본론부터 즉시 두괄식 마크다운으로 출력하십시오.
-수험생이 토픽명만 보고 인출한 답안을 원본 카드와 비교하여 아래 5가지 규격으로 채점하십시오:
-1. 📊 예상 점수 (10점 만점 기준, 예: 6.5점 / 10점)
-2. 🎯 키워드 매칭 분석 (잘 쓴 키워드 vs 반드시 외워야 할 누락 키워드)
+            return `당신은 정보관리기술사 실전 채점위원입니다. 인사말 없이 두괄식 마크다운으로 10점 만점 기준 채점을 수행하십시오:
+1. 📊 예상 점수 (10점 만점)
+2. 🎯 키워드 매칭 분석 (인출 키워드 vs 필수 누락 키워드)
 3. ✍️ 1단락 정의 첨삭 (목적-메커니즘-종결어 30자 규격 점검)
-4. 🏗️ 2단락 구성도/표 구조화 팁
-5. 💡 3단락 실전 차별화 제언 (0.5점 가산점 포인트)
+4. 💡 3단락 실전 차별화 제언
 
 [원본 카드 모범 답안 기준]
 - 토픽명: ${topic}
@@ -975,89 +1228,368 @@
 - 3단락 실전 차별화 포인트: ${differentiation}`;
         }
 
-        /* ==========================================
-         * ⚡ Gemini 3.8 Flash 단일 POST 호출 채점
-         * ========================================== */
-        async function gradeTestAnswer() {
-            if (isTestGrading || !currentDeck.length) return;
-            const inputEl = document.getElementById('test-answer-input');
-            const userDraft = (inputEl.value || '').trim();
+        function parseScoreFromMarkdown(mdText) {
+            if (!mdText) return null;
+            // "8.5점", "7.0 / 10", "예상 점수: 6.5" 등 추출
+            const m1 = mdText.match(/([0-9]+(?:\.[0-9]+)?)\s*\/\s*10/);
+            if (m1) {
+                const v = parseFloat(m1[1]);
+                if (!isNaN(v) && v >= 0 && v <= 10) return v;
+            }
+            const m2 = mdText.match(/예상\s*점수[^\d\n]*([0-9]+(?:\.[0-9]+)?)\s*점?/);
+            if (m2) {
+                const v = parseFloat(m2[1]);
+                if (!isNaN(v) && v >= 0 && v <= 10) return v;
+            }
+            const m3 = mdText.match(/([0-9]+(?:\.[0-9]+)?)\s*점/);
+            if (m3) {
+                const v = parseFloat(m3[1]);
+                if (!isNaN(v) && v >= 0 && v <= 10) return v;
+            }
+            return null;
+        }
 
-            if (!userDraft) {
-                alert('먼저 기억나는 정의, 두음, 키워드, 구성요소를 한 줄이라도 적어보세요!');
-                inputEl.focus();
+        function buildAsciiProgress(done, total) {
+            const slots = 10;
+            if (total <= 0) return '[          ]';
+            const filled = Math.min(slots, Math.round((done / total) * slots));
+            if (filled >= slots) return '[==========]';
+            const eq = '='.repeat(Math.max(0, filled));
+            const arrow = filled < slots ? '>' : '';
+            const spaces = ' '.repeat(Math.max(0, slots - filled - (arrow ? 1 : 0)));
+            return `[${eq}${arrow}${spaces}]`;
+        }
+
+        function updateBatchProgressUI(doneCount, totalCount, isFinished) {
+            const labelEl = document.getElementById('batch-progress-label');
+            const asciiEl = document.getElementById('batch-progress-ascii');
+            const fillEl = document.getElementById('batch-progress-fill');
+
+            const pct = totalCount > 0 ? Math.min(100, Math.round((doneCount / totalCount) * 100)) : 0;
+            const ascii = buildAsciiProgress(doneCount, totalCount);
+
+            if (labelEl) {
+                labelEl.innerText = isFinished
+                    ? `✅ 일괄 채점 완료! ${doneCount} / ${totalCount} 완료`
+                    : `채점 진행 중... ${doneCount} / ${totalCount} 완료`;
+            }
+            if (asciiEl) asciiEl.innerText = ascii;
+            if (fillEl) fillEl.style.width = `${pct}%`;
+
+            updateBatchSummaryCard(totalCount, isFinished);
+        }
+
+        function updateBatchSummaryCard(totalCount, forceVisible) {
+            const summaryCard = document.getElementById('batch-summary-card');
+            const avgEl = document.getElementById('batch-avg-score');
+            const passEl = document.getElementById('batch-pass-count');
+
+            const results = Object.values(batchResultsMap);
+            const scored = results.filter(r => r && r.status === 'done' && typeof r.score === 'number');
+            const finishedCount = results.filter(r => r && (r.status === 'done' || r.status === 'error')).length;
+
+            if (scored.length > 0) {
+                const sum = scored.reduce((acc, cur) => acc + cur.score, 0);
+                const avg = (sum / scored.length).toFixed(1);
+                const passCount = scored.filter(r => r.score >= 6.0).length;
+                if (avgEl) avgEl.innerText = `${avg}점`;
+                if (passEl) passEl.innerText = `${passCount} / ${totalCount}개`;
+            } else {
+                if (avgEl) avgEl.innerText = `- 점`;
+                if (passEl) passEl.innerText = `0 / ${totalCount}개`;
+            }
+
+            if (summaryCard) {
+                if (forceVisible || (totalCount > 0 && finishedCount >= totalCount)) {
+                    summaryCard.classList.add('is-visible');
+                } else {
+                    summaryCard.classList.remove('is-visible');
+                }
+            }
+        }
+
+        function toggleBatchItemAccordion(cardDomId) {
+            const el = document.getElementById(cardDomId);
+            if (!el) return;
+            const body = el.querySelector('.batch-item-body');
+            if (body) body.classList.toggle('is-collapsed');
+        }
+
+        async function requestSingleTopicGrade(entry, apiKey) {
+            const card = findCardByTopicKey(entry.topicKey, entry);
+            const systemPrompt = buildExaminerSystemPrompt(card);
+            const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${encodeURIComponent(apiKey)}`;
+
+            const response = await fetch(endpoint, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    system_instruction: {
+                        parts: [{ text: systemPrompt }]
+                    },
+                    contents: [
+                        {
+                            role: 'user',
+                            parts: [{ text: `[수험생 백지 인출 답안]\n${entry.answer}` }]
+                        }
+                    ],
+                    generationConfig: {
+                        temperature: 0.2,
+                        maxOutputTokens: 1000
+                    }
+                })
+            });
+
+            const data = await response.json();
+            if (!response.ok) {
+                const errMsg = (data && data.error && data.error.message) ? data.error.message : `HTTP ${response.status}`;
+                throw new Error(errMsg);
+            }
+
+            const replyText = data?.candidates?.[0]?.content?.parts?.map(p => p.text || '').join('\n') || '응답을 생성하지 못했습니다.';
+            return replyText;
+        }
+
+        function renderBatchItemCard(entry, index) {
+            const listEl = document.getElementById('batch-results-list');
+            const safeId = `batch-card-${index}`;
+            let cardEl = document.getElementById(safeId);
+
+            if (!cardEl) {
+                cardEl = document.createElement('div');
+                cardEl.id = safeId;
+                cardEl.className = 'batch-item-card';
+                listEl.appendChild(cardEl);
+            }
+
+            const state = batchResultsMap[entry.topicKey] || { status: 'pending' };
+
+            if (state.status === 'pending') {
+                cardEl.className = 'batch-item-card';
+                cardEl.innerHTML = `
+                    <div class="batch-item-header" onclick="toggleBatchItemAccordion('${safeId}')">
+                        <div class="batch-item-title">${index + 1}. ${escapeHtml(entry.topic)}</div>
+                        <div class="batch-item-status">⏳ 채점 대기/진행 중...</div>
+                    </div>
+                    <div class="batch-item-body">
+                        <div>
+                            <div class="batch-user-answer-label">✍️ 내가 작성한 답안</div>
+                            <div class="batch-user-answer-box">${escapeHtml(entry.answer)}</div>
+                        </div>
+                        <div class="test-grading-content" style="color:#94a3b8;">⏳ Gemini 3.8 Flash 채점위원이 답안을 분석하고 있습니다...</div>
+                    </div>
+                `;
+            } else if (state.status === 'done') {
+                cardEl.className = 'batch-item-card is-done';
+                const scoreBadge = typeof state.score === 'number'
+                    ? `<span style="color:${state.score >= 6.0 ? '#4ade80' : '#fcd34d'};">📊 ${state.score.toFixed(1)}점 / 10점</span>`
+                    : `<span style="color:#4ade80;">✅ 채점 완료</span>`;
+                cardEl.innerHTML = `
+                    <div class="batch-item-header" onclick="toggleBatchItemAccordion('${safeId}')">
+                        <div class="batch-item-title">${index + 1}. ${escapeHtml(entry.topic)}</div>
+                        <div class="batch-item-status">${scoreBadge} <span>▾</span></div>
+                    </div>
+                    <div class="batch-item-body">
+                        <div>
+                            <div class="batch-user-answer-label">✍️ 내가 작성한 답안</div>
+                            <div class="batch-user-answer-box">${escapeHtml(entry.answer)}</div>
+                        </div>
+                        <div class="test-grading-content">${renderMarkdown(state.markdown || '')}</div>
+                    </div>
+                `;
+            } else if (state.status === 'error') {
+                cardEl.className = 'batch-item-card is-error';
+                const encodedKey = encodeURIComponent(entry.topicKey);
+                cardEl.innerHTML = `
+                    <div class="batch-item-header" onclick="toggleBatchItemAccordion('${safeId}')">
+                        <div class="batch-item-title">${index + 1}. ${escapeHtml(entry.topic)}</div>
+                        <div class="batch-item-status" onclick="event.stopPropagation()">
+                            <span style="color:#fca5a5;">⚠️ 일시 지연</span>
+                            <button class="batch-retry-btn" onclick="retrySingleTopicGrade(decodeURIComponent('${encodedKey}'), ${index})">🔄 재시도</button>
+                        </div>
+                    </div>
+                    <div class="batch-item-body">
+                        <div>
+                            <div class="batch-user-answer-label">✍️ 내가 작성한 답안</div>
+                            <div class="batch-user-answer-box">${escapeHtml(entry.answer)}</div>
+                        </div>
+                        <div style="color:#fca5a5; font-size:0.8rem; background:rgba(239,68,68,0.12); border:1px solid rgba(239,68,68,0.4); padding:8px 10px; border-radius:8px;">
+                            ⚠️ 채점 호출 일시 지연 (${escapeHtml(state.errorMsg || '네트워크/서버 응답 지연')}) — 우측 상단 <b>[🔄 재시도]</b> 버튼을 누르면 이 토픽만 즉시 다시 채점합니다.
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        async function openBatchGradeModal() {
+            const entries = getWrittenAnswerEntries();
+            if (!entries.length) {
+                alert('먼저 최소 1개 이상의 문제에 답안을 작성해 주세요!');
                 return;
             }
 
             const apiKey = ensureApiKeyOrPrompt();
             if (!apiKey) return;
 
-            const card = currentDeck[currentIndex];
-            const systemPrompt = buildExaminerSystemPrompt(card);
+            const modal = document.getElementById('batch-grade-modal');
+            modal.classList.add('is-open');
 
-            const gradingBox = document.getElementById('test-grading-box');
-            const resultContainer = document.getElementById('test-grading-content');
-            const gradingStatus = document.getElementById('test-grading-status');
-            const gradingElapsed = document.getElementById('test-grading-elapsed');
-            const gradeBtn = document.getElementById('test-grade-btn');
+            if (isBatchGradingRunning) return;
 
-            gradingBox.classList.add('is-visible');
-            gradingStatus.innerHTML = '⏳ 실전 채점위원 채점 중...';
-            resultContainer.innerHTML = '<span style="color:#94a3b8;">⏳ AI 채점 결과를 생성하고 있습니다...</span>';
-            gradingElapsed.innerText = '';
+            const listEl = document.getElementById('batch-results-list');
+            listEl.innerHTML = '';
+            batchResultsMap = {};
+            document.getElementById('batch-summary-card').classList.remove('is-visible');
 
-            isTestGrading = true;
-            gradeBtn.disabled = true;
-            gradeBtn.innerText = '⏳ 채점 중...';
+            isBatchGradingRunning = true;
+            batchGradingAbortFlag = false;
 
-            const startTime = performance.now();
+            const total = entries.length;
+            let completed = 0;
+            updateBatchProgressUI(0, total, false);
+
+            // for...of 순차 호출 파이프라인 (Rate Limit 및 503 방어 + 0.5초 간격)
+            let idx = 0;
+            for (const entry of entries) {
+                if (batchGradingAbortFlag) break;
+
+                const currentIdx = idx++;
+                batchResultsMap[entry.topicKey] = { status: 'pending', score: null, markdown: '', errorMsg: '' };
+                renderBatchItemCard(entry, currentIdx);
+
+                try {
+                    const replyMarkdown = await requestSingleTopicGrade(entry, apiKey);
+                    const score = parseScoreFromMarkdown(replyMarkdown);
+                    batchResultsMap[entry.topicKey] = {
+                        status: 'done',
+                        score: score,
+                        markdown: replyMarkdown,
+                        errorMsg: ''
+                    };
+                } catch (err) {
+                    batchResultsMap[entry.topicKey] = {
+                        status: 'error',
+                        score: null,
+                        markdown: '',
+                        errorMsg: err.message || String(err)
+                    };
+                }
+
+                completed++;
+                renderBatchItemCard(entry, currentIdx);
+                updateBatchProgressUI(completed, total, completed >= total);
+
+                if (completed < total && !batchGradingAbortFlag) {
+                    await delay(500);
+                }
+            }
+
+            isBatchGradingRunning = false;
+            updateBatchProgressUI(completed, total, true);
+        }
+
+        async function retrySingleTopicGrade(topicKey, index) {
+            const entries = getWrittenAnswerEntries();
+            const entry = entries.find(e => e.topicKey === topicKey);
+            if (!entry) return;
+
+            const apiKey = ensureApiKeyOrPrompt();
+            if (!apiKey) return;
+
+            batchResultsMap[topicKey] = { status: 'pending', score: null, markdown: '', errorMsg: '' };
+            renderBatchItemCard(entry, index);
 
             try {
-                const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${encodeURIComponent(apiKey)}`;
-                const response = await fetch(endpoint, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        system_instruction: {
-                            parts: [{ text: systemPrompt }]
-                        },
-                        contents: [
-                            {
-                                role: 'user',
-                                parts: [{ text: `[수험생 백지 인출 답안]\n${userDraft}` }]
-                            }
-                        ],
-                        generationConfig: {
-                            temperature: 0.3,
-                            maxOutputTokens: 2048
-                        }
-                    })
-                });
-
-                const data = await response.json();
-                if (!response.ok) {
-                    const errMsg = (data && data.error && data.error.message) ? data.error.message : `HTTP ${response.status}`;
-                    throw new Error(errMsg);
-                }
-
-                const replyText = data?.candidates?.[0]?.content?.parts?.map(p => p.text || '').join('\n') || '응답을 생성하지 못했습니다.';
-                const totalSec = ((performance.now() - startTime) / 1000).toFixed(2);
-                gradingStatus.innerHTML = '✅ 실전 채점 완료';
-                gradingElapsed.innerText = `완료 ${totalSec}s`;
-                resultContainer.innerHTML = renderMarkdown(replyText);
+                const replyMarkdown = await requestSingleTopicGrade(entry, apiKey);
+                const score = parseScoreFromMarkdown(replyMarkdown);
+                batchResultsMap[topicKey] = {
+                    status: 'done',
+                    score: score,
+                    markdown: replyMarkdown,
+                    errorMsg: ''
+                };
             } catch (err) {
-                gradingStatus.innerHTML = '<span style="color:#ef4444;">❌ 채점 호출 오류</span>';
-                resultContainer.innerHTML = `<div style="color:#ef4444; background:rgba(239, 68, 68, 0.12); border:1px solid rgba(239, 68, 68, 0.45); padding:10px 12px; border-radius:8px; font-weight:700; line-height:1.5; word-break:break-word;">❌ 오류: ${escapeHtml(err.message || String(err))}</div><div style="margin-top:6px; font-size:0.78rem; color:#fca5a5;">우측 상단 ⚙️ 버튼을 눌러 Gemini API 키를 확인해 주세요.</div>`;
-            } finally {
-                isTestGrading = false;
-                if (gradeBtn) {
-                    gradeBtn.disabled = false;
-                    gradeBtn.innerText = '🎯 AI 실전 채점 및 피드백';
-                }
+                batchResultsMap[topicKey] = {
+                    status: 'error',
+                    score: null,
+                    markdown: '',
+                    errorMsg: err.message || String(err)
+                };
+            }
+
+            renderBatchItemCard(entry, index);
+            const total = entries.length;
+            const doneCount = Object.values(batchResultsMap).filter(r => r && (r.status === 'done' || r.status === 'error')).length;
+            updateBatchProgressUI(doneCount, total, doneCount >= total);
+        }
+
+        function closeBatchGradeModal() {
+            batchGradingAbortFlag = true;
+            isBatchGradingRunning = false;
+            document.getElementById('batch-grade-modal').classList.remove('is-open');
+        }
+
+        function handleBatchModalOverlayClick(event) {
+            if (event.target.id === 'batch-grade-modal') {
+                closeBatchGradeModal();
             }
         }
 
-        
+        async function copyAllBatchResults() {
+            const entries = getWrittenAnswerEntries();
+            if (!entries.length) {
+                alert('복사할 답안이나 채점 결과가 없습니다.');
+                return;
+            }
+
+            const lines = [];
+            lines.push('======================================');
+            lines.push('[정보관리기술사 실전 백지 인출 종합 성적표]');
+            lines.push('');
+
+            entries.forEach((entry, idx) => {
+                const res = batchResultsMap[entry.topicKey];
+                lines.push(`${idx + 1}. 토픽명: ${entry.topic}`);
+                lines.push(`- 작성 내용:\n${entry.answer.trim()}`);
+                if (res && res.status === 'done' && res.markdown) {
+                    lines.push(`\n[AI 채점 피드백]\n${res.markdown.trim()}`);
+                } else if (res && res.status === 'error') {
+                    lines.push(`\n[AI 채점 피드백] (미완료: ${res.errorMsg || '일시 지연'})`);
+                }
+                lines.push('--------------------------------------');
+            });
+            lines.push('======================================');
+
+            const ok = await copyTextToClipboard(lines.join('\n'));
+            if (ok) {
+                alert('📋 작성 답안 및 채점 결과 전체가 클립보드에 복사되었습니다!');
+            } else {
+                alert('클립보드 복사에 실패했습니다.');
+            }
+        }
+
+        function clearAllTestAnswers() {
+            const entries = getWrittenAnswerEntries();
+            if (!entries.length) {
+                alert('초기화할 작성 답안이 없습니다.');
+                return;
+            }
+            if (!confirm(`작성된 답안 ${entries.length}개를 모두 초기화하시겠습니까?`)) {
+                return;
+            }
+            batchGradingAbortFlag = true;
+            isBatchGradingRunning = false;
+            testAnswersMap = {};
+            batchResultsMap = {};
+            try {
+                localStorage.removeItem(TEST_ANSWERS_STORAGE_KEY);
+            } catch (e) {}
+
+            closeBatchGradeModal();
+            renderTestCard();
+            alert('🗑️ 작성된 모든 답안이 초기화되었습니다.');
+        }
+
         function toggleMastered(event) {
             if (event) event.stopPropagation();
             if (!currentDeck.length) return;
