@@ -41,11 +41,15 @@
         .domain-name { font-weight: 600; font-size: 1rem; }
         .domain-count { font-size: 0.75rem; color: var(--text-secondary); margin-top: 4px; }
 
-        /* Study View */
+        /* Study View & Header Bar */
         #study-view { display: none; flex-direction: column; flex: 1; min-height: 0; gap: 12px; }
-        .study-header { display: flex; justify-content: space-between; align-items: center; }
-        .back-btn { background: none; border: 1px solid var(--border-color); color: var(--text-secondary); padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 0.85rem; }
-        .progress-text { font-size: 0.85rem; color: var(--text-secondary); }
+        .study-header { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: nowrap; width: 100%; }
+        .back-btn { background: none; border: 1px solid var(--border-color); color: var(--text-secondary); padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 0.85rem; white-space: nowrap; flex-shrink: 0; transition: all 0.15s; }
+        .back-btn:hover { border-color: var(--accent); color: var(--text-primary); }
+        .ai-tutor-btn { background: linear-gradient(135deg, rgba(56, 189, 248, 0.22) 0%, rgba(59, 130, 246, 0.35) 100%); border: 1px solid #38bdf8; color: #e0f2fe; padding: 6px 14px; border-radius: 999px; cursor: pointer; font-size: 0.85rem; font-weight: 700; white-space: nowrap; flex-shrink: 0; box-shadow: 0 0 12px rgba(56, 189, 248, 0.32), inset 0 0 8px rgba(56, 189, 248, 0.18); transition: all 0.2s ease; display: inline-flex; align-items: center; gap: 5px; }
+        .ai-tutor-btn:hover { background: linear-gradient(135deg, rgba(56, 189, 248, 0.38) 0%, rgba(59, 130, 246, 0.55) 100%); box-shadow: 0 0 18px rgba(56, 189, 248, 0.55); transform: translateY(-1px); }
+        .ai-tutor-btn:active { transform: scale(0.96); }
+        .progress-text, .card-counter { font-size: 0.85rem; color: var(--text-secondary); white-space: nowrap; flex-shrink: 0; text-align: right; min-width: 58px; font-variant-numeric: tabular-nums; }
 
         /* Flashcard */
         .card-container { perspective: 1000px; flex: 1; display: flex; flex-direction: column; min-height: 520px; cursor: pointer; position: relative; }
@@ -101,6 +105,57 @@
         .ctrl-btn.check-btn { border-color: rgba(74, 222, 128, 0.45); color: #86efac; background: rgba(22, 101, 52, 0.25); }
         .ctrl-btn.check-btn.is-mastered { background: #22c55e; color: #052e16; border-color: #22c55e; font-weight: 800; }
         .ctrl-btn.primary { background: var(--accent); color: #0f172a; border: none; font-weight: 800; }
+
+        /* AI Tutor Modal */
+        .modal-overlay { display: none; position: fixed; inset: 0; z-index: 1000; background: rgba(2, 6, 23, 0.78); backdrop-filter: blur(6px); align-items: center; justify-content: center; padding: 12px; }
+        .modal-overlay.is-open { display: flex; }
+        .tutor-modal { width: 100%; max-width: 680px; height: min(86dvh, 760px); background: #0f172a; border: 1px solid rgba(56, 189, 248, 0.45); border-radius: 18px; box-shadow: 0 16px 48px rgba(0, 0, 0, 0.65), 0 0 24px rgba(56, 189, 248, 0.18); display: flex; flex-direction: column; overflow: hidden; }
+        .tutor-modal-header { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 12px 14px; background: linear-gradient(90deg, rgba(30, 58, 138, 0.55) 0%, rgba(15, 23, 42, 0.95) 100%); border-bottom: 1px solid var(--border-color); }
+        .tutor-topic-badge { flex: 1; min-width: 0; display: flex; align-items: center; gap: 6px; font-size: 0.86rem; font-weight: 700; color: #e0f2fe; background: rgba(56, 189, 248, 0.14); border: 1px solid rgba(56, 189, 248, 0.35); padding: 5px 11px; border-radius: 999px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .tutor-header-actions { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+        .tutor-icon-btn { background: rgba(30, 41, 59, 0.85); border: 1px solid var(--border-color); color: var(--text-primary); width: 34px; height: 34px; border-radius: 9px; cursor: pointer; font-size: 0.95rem; display: inline-flex; align-items: center; justify-content: center; transition: all 0.15s; }
+        .tutor-icon-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+        /* API Key Config Panel inside Modal */
+        .api-key-panel { display: none; flex-direction: column; gap: 8px; padding: 12px 14px; background: rgba(30, 41, 59, 0.95); border-bottom: 1px solid rgba(56, 189, 248, 0.35); }
+        .api-key-panel.is-visible { display: flex; }
+        .api-key-label { font-size: 0.78rem; color: #93c5fd; font-weight: 600; display: flex; justify-content: space-between; align-items: center; }
+        .api-key-row { display: flex; gap: 6px; }
+        .api-key-input { flex: 1; background: #0f172a; border: 1px solid var(--border-color); color: var(--text-primary); padding: 8px 10px; border-radius: 8px; font-size: 0.82rem; outline: none; }
+        .api-key-input:focus { border-color: var(--accent); }
+        .api-key-save-btn { background: var(--accent); color: #0f172a; border: none; padding: 8px 12px; border-radius: 8px; font-size: 0.8rem; font-weight: 800; cursor: pointer; white-space: nowrap; }
+        .api-key-clear-btn { background: rgba(239, 68, 68, 0.18); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.4); padding: 8px 10px; border-radius: 8px; font-size: 0.78rem; font-weight: 700; cursor: pointer; white-space: nowrap; }
+
+        /* Quick Actions */
+        .tutor-quick-actions { display: flex; gap: 6px; padding: 10px 12px; background: rgba(15, 23, 42, 0.9); border-bottom: 1px solid rgba(51, 65, 85, 0.7); overflow-x: auto; scrollbar-width: none; }
+        .tutor-quick-actions::-webkit-scrollbar { display: none; }
+        .quick-action-btn { background: rgba(30, 41, 59, 0.9); border: 1px solid rgba(56, 189, 248, 0.35); color: #bae6fd; padding: 7px 11px; border-radius: 999px; font-size: 0.78rem; font-weight: 700; cursor: pointer; white-space: nowrap; transition: all 0.15s; flex-shrink: 0; }
+        .quick-action-btn:hover { background: rgba(56, 189, 248, 0.2); border-color: var(--accent); color: #fff; }
+        .quick-action-btn:active { transform: scale(0.97); }
+
+        /* Chat Log Area */
+        .tutor-chat-log { flex: 1; overflow-y: auto; padding: 14px; display: flex; flex-direction: column; gap: 12px; background: #0b1120; }
+        .chat-msg { max-width: 90%; padding: 11px 14px; border-radius: 14px; font-size: 0.85rem; line-height: 1.55; word-break: keep-all; overflow-wrap: anywhere; }
+        .chat-msg.user { align-self: flex-end; background: linear-gradient(135deg, #0284c7 0%, #2563eb 100%); color: #ffffff; border-bottom-right-radius: 4px; }
+        .chat-msg.assistant { align-self: flex-start; background: #1e293b; color: #f1f5f9; border: 1px solid #334155; border-bottom-left-radius: 4px; width: 100%; max-width: 96%; }
+        .chat-msg.system-info { align-self: center; max-width: 96%; background: rgba(30, 58, 138, 0.3); border: 1px dashed rgba(56, 189, 248, 0.4); color: #bae6fd; font-size: 0.79rem; text-align: center; padding: 9px 12px; }
+        .chat-msg h3, .chat-msg h4 { color: #38bdf8; margin: 8px 0 4px 0; font-size: 0.92rem; }
+        .chat-msg h3:first-child, .chat-msg h4:first-child { margin-top: 0; }
+        .chat-msg strong { color: #fde047; font-weight: 700; }
+        .chat-msg code { background: rgba(15, 23, 42, 0.8); color: #7dd3fc; padding: 2px 5px; border-radius: 4px; font-family: monospace; font-size: 0.8rem; }
+        .chat-msg pre { background: #090d16; border: 1px solid #334155; padding: 8px 10px; border-radius: 8px; overflow-x: auto; margin: 6px 0; font-family: monospace; font-size: 0.78rem; color: #e2e8f0; white-space: pre; }
+        .chat-msg ul, .chat-msg ol { padding-left: 18px; margin: 4px 0; }
+        .chat-msg li { margin-bottom: 3px; }
+        .chat-msg table { width: 100%; border-collapse: collapse; margin: 8px 0; font-size: 0.76rem; }
+        .chat-msg th, .chat-msg td { border: 1px solid #334155; padding: 5px 7px; text-align: left; }
+        .chat-msg th { background: #1e3a8a; color: #e0f2fe; }
+
+        /* Chat Input Bar */
+        .tutor-input-bar { display: flex; gap: 8px; padding: 10px 12px; background: #0f172a; border-top: 1px solid var(--border-color); align-items: flex-end; }
+        .tutor-input { flex: 1; background: #1e293b; border: 1px solid var(--border-color); color: var(--text-primary); padding: 9px 12px; border-radius: 10px; font-size: 0.86rem; line-height: 1.4; max-height: 110px; min-height: 40px; resize: none; outline: none; }
+        .tutor-input:focus { border-color: var(--accent); }
+        .tutor-send-btn { background: var(--accent-gradient); color: #ffffff; border: none; padding: 0 16px; height: 40px; border-radius: 10px; font-size: 0.86rem; font-weight: 800; cursor: pointer; white-space: nowrap; flex-shrink: 0; transition: opacity 0.15s; }
+        .tutor-send-btn:disabled { opacity: 0.5; cursor: not-allowed; }
     </style>
 </head>
 <body>
@@ -129,7 +184,8 @@
         <div id="study-view">
             <div class="study-header">
                 <button class="back-btn" onclick="goHome()">← 홈으로</button>
-                <div class="progress-text" id="progress-text">1 / 10</div>
+                <button class="ai-tutor-btn" id="ai-tutor-open-btn" onclick="openAiTutorModal(event)">🤖 AI 튜터</button>
+                <div class="progress-text card-counter" id="progress-text">1 / 10</div>
             </div>
 
             <div class="card-container" onclick="flipCard()">
@@ -201,6 +257,49 @@
         </div>
     </div>
 
+    <!-- AI 튜터 모달 레이어 -->
+    <div class="modal-overlay" id="ai-tutor-modal" onclick="handleModalOverlayClick(event)">
+        <div class="tutor-modal" onclick="event.stopPropagation()">
+            <!-- 1) 상단 바: 현재 카드 토픽명 배지 + 설정(⚙️), 닫기(✕) -->
+            <div class="tutor-modal-header">
+                <div class="tutor-topic-badge" id="tutor-topic-badge">🤖 AI 튜터 · 토픽명</div>
+                <div class="tutor-header-actions">
+                    <button class="tutor-icon-btn" title="Gemini API 키 설정" onclick="toggleApiKeyPanel()">⚙️</button>
+                    <button class="tutor-icon-btn" title="닫기" onclick="closeAiTutorModal()">✕</button>
+                </div>
+            </div>
+
+            <!-- API 키 설정 패널 (저장된 키가 없거나 ⚙️ 클릭 시 노출) -->
+            <div class="api-key-panel" id="api-key-panel">
+                <div class="api-key-label">
+                    <span>🔑 Gemini API Key (브라우저 localStorage 전용 저장)</span>
+                    <span id="api-key-status" style="font-size:0.72rem; color:#94a3b8;">미등록</span>
+                </div>
+                <div class="api-key-row">
+                    <input type="password" id="gemini-api-key-input" class="api-key-input" placeholder="AIzaSy... (Google AI Studio API 키 입력)" autocomplete="off">
+                    <button class="api-key-save-btn" onclick="saveGeminiApiKey()">저장</button>
+                    <button class="api-key-clear-btn" onclick="clearGeminiApiKey()">삭제</button>
+                </div>
+            </div>
+
+            <!-- 2) 빠른 검증 프리셋 버튼 (Quick Actions) -->
+            <div class="tutor-quick-actions">
+                <button class="quick-action-btn" onclick="runQuickAction('ESSAY_OUTLINE')">📝 2교시 서술형 목차 제안</button>
+                <button class="quick-action-btn" onclick="runQuickAction('DIFF_BOOST')">🎯 3단락 실전 차별화 보강</button>
+                <button class="quick-action-btn" onclick="runQuickAction('GRADE_ANSWER')">💡 내 답안 키워드 채점/검증</button>
+            </div>
+
+            <!-- 3) 대화 로그 영역 -->
+            <div class="tutor-chat-log" id="tutor-chat-log"></div>
+
+            <!-- 4) 하단 바: 텍스트 입력창 및 전송 버튼 -->
+            <div class="tutor-input-bar">
+                <textarea id="tutor-user-input" class="tutor-input" rows="1" placeholder="질문이나 내가 작성한 1단락 정의/키워드를 입력하세요... (Enter 전송, Shift+Enter 줄바꿈)" onkeydown="handleTutorInputKeydown(event)"></textarea>
+                <button id="tutor-send-btn" class="tutor-send-btn" onclick="sendTutorMessage()">전송</button>
+            </div>
+        </div>
+    </div>
+
     <script src="topics.js"></script>
     <script>
         let currentDeck = [];
@@ -208,6 +307,10 @@
         let isFlipped = false;
         let masteredSet = new Set();
         const MASTERED_STORAGE_KEY = 'itpe_mastered_topics_v1';
+        const GEMINI_KEY_STORAGE = 'gemini_api_key';
+        let tutorChatHistory = [];
+        let lastTutorTopicKey = '';
+        let isTutorLoading = false;
 
         function loadMastered() {
             try {
@@ -312,7 +415,6 @@
             }
         }
 
-        
         function parseMdTableRows(mdText) {
             if (!mdText) return null;
             const lines = mdText.split('\n').map(l => l.trim()).filter(l => l.startsWith('|'));
@@ -323,7 +425,6 @@
                 if (t.endsWith('|')) t = t.slice(0, -1);
                 return t.split('|').map(c => c.trim());
             };
-            const header = parseCells(lines[0]);
             const body = lines.slice(2).map(parseCells);
             return body.map(row => {
                 if (row.length >= 3) {
@@ -347,7 +448,6 @@
 
             tableWrapper.style.display = 'flex';
 
-            // Normalize row objects: support { category, sub, desc } / { major, minor, desc } or [major, minor, desc]
             const normalized = rows.map(r => {
                 if (Array.isArray(r)) {
                     return { major: r[0] || '', minor: r[1] || '', desc: r[2] || '' };
@@ -359,7 +459,6 @@
                 };
             });
 
-            // Calculate rowspan for consecutive identical major categories OR empty string "" continuation
             const rowspans = new Array(normalized.length).fill(1);
             for (let i = 0; i < normalized.length; i++) {
                 if (rowspans[i] === 0) continue;
@@ -435,7 +534,6 @@
                 kwContainer.style.display = 'none';
             }
 
-            // ⓪ 최상단 1단락 핵심 정의 콜아웃 렌더링
             const defWrapper = document.getElementById('definition-wrapper');
             const defBox = document.getElementById('back-definition');
             if (card.definition && card.definition.trim() !== '') {
@@ -446,7 +544,6 @@
                 defBox.innerText = '';
             }
 
-            // ① 상단 다이어그램 영역 (이미지, ASCII 아키텍처 또는 텍스트 렌더링)
             const diagWrapper = document.getElementById('diagram-wrapper');
             const diagBox = document.getElementById('back-diagram');
             diagBox.classList.remove('has-image');
@@ -491,11 +588,9 @@
                 diagWrapper.style.display = 'none';
             }
 
-            // ② 하단 서브노트 표 영역 (tableRows 또는 details 마크다운 표 동적 렌더링)
             const finalTableRows = card.tableRows || mdTableRows;
             renderSubnoteTable(finalTableRows);
 
-            // ③ 최하단: 3단락 실전 차별화 콜아웃 렌더링
             const diffWrapper = document.getElementById('diff-wrapper');
             const diffBox = document.getElementById('back-diff');
             if (card.differentiation && card.differentiation.trim() !== '') {
@@ -533,12 +628,10 @@
             const key = getTopicKey(card);
 
             if (masteredSet.has(key)) {
-                // 이미 이해함 상태인 경우 -> 체크 해제
                 masteredSet.delete(key);
                 saveMastered();
                 renderCard();
             } else {
-                // 새로 이해함 체크 -> 저장 후 현재 덱의 맨 뒤로 이동!
                 masteredSet.add(key);
                 saveMastered();
 
@@ -573,7 +666,6 @@
             }
         }
 
-        // 엄지손가락 좌우 스와이프 제스처 지원
         function setupSwipeGesture() {
             const container = document.querySelector('.card-container');
             if (!container) return;
@@ -595,18 +687,328 @@
                 const dx = endX - startX;
                 const dy = endY - startY;
 
-                // 가로 스와이프 거리가 50px 이상이고 세로 스크롤보다 가로 이동이 뚜렷할 때
                 if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.4) {
                     justSwiped = true;
                     if (dx < 0) {
-                        // 오른쪽 -> 왼쪽으로 밀기: 다음 카드
                         nextCard();
                     } else {
-                        // 왼쪽 -> 오른쪽으로 밀기: 이전 카드
                         prevCard();
                     }
                 }
             }, { passive: true });
+        }
+
+        /* ==========================================
+         * 🤖 AI 튜터 (Gemini 2.5 Flash) 모달 & API 로직
+         * ========================================== */
+        function getSavedApiKey() {
+            try {
+                return (localStorage.getItem(GEMINI_KEY_STORAGE) || '').trim();
+            } catch (e) {
+                return '';
+            }
+        }
+
+        function updateApiKeyUiStatus() {
+            const key = getSavedApiKey();
+            const statusEl = document.getElementById('api-key-status');
+            const inputEl = document.getElementById('gemini-api-key-input');
+            if (key) {
+                statusEl.innerText = '✅ 저장됨 (' + key.slice(0, 6) + '...)';
+                statusEl.style.color = '#4ade80';
+                inputEl.value = key;
+            } else {
+                statusEl.innerText = '⚠️ 미등록 (키 입력 필요)';
+                statusEl.style.color = '#fbbf24';
+                inputEl.value = '';
+            }
+        }
+
+        function toggleApiKeyPanel(forceShow) {
+            const panel = document.getElementById('api-key-panel');
+            updateApiKeyUiStatus();
+            if (typeof forceShow === 'boolean') {
+                panel.classList.toggle('is-visible', forceShow);
+            } else {
+                panel.classList.toggle('is-visible');
+            }
+            if (panel.classList.contains('is-visible')) {
+                setTimeout(() => document.getElementById('gemini-api-key-input').focus(), 50);
+            }
+        }
+
+        function saveGeminiApiKey() {
+            const inputEl = document.getElementById('gemini-api-key-input');
+            const val = (inputEl.value || '').trim();
+            if (!val) {
+                alert('유효한 Gemini API 키를 입력해 주세요.');
+                return;
+            }
+            try {
+                localStorage.setItem(GEMINI_KEY_STORAGE, val);
+                updateApiKeyUiStatus();
+                document.getElementById('api-key-panel').classList.remove('is-visible');
+                appendChatBubble('system-info', '🔑 Gemini API 키가 브라우저(localStorage)에 안전하게 저장되었습니다. 이제 프리셋 버튼이나 질문을 전송해 보세요!');
+            } catch (e) {
+                alert('localStorage 저장에 실패했습니다.');
+            }
+        }
+
+        function clearGeminiApiKey() {
+            try {
+                localStorage.removeItem(GEMINI_KEY_STORAGE);
+                updateApiKeyUiStatus();
+                appendChatBubble('system-info', '🗑️ 저장된 Gemini API 키가 삭제되었습니다.');
+            } catch (e) {}
+        }
+
+        function ensureApiKeyOrPrompt() {
+            let key = getSavedApiKey();
+            if (key) return key;
+            toggleApiKeyPanel(true);
+            const entered = window.prompt('Gemini API 키가 설정되지 않았습니다.\nGoogle AI Studio에서 발급받은 Gemini API 키를 입력해 주세요 (브라우저 localStorage에만 저장됩니다):');
+            if (entered && entered.trim()) {
+                key = entered.trim();
+                try {
+                    localStorage.setItem(GEMINI_KEY_STORAGE, key);
+                } catch (e) {}
+                updateApiKeyUiStatus();
+                document.getElementById('api-key-panel').classList.remove('is-visible');
+                return key;
+            }
+            return '';
+        }
+
+        function openAiTutorModal(event) {
+            if (event) event.stopPropagation();
+            if (!currentDeck.length) return;
+            const card = currentDeck[currentIndex];
+            const topicKey = getTopicKey(card);
+
+            document.getElementById('tutor-topic-badge').innerText = `🤖 [${card.domain}] ${card.topic}`;
+            document.getElementById('ai-tutor-modal').classList.add('is-open');
+            updateApiKeyUiStatus();
+
+            // 토픽이 바뀌었으면 대화 이력 초기화 및 환영 안내 표시
+            if (lastTutorTopicKey !== topicKey) {
+                lastTutorTopicKey = topicKey;
+                tutorChatHistory = [];
+                const logEl = document.getElementById('tutor-chat-log');
+                logEl.innerHTML = '';
+                appendChatBubble(
+                    'system-info',
+                    `📌 <strong>${escapeHtml(card.topic)}</strong> 카드의 컨텍스트(1단락 정의, 핵심 키워드, 구성요소 표, 3단락 차별화)가 AI 수석 코치에 자동 바인딩되었습니다.<br>상단 빠른 검증 버튼을 누르거나 궁금한 점·내 답안을 아래에 입력해 보세요.`
+                );
+            }
+
+            if (!getSavedApiKey()) {
+                toggleApiKeyPanel(true);
+            } else {
+                toggleApiKeyPanel(false);
+            }
+        }
+
+        function closeAiTutorModal() {
+            document.getElementById('ai-tutor-modal').classList.remove('is-open');
+        }
+
+        function handleModalOverlayClick(event) {
+            if (event.target.id === 'ai-tutor-modal') {
+                closeAiTutorModal();
+            }
+        }
+
+        function escapeHtml(str) {
+            return String(str || '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;');
+        }
+
+        // 경량 마크다운 -> HTML 렌더러
+        function renderMarkdown(md) {
+            if (!md) return '';
+            let text = escapeHtml(md).replace(/\r\n/g, '\n');
+
+            // 코드 블록 ``` ... ```
+            text = text.replace(/```([a-zA-Z0-9_-]*)\n([\s\S]*?)```/g, (_, lang, code) => {
+                return `<pre><code>${code.trim()}</code></pre>`;
+            });
+
+            // 마크다운 표 렌더링
+            const lines = text.split('\n');
+            const outLines = [];
+            let i = 0;
+            while (i < lines.length) {
+                if (
+                    lines[i].trim().startsWith('|') &&
+                    i + 1 < lines.length &&
+                    /^\s*\|\s*:?-{2,}/.test(lines[i + 1])
+                ) {
+                    const parseRow = l => l.trim().replace(/^\||\|$/g, '').split('|').map(c => c.trim());
+                    const headers = parseRow(lines[i]);
+                    i += 2;
+                    let tableHtml = '<table><thead><tr>' + headers.map(h => `<th>${ formatInlineMd(h) }</th>`).join('') + '</tr></thead><tbody>';
+                    while (i < lines.length && lines[i].trim().startsWith('|')) {
+                        const cells = parseRow(lines[i]);
+                        tableHtml += '<tr>' + cells.map(c => `<td>${ formatInlineMd(c) }</td>`).join('') + '</tr>';
+                        i++;
+                    }
+                    tableHtml += '</tbody></table>';
+                    outLines.push(tableHtml);
+                    continue;
+                }
+                outLines.push(lines[i]);
+                i++;
+            }
+
+            return outLines.map(line => {
+                const t = line.trim();
+                if (t.startsWith('<pre>') || t.startsWith('<table>')) return line;
+                if (/^###\s+(.+)/.test(t)) return `<h3>${formatInlineMd(t.replace(/^###\s+/, ''))}</h3>`;
+                if (/^##\s+(.+)/.test(t)) return `<h3>${formatInlineMd(t.replace(/^##\s+/, ''))}</h3>`;
+                if (/^####\s+(.+)/.test(t)) return `<h4>${formatInlineMd(t.replace(/^####\s+/, ''))}</h4>`;
+                if (/^[-*]\s+(.+)/.test(t)) return `<div style="padding-left:10px;">• ${formatInlineMd(t.replace(/^[-*]\s+/, ''))}</div>`;
+                return formatInlineMd(line);
+            }).join('<br>');
+        }
+
+        function formatInlineMd(str) {
+            return str
+                .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+                .replace(/`([^`]+)`/g, '<code>$1</code>');
+        }
+
+        function appendChatBubble(role, contentHtmlOrMd, isMarkdown = false) {
+            const logEl = document.getElementById('tutor-chat-log');
+            const div = document.createElement('div');
+            div.className = `chat-msg ${role}`;
+            div.innerHTML = isMarkdown ? renderMarkdown(contentHtmlOrMd) : contentHtmlOrMd;
+            logEl.appendChild(div);
+            logEl.scrollTop = logEl.scrollHeight;
+            return div;
+        }
+
+        function buildCardSystemPrompt(card) {
+            const topic = card.topic || '';
+            const definition = card.definition || '';
+            const keywords = Array.isArray(card.keywords) ? card.keywords.join(', ') : '';
+            const differentiation = card.differentiation || '';
+
+            let tableSummary = '';
+            if (Array.isArray(card.tableRows) && card.tableRows.length > 0) {
+                tableSummary = card.tableRows
+                    .map(r => `[${r.major || r.category || ''}] ${r.minor || r.sub || ''}: ${r.desc || ''}`)
+                    .join(' / ');
+            } else if (typeof card.details === 'string' && card.details.trim()) {
+                tableSummary = card.details.trim();
+            }
+
+            return `당신은 정보관리기술사 수험 전문 수석 코치입니다.
+현재 수험생이 학습 중인 토픽 정보:
+- 토픽명: ${topic}
+- 1단락 정의: ${definition}
+- 주요 키워드: ${keywords}
+- 2단락 핵심 구성요소: ${tableSummary}
+- 차별화 포인트: ${differentiation}
+
+수험생의 질문이나 작성 답안에 대해 정보관리기술사 1교시/2교시 실전 채점 기준(단락 구성, 차별화 키워드, 실무 적합성)에 맞추어 날카롭고 핵심 위주로 피드백하십시오.`;
+        }
+
+        function runQuickAction(actionType) {
+            if (!currentDeck.length || isTutorLoading) return;
+            const card = currentDeck[currentIndex];
+            const inputEl = document.getElementById('tutor-user-input');
+            const userDraft = (inputEl.value || '').trim();
+
+            let promptText = '';
+            if (actionType === 'ESSAY_OUTLINE') {
+                promptText = `[📝 2교시 서술형 목차 제안 요청]\n현재 토픽(${card.topic})이 정보관리기술사 2교시 서술형(25점 만점, 3페이지 분량) 문제로 출제되었다고 가정하고, 고득점(16점 이상)을 받을 수 있는 실전 4단락 표준 목차(1. 개요/배경, 2. 핵심 기술/아키텍처 및 메커니즘, 3. 비교/트레이드오프 및 실무 도입 이슈, 4. 기술사적 제언/결론)와 단락별 핵심 채점 키워드를 구체적으로 제안해 주세요.`;
+            } else if (actionType === 'DIFF_BOOST') {
+                promptText = `[🎯 3단락 실전 차별화 보강 요청]\n현재 카드의 3단락 차별화 내용을 바탕으로, 실제 시험장에서 채점위원의 눈길을 사로잡을 수 있는 추가 차별화 포인트 3가지(① 유사·경쟁 기술 정량 비교표, ② 실무 운영 시 한계점과 튜닝/극복 방안, ③ 최신 기술 표준·법제도·AX 트렌드 연계 제언)를 실전 답안 문장 형태로 보강해 주세요.`;
+            } else if (actionType === 'GRADE_ANSWER') {
+                if (userDraft) {
+                    promptText = `[💡 내 답안 키워드 채점/검증 요청]\n다음은 제가 암기해서 작성해 본 답안(정의/키워드/요약)입니다:\n"${userDraft}"\n\n현재 토픽의 모범 답안 기준에 비추어 ① 1단락 정의 적합성(목적+핵심키워드+종결어), ② 필수 채점 키워드 포함 및 누락 여부, ③ 1교시(10점 만점) 예상 점수와 보완할 한 줄 코멘트를 날카롭게 채점해 주세요.`;
+                    inputEl.value = '';
+                } else {
+                    promptText = `[💡 내 답안 키워드 채점/검증 가이드 요청]\n현재 토픽(${card.topic})의 백지 복습 자가점검을 위해, 수험생이 반드시 떠올려야 할 '필수 암기 체크리스트 5선(핵심 두음, 1단락 필수 어구, 2단락 핵심 구성요소, 3단락 비교 키워드)'을 먼저 제시해 주시고, 제가 바로 이어서 답안을 입력하면 채점해 주세요.`;
+                }
+            }
+
+            if (promptText) {
+                sendTutorMessage(promptText);
+            }
+        }
+
+        function handleTutorInputKeydown(event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                sendTutorMessage();
+            }
+        }
+
+        async function sendTutorMessage(overrideText) {
+            if (isTutorLoading || !currentDeck.length) return;
+            const inputEl = document.getElementById('tutor-user-input');
+            const userText = typeof overrideText === 'string' ? overrideText : (inputEl.value || '').trim();
+            if (!userText) return;
+
+            const apiKey = ensureApiKeyOrPrompt();
+            if (!apiKey) {
+                appendChatBubble('system-info', '⚠️ Gemini API 키를 먼저 입력하고 [저장]을 눌러주세요.');
+                return;
+            }
+
+            if (typeof overrideText !== 'string') {
+                inputEl.value = '';
+            }
+
+            const card = currentDeck[currentIndex];
+            const systemPrompt = buildCardSystemPrompt(card);
+
+            appendChatBubble('user', escapeHtml(userText).replace(/\n/g, '<br>'), false);
+            tutorChatHistory.push({ role: 'user', parts: [{ text: userText }] });
+
+            isTutorLoading = true;
+            document.getElementById('tutor-send-btn').disabled = true;
+            const loadingBubble = appendChatBubble('assistant', '⏳ 수석 코치가 실전 채점 기준으로 분석 중입니다...', false);
+
+            try {
+                const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${encodeURIComponent(apiKey)}`;
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        system_instruction: {
+                            parts: [{ text: systemPrompt }]
+                        },
+                        contents: tutorChatHistory,
+                        generationConfig: {
+                            temperature: 0.4,
+                            maxOutputTokens: 2048
+                        }
+                    })
+                });
+
+                const data = await response.json();
+                if (!response.ok) {
+                    const errMsg = (data && data.error && data.error.message) ? data.error.message : `HTTP ${response.status}`;
+                    throw new Error(errMsg);
+                }
+
+                const replyText = data?.candidates?.[0]?.content?.parts?.map(p => p.text || '').join('\n') || '응답을 생성하지 못했습니다.';
+                tutorChatHistory.push({ role: 'model', parts: [{ text: replyText }] });
+                loadingBubble.innerHTML = renderMarkdown(replyText);
+            } catch (err) {
+                tutorChatHistory.pop();
+                loadingBubble.innerHTML = `<span style="color:#fca5a5;">❌ 호출 오류: ${escapeHtml(err.message)}</span><br><span style="font-size:0.78rem; color:#94a3b8;">상단 ⚙️ 버튼을 눌러 Gemini API 키가 정확한지 확인해 주세요.</span>`;
+            } finally {
+                isTutorLoading = false;
+                document.getElementById('tutor-send-btn').disabled = false;
+                const logEl = document.getElementById('tutor-chat-log');
+                logEl.scrollTop = logEl.scrollHeight;
+            }
         }
 
         window.onload = () => {
