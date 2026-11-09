@@ -976,178 +976,8 @@
         }
 
         /* ==========================================
-         * ⚡ 초고속 실시간 스트리밍(SSE) 공통 호출기
+         * ⚡ Gemini 3.8 Flash 단일 POST 호출 채점
          * ========================================== */
-        const marked = window.marked || { parse: (md) => renderMarkdown(md) };
-
-        async function streamGeminiSSE({ apiKey, systemPrompt, contents, generationConfig, resultContainer, onChunk, signal }) {
-            const temp = generationConfig?.temperature ?? 0.2;
-            const maxTokens = generationConfig?.maxOutputTokens ?? 2500;
-
-            const configWithNoThinking = {
-                temperature: temp,
-                maxOutputTokens: maxTokens,
-                thinkingConfig: {
-                    thinkingBudget: 0
-                }
-            };
-
-            const fallbackBasicConfig = {
-                temperature: temp,
-                maxOutputTokens: maxTokens
-            };
-
-            const attempts = [
-                { model: 'gemini-2.5-flash', config: configWithNoThinking },
-                { model: 'gemini-2.5-flash', config: fallbackBasicConfig },
-                { model: 'gemini-2.0-flash', config: fallbackBasicConfig },
-                { model: 'gemini-3.8-flash', config: configWithNoThinking },
-                { model: 'gemini-3.8-flash', config: fallbackBasicConfig }
-            ];
-
-            let response = null;
-            let lastError = null;
-
-            for (let i = 0; i < attempts.length; i++) {
-                const { model, config } = attempts[i];
-                const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:streamGenerateContent?key=${encodeURIComponent(apiKey)}&alt=sse`;
-
-                response = await fetch(url, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    signal,
-                    body: JSON.stringify({
-                        system_instruction: { parts: [{ text: systemPrompt }] },
-                        contents,
-                        generationConfig: config
-                    })
-                });
-
-                if (!response.ok) {
-                    const rawErrorText = await response.text();
-                    let errMsg = `HTTP ${response.status}`;
-                    try {
-                        const sseExtracted = rawErrorText
-                            .split(/\r?\n/)
-                            .map(l => l.trim())
-                            .filter(l => l.startsWith('data:'))
-                            .map(l => l.slice(5).trim())
-                            .join('');
-                        const jsonText = sseExtracted || rawErrorText.trim();
-                        const errJson = JSON.parse(jsonText);
-                        errMsg = errJson?.error?.message
-                            ? `[HTTP ${response.status}] ${errJson.error.message}`
-                            : `[HTTP ${response.status}] ${rawErrorText.trim()}`;
-                    } catch (parseErr) {
-                        errMsg = `[HTTP ${response.status}] ${rawErrorText.trim() || response.statusText || '요청 실패'}`;
-                    }
-                    lastError = new Error(errMsg);
-                    // thinkingConfig 400 에러 또는 모델명 404 에러 시 다음 폴백 설정으로 즉시 재시도
-                    if ((response.status === 400 || response.status === 404) && i < attempts.length - 1) {
-                        continue;
-                    }
-                    throw lastError;
-                }
-
-                break;
-            }
-
-            if (!response || !response.ok) {
-                throw lastError || new Error('스트리밍 API 응답 오류');
-            }
-
-            if (!response.body) {
-                throw new Error('스트리밍 응답 본문(ReadableStream)을 읽을 수 없습니다.');
-            }
-
-            const reader = response.body.getReader();
-            const decoder = new TextDecoder('utf-8');
-            let buffer = '';
-            let fullResponseText = '';
-            let isStreamDone = false;
-
-            const handleSseLine = (rawLine) => {
-                const line = rawLine.trim();
-                if (!line || !line.startsWith('data:')) return;
-
-                const dataStr = line.replace(/^data:\s*/, '').trim();
-                if (!dataStr) return;
-                if (dataStr === '[DONE]') {
-                    isStreamDone = true;
-                    return;
-                }
-
-                let parsed;
-                try {
-                    parsed = JSON.parse(dataStr);
-                } catch (jsonErr) {
-                    return;
-                }
-
-                if (parsed?.error) {
-                    throw new Error(parsed.error.message || '스트리밍 중 API 에러가 발생했습니다.');
-                }
-
-                const parts = parsed?.candidates?.[0]?.content?.parts;
-                if (Array.isArray(parts)) {
-                    let newChunkText = '';
-                    for (const p of parts) {
-                        if (p?.thought === true) continue;
-                        if (typeof p?.text === 'string' && p.text.length > 0) {
-                            newChunkText += p.text;
-                        }
-                    }
-                    if (newChunkText.length > 0) {
-                        fullResponseText += newChunkText;
-                        if (resultContainer) {
-                            resultContainer.innerHTML = marked.parse(fullResponseText);
-                        }
-                        if (typeof onChunk === 'function') {
-                            onChunk(fullResponseText, newChunkText);
-                        }
-                    }
-                }
-            };
-
-            try {
-                while (!isStreamDone) {
-                    const { value, done } = await reader.read();
-                    if (done) {
-                        buffer += decoder.decode();
-                        break;
-                    }
-                    buffer += decoder.decode(value, { stream: true });
-
-                    const lines = buffer.split(/\r?\n/);
-                    buffer = lines.pop() ?? '';
-
-                    for (const rawLine of lines) {
-                        handleSseLine(rawLine);
-                        if (isStreamDone) break;
-                    }
-                }
-
-                if (!isStreamDone && buffer.trim()) {
-                    const remaining = buffer.split(/\r?\n/);
-                    for (const rawLine of remaining) {
-                        handleSseLine(rawLine);
-                        if (isStreamDone) break;
-                    }
-                }
-            } finally {
-                try {
-                    if (isStreamDone) {
-                        await reader.cancel();
-                    }
-                } catch (e) {}
-                try {
-                    reader.releaseLock();
-                } catch (e) {}
-            }
-
-            return fullResponseText;
-        }
-
         async function gradeTestAnswer() {
             if (isTestGrading || !currentDeck.length) return;
             const inputEl = document.getElementById('test-answer-input');
@@ -1172,87 +1002,57 @@
             const gradeBtn = document.getElementById('test-grade-btn');
 
             gradingBox.classList.add('is-visible');
-            gradingStatus.innerHTML = '<span class="streaming-dot"></span>실전 채점위원 실시간 스트리밍 첨삭 중...';
-            resultContainer.innerHTML = '<span id="grading-stream-loading" style="color:#94a3b8;">⚡ 채점 스트림 연결 중...</span>';
+            gradingStatus.innerHTML = '⏳ 실전 채점위원 채점 중...';
+            resultContainer.innerHTML = '<span style="color:#94a3b8;">⏳ AI 채점 결과를 생성하고 있습니다...</span>';
             gradingElapsed.innerText = '';
 
             isTestGrading = true;
             gradeBtn.disabled = true;
-            gradeBtn.innerText = '⚡ 실시간 채점 중...';
+            gradeBtn.innerText = '⏳ 채점 중...';
 
-            if (activeStreamAbortController) {
-                try { activeStreamAbortController.abort(); } catch (e) {}
-            }
-            activeStreamAbortController = new AbortController();
             const startTime = performance.now();
-            let firstTokenTime = null;
-            let fullResponseText = '';
 
             try {
-                const finalText = await streamGeminiSSE({
-                    apiKey,
-                    systemPrompt,
-                    contents: [
-                        {
-                            role: 'user',
-                            parts: [{ text: `[수험생 백지 인출 답안]\n${userDraft}` }]
+                const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${encodeURIComponent(apiKey)}`;
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        system_instruction: {
+                            parts: [{ text: systemPrompt }]
+                        },
+                        contents: [
+                            {
+                                role: 'user',
+                                parts: [{ text: `[수험생 백지 인출 답안]\n${userDraft}` }]
+                            }
+                        ],
+                        generationConfig: {
+                            temperature: 0.3,
+                            maxOutputTokens: 2048
                         }
-                    ],
-                    generationConfig: {
-                        temperature: 0.2,
-                        maxOutputTokens: 2500,
-                        thinkingConfig: {
-                            thinkingBudget: 0
-                        }
-                    },
-                    resultContainer,
-                    signal: activeStreamAbortController.signal,
-                    onChunk: (accumulatedText, newChunkText) => {
-                        if (firstTokenTime === null) {
-                            firstTokenTime = ((performance.now() - startTime) / 1000).toFixed(2);
-                            gradingElapsed.innerText = `첫 응답 ${firstTokenTime}초`;
-                        }
-                        fullResponseText = accumulatedText;
-                        resultContainer.innerHTML = marked.parse(fullResponseText);
-                    }
+                    })
                 });
 
-                if (finalText && finalText.length > fullResponseText.length) {
-                    fullResponseText = finalText;
+                const data = await response.json();
+                if (!response.ok) {
+                    const errMsg = (data && data.error && data.error.message) ? data.error.message : `HTTP ${response.status}`;
+                    throw new Error(errMsg);
                 }
 
+                const replyText = data?.candidates?.[0]?.content?.parts?.map(p => p.text || '').join('\n') || '응답을 생성하지 못했습니다.';
                 const totalSec = ((performance.now() - startTime) / 1000).toFixed(2);
-                if (fullResponseText && fullResponseText.trim()) {
-                    gradingStatus.innerHTML = '✅ 실전 채점 완료';
-                    gradingElapsed.innerText = firstTokenTime ? `첫 글자 ${firstTokenTime}s · 완료 ${totalSec}s` : `완료 ${totalSec}s`;
-                    resultContainer.innerHTML = marked.parse(fullResponseText);
-                } else {
-                    gradingStatus.innerHTML = '<span style="color:#ef4444;">⚠️ 빈 응답 수신</span>';
-                    resultContainer.innerHTML = '<div style="color:#ef4444; font-weight:600;">응답이 비어 있습니다. 다시 시도해 주세요.</div>';
-                }
+                gradingStatus.innerHTML = '✅ 실전 채점 완료';
+                gradingElapsed.innerText = `완료 ${totalSec}s`;
+                resultContainer.innerHTML = renderMarkdown(replyText);
             } catch (err) {
-                if (err.name === 'AbortError') {
-                    gradingStatus.innerHTML = '⏹️ 채점 중단됨';
-                    resultContainer.innerHTML = '<span style="color:#94a3b8;">채점 스트림이 취소되었습니다.</span>';
-                    return;
-                }
                 gradingStatus.innerHTML = '<span style="color:#ef4444;">❌ 채점 호출 오류</span>';
-                resultContainer.innerHTML = `<div style="color:#ef4444; background:rgba(239, 68, 68, 0.12); border:1px solid rgba(239, 68, 68, 0.45); padding:10px 12px; border-radius:8px; font-weight:700; line-height:1.5; word-break:break-word;">❌ 오류: ${escapeHtml(err.message || String(err))}</div><div style="margin-top:6px; font-size:0.78rem; color:#fca5a5;">우측 상단 ⚙️ 버튼을 눌러 Gemini API 키 및 요청 상태를 확인해 주세요.</div>`;
+                resultContainer.innerHTML = `<div style="color:#ef4444; background:rgba(239, 68, 68, 0.12); border:1px solid rgba(239, 68, 68, 0.45); padding:10px 12px; border-radius:8px; font-weight:700; line-height:1.5; word-break:break-word;">❌ 오류: ${escapeHtml(err.message || String(err))}</div><div style="margin-top:6px; font-size:0.78rem; color:#fca5a5;">우측 상단 ⚙️ 버튼을 눌러 Gemini API 키를 확인해 주세요.</div>`;
             } finally {
                 isTestGrading = false;
                 if (gradeBtn) {
                     gradeBtn.disabled = false;
                     gradeBtn.innerText = '🎯 AI 실전 채점 및 피드백';
-                }
-                const loadingSpan = document.getElementById('grading-stream-loading');
-                if (loadingSpan) {
-                    loadingSpan.remove();
-                }
-                if (resultContainer && resultContainer.innerText.includes('채점 스트림 연결 중')) {
-                    resultContainer.innerHTML = '<div style="color:#ef4444; font-weight:600;">⚠️ 채점 스트림 연결이 종료되었습니다. 다시 시도해 주세요.</div>';
-                }
-                if (gradingStatus && gradingStatus.innerText.includes('스트리밍 첨삭 중')) {
-                    gradingStatus.innerHTML = '⏹️ 채점 대기';
                 }
             }
         }
@@ -1630,26 +1430,31 @@
             const logEl = document.getElementById('tutor-chat-log');
 
             try {
-                const replyText = await streamGeminiSSE({
-                    apiKey,
-                    systemPrompt,
-                    contents: tutorChatHistory,
-                    generationConfig: {
-                        temperature: 0.2,
-                        maxOutputTokens: 2500,
-                        thinkingConfig: {
-                            thinkingBudget: 0
+                const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${encodeURIComponent(apiKey)}`;
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        system_instruction: {
+                            parts: [{ text: systemPrompt }]
+                        },
+                        contents: tutorChatHistory,
+                        generationConfig: {
+                            temperature: 0.4,
+                            maxOutputTokens: 2048
                         }
-                    },
-                    resultContainer: loadingBubble,
-                    onChunk: (accumulated) => {
-                        loadingBubble.innerHTML = renderMarkdown(accumulated);
-                        logEl.scrollTop = logEl.scrollHeight;
-                    }
+                    })
                 });
 
+                const data = await response.json();
+                if (!response.ok) {
+                    const errMsg = (data && data.error && data.error.message) ? data.error.message : `HTTP ${response.status}`;
+                    throw new Error(errMsg);
+                }
+
+                const replyText = data?.candidates?.[0]?.content?.parts?.map(p => p.text || '').join('\n') || '응답을 생성하지 못했습니다.';
                 tutorChatHistory.push({ role: 'model', parts: [{ text: replyText }] });
-                loadingBubble.innerHTML = renderMarkdown(replyText || '응답을 생성하지 못했습니다.');
+                loadingBubble.innerHTML = renderMarkdown(replyText);
             } catch (err) {
                 tutorChatHistory.pop();
                 loadingBubble.innerHTML = `<span style="color:#fca5a5;">❌ 호출 오류: ${escapeHtml(err.message)}</span><br><span style="font-size:0.78rem; color:#94a3b8;">상단 ⚙️ 버튼을 눌러 Gemini API 키가 정확한지 확인해 주세요.</span>`;
@@ -1659,7 +1464,6 @@
                 logEl.scrollTop = logEl.scrollHeight;
             }
         }
-
         window.onload = () => {
             initApp();
             setupSwipeGesture();
