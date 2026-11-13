@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>정보관리기술사 실전 모의고사 시뮬레이터 (152제)</title>
+    <title>정보관리기술사 실전 모의고사 시뮬레이터</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -18,14 +18,14 @@
                     <a href="index.html" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 px-2.5 py-1 rounded-md transition flex items-center gap-1">
                         <i class="fa-solid fa-arrow-left"></i> 플래시카드 홈
                     </a>
-                    <span class="text-xs bg-indigo-950 text-indigo-300 border border-indigo-800/60 px-2.5 py-0.5 rounded-full font-semibold">노션 모의고사 전 문항 (152제)</span>
+                    <span class="text-xs bg-indigo-950 text-indigo-300 border border-indigo-800/60 px-2.5 py-0.5 rounded-full font-semibold">노션 모의고사 152제 탑재</span>
                 </div>
                 <h1 class="text-2xl font-bold tracking-tight text-white flex items-center gap-2">
                     <i class="fa-solid fa-pen-nib text-indigo-400"></i> 정보관리기술사 실전 모의고사 머신
                 </h1>
-                <p class="text-sm text-slate-400 mt-1">자율 선택형 백지 인출 및 일괄 복사 시뮬레이터 (1교시 104제 · 2교시 48제)</p>
+                <p class="text-sm text-slate-400 mt-1">자율 선택형 백지 인출 및 일괄 복사 시뮬레이터</p>
             </div>
-            <div class="flex items-center gap-2">
+            <div>
                 <button onclick="copyAllAnswers()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-lg text-sm font-medium transition shadow-lg flex items-center gap-2 cursor-pointer">
                     <i class="fa-solid fa-copy"></i> 📋 내가 푼 답안 전체 복사
                 </button>
@@ -41,37 +41,70 @@
                     <p class="text-slate-400 text-sm mb-6">원하는 문제를 골라 자유롭게 타이핑하고, 언제든 답안을 복사할 수 있습니다.</p>
                     
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-lg mx-auto">
-                        <button onclick="selectSession('1교시')" class="p-6 bg-slate-800 hover:bg-slate-750 border border-slate-700 hover:border-indigo-500 rounded-xl transition text-left group cursor-pointer">
+                        <button onclick="openConfig('1교시')" class="p-6 bg-slate-800 hover:bg-slate-750 border border-slate-700 hover:border-indigo-500 rounded-xl transition text-left group cursor-pointer">
                             <div class="text-indigo-400 font-bold text-lg mb-1 flex items-center justify-between">
-                                <span>1교시형 (단답형 · 104제)</span>
+                                <span>1교시형 (단답형)</span>
                                 <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition"></i>
                             </div>
-                            <p class="text-xs text-slate-400">10점 만점 콤팩트 백지 인출 연습 (8개 도메인 × 13문제)</p>
+                            <p class="text-xs text-slate-400">10점 만점 콤팩트 백지 인출 연습 (총 104문제)</p>
                         </button>
 
-                        <button onclick="selectSession('2교시')" class="p-6 bg-slate-800 hover:bg-slate-750 border border-slate-700 hover:border-indigo-500 rounded-xl transition text-left group cursor-pointer">
+                        <button onclick="openConfig('2교시')" class="p-6 bg-slate-800 hover:bg-slate-750 border border-slate-700 hover:border-indigo-500 rounded-xl transition text-left group cursor-pointer">
                             <div class="text-indigo-400 font-bold text-lg mb-1 flex items-center justify-between">
-                                <span>2~4교시형 (서술형 · 48제)</span>
+                                <span>2~4교시형 (서술형)</span>
                                 <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition"></i>
                             </div>
-                            <p class="text-xs text-slate-400">가·나·다 세부 조건 서술형 목차 연습 (8개 도메인 × 6문제)</p>
+                            <p class="text-xs text-slate-400">가·나·다 세부 조건 서술형 목차 연습 (총 48문제)</p>
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 1-2. 뷰: 모의고사 문제 개수 세팅 화면 (신규 추가) -->
+            <section id="view-config" class="hidden space-y-6">
+                <div class="bg-slate-800/50 border border-slate-700/60 rounded-2xl p-6 max-w-lg mx-auto text-center space-y-6">
+                    <div class="flex items-center justify-between">
+                        <button onclick="switchView('mode-select')" class="text-sm text-slate-400 hover:text-white transition flex items-center gap-2 cursor-pointer">
+                            <i class="fa-solid fa-arrow-left"></i> 뒤로
+                        </button>
+                        <h2 id="config-title" class="text-lg font-bold text-indigo-400">모의고사 세트 설정</h2>
+                        <div class="w-10"></div>
+                    </div>
+
+                    <div>
+                        <p class="text-slate-300 text-sm mb-4">이번 세트에서 풀고 싶은 문제 개수를 선택하세요.<br><span class="text-xs text-slate-400">선택한 개수만큼 무작위로 추출됩니다.</span></p>
+                        
+                        <div class="grid grid-cols-2 gap-3 mb-6">
+                            <button onclick="setQuestionCount(4)" id="btn-count-4" class="count-btn p-3 bg-slate-900 border border-slate-700 rounded-xl text-sm font-medium hover:border-indigo-500 transition cursor-pointer">
+                                ⚡ 미니 세트 (4문제)
+                            </button>
+                            <button onclick="setQuestionCount(10)" id="btn-count-10" class="count-btn p-3 bg-slate-900 border border-slate-700 rounded-xl text-sm font-medium hover:border-indigo-500 transition cursor-pointer">
+                                🎯 표준 실전 (10문제)
+                            </button>
+                            <button onclick="setQuestionCount(20)" id="btn-count-20" class="count-btn p-3 bg-slate-900 border border-slate-700 rounded-xl text-sm font-medium hover:border-indigo-500 transition cursor-pointer">
+                                🔥 집중 세트 (20문제)
+                            </button>
+                            <button onclick="setQuestionCount('all')" id="btn-count-all" class="count-btn p-3 bg-slate-900 border border-slate-700 rounded-xl text-sm font-medium hover:border-indigo-500 transition cursor-pointer">
+                                📚 전체 보기
+                            </button>
+                        </div>
+
+                        <button onclick="startMockExam()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white py-3 rounded-xl font-bold transition shadow-lg cursor-pointer flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-dice"></i> 무작위 모의고사 시작하기
                         </button>
                     </div>
                 </div>
             </section>
 
             <!-- 2. 뷰: 문제 목록 대시보드 화면 -->
-            <section id="view-dashboard" class="hidden space-y-5">
-                <div class="flex flex-wrap justify-between items-center gap-2 bg-slate-800/40 p-4 rounded-xl border border-slate-800">
-                    <button onclick="goBackToHome()" class="text-sm text-slate-400 hover:text-white transition flex items-center gap-2 cursor-pointer">
-                        <i class="fa-solid fa-arrow-left"></i> 교시 다시 선택
+            <section id="view-dashboard" class="hidden space-y-6">
+                <div class="flex justify-between items-center bg-slate-800/40 p-4 rounded-xl border border-slate-800">
+                    <button onclick="switchView('config')" class="text-sm text-slate-400 hover:text-white transition flex items-center gap-2 cursor-pointer">
+                        <i class="fa-solid fa-arrow-left"></i> 세팅 변경
                     </button>
                     <div id="dashboard-title" class="font-bold text-indigo-400 text-lg"></div>
                     <div id="completion-badge" class="text-xs bg-slate-700 px-3 py-1 rounded-full text-slate-300">작성 완료: 0 / 0</div>
                 </div>
-
-                <!-- 도메인 필터 탭 -->
-                <div id="domain-filter-bar" class="flex flex-wrap gap-2"></div>
 
                 <!-- 문제 카드 그리드 리스트 -->
                 <div id="question-list-container" class="space-y-3">
@@ -90,7 +123,7 @@
 
                 <!-- 문제 원문 카드 -->
                 <div class="bg-slate-800 border border-slate-700 rounded-xl p-6 shadow-md">
-                    <div class="flex flex-wrap items-center gap-2 mb-3">
+                    <div class="flex items-center gap-2 mb-3">
                         <span id="solve-session-badge" class="text-xs px-2.5 py-1 rounded font-semibold bg-indigo-900 text-indigo-200">1교시</span>
                         <span id="solve-domain-badge" class="text-xs px-2.5 py-1 rounded font-semibold bg-slate-700 text-sky-300">도메인</span>
                         <span id="solve-qnum" class="text-sm font-bold text-slate-400">문제 1</span>
@@ -132,7 +165,7 @@
 
     <!-- JavaScript 로직 -->
     <script>
-        // 모의고사 원본 데이터셋 (노션 모의고사 152문항 전수 수록 - 원문 그대로 유지)
+        // 모의고사 원본 데이터셋 (노션 모의고사 형식 - 152문항 원문 그대로 유지)
         const mockData = [
           {
                     "id": 1,
@@ -1202,11 +1235,11 @@
 
         // 앱 상태 변수
         let currentSession = null;
-        let currentDomainFilter = 'ALL';
+        let selectedCount = 4; // 기본 선택 개수
         let currentQuestionIndex = 0;
-        let activeQuestions = []; // 현재 선택된 교시(+도메인)의 문제 목록
+        let activeQuestions = []; // 현재 무작위 추출된 문제 목록
 
-        // 로컬 스토리지에서 답안 불러오기 (없으면 빈 객체)
+        // 로컬 스토리지에서 답안 불러오기
         function getStoredAnswers() {
             try {
                 return JSON.parse(localStorage.getItem('tech_exam_answers')) || {};
@@ -1223,7 +1256,6 @@
             showSaveIndicator();
         }
 
-        // 저장 완료 뱃지 깜빡임 효과
         function showSaveIndicator() {
             const indicator = document.getElementById('auto-save-status');
             indicator.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> 저장 중...';
@@ -1235,11 +1267,14 @@
         // 뷰 전환 함수
         function switchView(viewName) {
             document.getElementById('view-mode-select').classList.add('hidden');
+            document.getElementById('view-config').classList.add('hidden');
             document.getElementById('view-dashboard').classList.add('hidden');
             document.getElementById('view-solve').classList.add('hidden');
 
             if (viewName === 'mode-select') {
                 document.getElementById('view-mode-select').classList.remove('hidden');
+            } else if (viewName === 'config') {
+                document.getElementById('view-config').classList.remove('hidden');
             } else if (viewName === 'dashboard') {
                 document.getElementById('view-dashboard').classList.remove('hidden');
                 renderDashboard();
@@ -1249,31 +1284,37 @@
             }
         }
 
-        function updateActiveQuestions() {
-            activeQuestions = mockData.filter(q => {
-                if (q.session !== currentSession) return false;
-                if (currentDomainFilter !== 'ALL' && q.domain !== currentDomainFilter) return false;
-                return true;
-            });
-        }
-
-        // 교시 선택
-        function selectSession(session) {
+        // 교시 선택 후 세팅 화면으로 이동
+        function openConfig(session) {
             currentSession = session;
-            currentDomainFilter = 'ALL';
-            updateActiveQuestions();
+            document.getElementById('config-title').innerText = `${session} 모의고사 세트 설정`;
+            setQuestionCount(4); // 기본 4개로 초기화
+            switchView('config');
+        }
+
+        // 문제 개수 선택 버튼 UI 처리
+        function setQuestionCount(count) {
+            selectedCount = count;
+            document.querySelectorAll('.count-btn').forEach(btn => {
+                btn.classList.remove('border-indigo-500', 'bg-indigo-950/40');
+            });
+            let targetId = count === 'all' ? 'btn-count-all' : `btn-count-${count}`;
+            document.getElementById(targetId).classList.add('border-indigo-500', 'bg-indigo-950/40');
+        }
+
+        // 🎲 무작위 모의고사 세트 생성 및 시작
+        function startMockExam() {
+            const pool = mockData.filter(q => q.session === currentSession);
+            
+            // 무작위 셔플 후 지정된 개수만큼 자르기
+            const shuffled = [...pool].sort(() => 0.5 - Math.random());
+            if (selectedCount === 'all') {
+                activeQuestions = shuffled;
+            } else {
+                activeQuestions = shuffled.slice(0, Math.min(selectedCount, shuffled.length));
+            }
+
             switchView('dashboard');
-        }
-
-        function selectDomainFilter(domain) {
-            currentDomainFilter = domain;
-            updateActiveQuestions();
-            renderDashboard();
-        }
-
-        function goBackToHome() {
-            currentSession = null;
-            switchView('mode-select');
         }
 
         function goBackToDashboard() {
@@ -1282,22 +1323,9 @@
 
         // 대시보드 렌더링
         function renderDashboard() {
-            document.getElementById('dashboard-title').innerText = `${currentSession} 모의고사 문제 목록`;
+            document.getElementById('dashboard-title').innerText = `${currentSession} 무작위 모의고사 (${activeQuestions.length}제)`;
             const container = document.getElementById('question-list-container');
-            const filterBar = document.getElementById('domain-filter-bar');
             const answers = getStoredAnswers();
-
-            // 도메인 필터 버튼 렌더링
-            const sessionItems = mockData.filter(q => q.session === currentSession);
-            const domains = ['ALL', ...new Set(sessionItems.map(q => q.domain))];
-            filterBar.innerHTML = domains.map(d => {
-                const count = d === 'ALL' ? sessionItems.length : sessionItems.filter(q => q.domain === d).length;
-                const activeClass = currentDomainFilter === d
-                    ? 'bg-indigo-600 text-white border-indigo-500'
-                    : 'bg-slate-800 text-slate-300 border-slate-700 hover:border-indigo-400';
-                const label = d === 'ALL' ? `전체 (${count})` : `${d} (${count})`;
-                return `<button onclick="selectDomainFilter('${d}')" class="text-xs px-3 py-1.5 rounded-full border font-medium transition cursor-pointer ${activeClass}">${label}</button>`;
-            }).join('');
 
             let completedCount = 0;
             let html = '';
@@ -1309,8 +1337,8 @@
                 html += `
                     <div onclick="openSolveView(${idx})" class="bg-slate-800 hover:bg-slate-750 border border-slate-700/80 hover:border-indigo-500 rounded-xl p-4 transition cursor-pointer flex items-center justify-between group">
                         <div class="flex items-center gap-3 overflow-hidden pr-2">
+                            <span class="text-sm font-bold text-slate-400 w-16 shrink-0">SET Q.${idx + 1}</span>
                             <span class="text-xs font-semibold px-2 py-0.5 rounded bg-slate-700 text-sky-300 shrink-0">${q.domain}</span>
-                            <span class="text-sm font-bold text-slate-400 w-12 shrink-0">Q.${idx + 1}</span>
                             <p class="text-sm text-slate-200 truncate font-medium">${q.question.split('\n')[0]}</p>
                         </div>
                         <div class="flex items-center gap-3 shrink-0">
@@ -1340,10 +1368,10 @@
 
             document.getElementById('solve-session-badge').innerText = q.session;
             document.getElementById('solve-domain-badge').innerText = q.domain;
-            document.getElementById('solve-qnum').innerText = `문제 ${currentQuestionIndex + 1} / ${activeQuestions.length}`;
+            document.getElementById('solve-qnum').innerText = `세트 문제 ${currentQuestionIndex + 1} / ${activeQuestions.length}`;
             document.getElementById('solve-question-text').innerText = q.question;
             document.getElementById('answer-textarea').value = answers[q.id] || '';
-            document.getElementById('solve-nav-info').innerText = `[${q.domain}] ${currentQuestionIndex + 1}번 문제`;
+            document.getElementById('solve-nav-info').innerText = `세트 ${currentQuestionIndex + 1}번 문제`;
         }
 
         // 타이핑 시 실시간 저장
@@ -1368,11 +1396,13 @@
             exportText += "[정보관리기술사 실전 모의고사 백지 인출 답안]\n\n";
 
             let count = 0;
-            mockData.forEach((q) => {
+            // 현재 세션에서 풀었던 문제들(세트가 아직 선택 안 된 경우 전체 mockData) 중에서 작성된 것만 추출
+            const targetList = activeQuestions.length > 0 ? activeQuestions : mockData;
+            targetList.forEach((q, idx) => {
                 const userAns = answers[q.id];
                 if (userAns && userAns.trim().length > 0) {
                     count++;
-                    exportText += `${count}. [${q.session} / ${q.domain}] 문제: ${q.question.replace(/\n/g, ' ')}\n`;
+                    exportText += `${count}. 문제: ${q.question.replace(/\n/g, ' ')}\n`;
                     exportText += `- 작성 내용:\n${userAns}\n\n--------------------------------------\n\n`;
                 }
             });
@@ -1384,10 +1414,9 @@
 
             exportText += "======================================\n";
 
-            // 클립보드 복사
             navigator.clipboard.writeText(exportText).then(() => {
                 showToast(`총 ${count}개의 작성 답안이 클립보드에 복사되었습니다!`);
-            }).catch(() => {
+            }).catch(err => {
                 showToast("복사에 실패했습니다. 권한을 확인해주세요.", "bg-rose-600");
             });
         }
