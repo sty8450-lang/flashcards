@@ -1,0 +1,1408 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>정보관리기술사 실전 모의고사 시뮬레이터 (152제)</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen font-sans antialiased">
+
+    <div class="max-w-4xl mx-auto px-4 py-8">
+        <!-- 상단 헤더 -->
+        <header class="flex flex-wrap justify-between items-center gap-3 mb-8 pb-4 border-b border-slate-800">
+            <div>
+                <div class="flex items-center gap-2 mb-1">
+                    <a href="index.html" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 px-2.5 py-1 rounded-md transition flex items-center gap-1">
+                        <i class="fa-solid fa-arrow-left"></i> 플래시카드 홈
+                    </a>
+                    <span class="text-xs bg-indigo-950 text-indigo-300 border border-indigo-800/60 px-2.5 py-0.5 rounded-full font-semibold">노션 모의고사 전 문항 (152제)</span>
+                </div>
+                <h1 class="text-2xl font-bold tracking-tight text-white flex items-center gap-2">
+                    <i class="fa-solid fa-pen-nib text-indigo-400"></i> 정보관리기술사 실전 모의고사 머신
+                </h1>
+                <p class="text-sm text-slate-400 mt-1">자율 선택형 백지 인출 및 일괄 복사 시뮬레이터 (1교시 104제 · 2교시 48제)</p>
+            </div>
+            <div class="flex items-center gap-2">
+                <button onclick="copyAllAnswers()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-lg text-sm font-medium transition shadow-lg flex items-center gap-2 cursor-pointer">
+                    <i class="fa-solid fa-copy"></i> 📋 내가 푼 답안 전체 복사
+                </button>
+            </div>
+        </header>
+
+        <!-- 메인 컨테이너 -->
+        <main id="app">
+            <!-- 1. 뷰: 교시 선택 화면 -->
+            <section id="view-mode-select" class="space-y-6">
+                <div class="bg-slate-800/50 border border-slate-700/60 rounded-2xl p-6 text-center">
+                    <h2 class="text-xl font-semibold mb-3 text-white">연습할 교시를 선택하세요</h2>
+                    <p class="text-slate-400 text-sm mb-6">원하는 문제를 골라 자유롭게 타이핑하고, 언제든 답안을 복사할 수 있습니다.</p>
+                    
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-lg mx-auto">
+                        <button onclick="selectSession('1교시')" class="p-6 bg-slate-800 hover:bg-slate-750 border border-slate-700 hover:border-indigo-500 rounded-xl transition text-left group cursor-pointer">
+                            <div class="text-indigo-400 font-bold text-lg mb-1 flex items-center justify-between">
+                                <span>1교시형 (단답형 · 104제)</span>
+                                <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition"></i>
+                            </div>
+                            <p class="text-xs text-slate-400">10점 만점 콤팩트 백지 인출 연습 (8개 도메인 × 13문제)</p>
+                        </button>
+
+                        <button onclick="selectSession('2교시')" class="p-6 bg-slate-800 hover:bg-slate-750 border border-slate-700 hover:border-indigo-500 rounded-xl transition text-left group cursor-pointer">
+                            <div class="text-indigo-400 font-bold text-lg mb-1 flex items-center justify-between">
+                                <span>2~4교시형 (서술형 · 48제)</span>
+                                <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition"></i>
+                            </div>
+                            <p class="text-xs text-slate-400">가·나·다 세부 조건 서술형 목차 연습 (8개 도메인 × 6문제)</p>
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 2. 뷰: 문제 목록 대시보드 화면 -->
+            <section id="view-dashboard" class="hidden space-y-5">
+                <div class="flex flex-wrap justify-between items-center gap-2 bg-slate-800/40 p-4 rounded-xl border border-slate-800">
+                    <button onclick="goBackToHome()" class="text-sm text-slate-400 hover:text-white transition flex items-center gap-2 cursor-pointer">
+                        <i class="fa-solid fa-arrow-left"></i> 교시 다시 선택
+                    </button>
+                    <div id="dashboard-title" class="font-bold text-indigo-400 text-lg"></div>
+                    <div id="completion-badge" class="text-xs bg-slate-700 px-3 py-1 rounded-full text-slate-300">작성 완료: 0 / 0</div>
+                </div>
+
+                <!-- 도메인 필터 탭 -->
+                <div id="domain-filter-bar" class="flex flex-wrap gap-2"></div>
+
+                <!-- 문제 카드 그리드 리스트 -->
+                <div id="question-list-container" class="space-y-3">
+                    <!-- Javascript로 동적 생성 -->
+                </div>
+            </section>
+
+            <!-- 3. 뷰: 개별 문제 작성 화면 -->
+            <section id="view-solve" class="hidden space-y-4">
+                <div class="flex justify-between items-center bg-slate-800/40 p-3 rounded-xl border border-slate-800">
+                    <button onclick="goBackToDashboard()" class="text-sm text-indigo-400 hover:text-indigo-300 transition flex items-center gap-2 cursor-pointer font-medium">
+                        <i class="fa-solid fa-list"></i> ⬅️ 문제 목록으로
+                    </button>
+                    <div id="solve-nav-info" class="text-xs text-slate-400">문제 번호</div>
+                </div>
+
+                <!-- 문제 원문 카드 -->
+                <div class="bg-slate-800 border border-slate-700 rounded-xl p-6 shadow-md">
+                    <div class="flex flex-wrap items-center gap-2 mb-3">
+                        <span id="solve-session-badge" class="text-xs px-2.5 py-1 rounded font-semibold bg-indigo-900 text-indigo-200">1교시</span>
+                        <span id="solve-domain-badge" class="text-xs px-2.5 py-1 rounded font-semibold bg-slate-700 text-sky-300">도메인</span>
+                        <span id="solve-qnum" class="text-sm font-bold text-slate-400">문제 1</span>
+                    </div>
+                    <div id="solve-question-text" class="text-base text-slate-100 whitespace-pre-line leading-relaxed font-medium">
+                        <!-- 문제 원문 -->
+                    </div>
+                </div>
+
+                <!-- 답안 작성 Area -->
+                <div class="bg-slate-800 border border-slate-700 rounded-xl p-4 shadow-md space-y-2">
+                    <div class="flex justify-between items-center text-xs text-slate-400 px-1">
+                        <span>✍️ 백지 인출 답안 작성 (실시간 자동 저장됨)</span>
+                        <span id="auto-save-status" class="text-emerald-400 font-medium"><i class="fa-solid fa-check"></i> 저장됨</span>
+                    </div>
+                    <textarea id="answer-textarea" rows="12" 
+                        class="w-full bg-slate-900 border border-slate-700 rounded-lg p-4 text-slate-100 focus:outline-none focus:border-indigo-500 font-mono text-sm leading-relaxed"
+                        placeholder="이곳에 키워드 및 답안을 거침없이 타이핑하세요..."
+                        oninput="handleAnswerInput(this.value)"></textarea>
+                </div>
+
+                <!-- 하단 이전/다음 네비게이션 -->
+                <div class="flex justify-between pt-2">
+                    <button onclick="moveQuestion(-1)" class="bg-slate-800 hover:bg-slate-700 px-4 py-2 rounded-lg text-sm text-slate-300 transition cursor-pointer">
+                        <i class="fa-solid fa-chevron-left"></i> 이전 문제
+                    </button>
+                    <button onclick="moveQuestion(1)" class="bg-slate-800 hover:bg-slate-700 px-4 py-2 rounded-lg text-sm text-slate-300 transition cursor-pointer">
+                        다음 문제 <i class="fa-solid fa-chevron-right"></i>
+                    </button>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- 토스트 팝업 알림 -->
+    <div id="toast" class="fixed bottom-6 right-6 bg-emerald-600 text-white px-5 py-3 rounded-xl shadow-2xl transition-all duration-300 translate-y-20 opacity-0 pointer-events-none font-medium flex items-center gap-2 z-50">
+        <i class="fa-solid fa-circle-check text-lg"></i> <span id="toast-msg">복사되었습니다!</span>
+    </div>
+
+    <!-- JavaScript 로직 -->
+    <script>
+        // 모의고사 원본 데이터셋 (노션 모의고사 152문항 전수 수록 - 원문 그대로 유지)
+        const mockData = [
+          {
+                    "id": 1,
+                    "session": "1교시",
+                    "domain": "경영/프관",
+                    "qNum": 1,
+                    "question": "1. 공공 SLA 도입의 필요성"
+          },
+          {
+                    "id": 2,
+                    "session": "1교시",
+                    "domain": "경영/프관",
+                    "qNum": 2,
+                    "question": "2. BCP와 BIA 에 대하여 설명하시오."
+          },
+          {
+                    "id": 3,
+                    "session": "1교시",
+                    "domain": "경영/프관",
+                    "qNum": 3,
+                    "question": "3. ISO 21500"
+          },
+          {
+                    "id": 4,
+                    "session": "1교시",
+                    "domain": "경영/프관",
+                    "qNum": 4,
+                    "question": "4. 공급망관리(SCM, Supply Chain Management)"
+          },
+          {
+                    "id": 5,
+                    "session": "1교시",
+                    "domain": "경영/프관",
+                    "qNum": 5,
+                    "question": "5. IT 투자성과지표와 프레임워크"
+          },
+          {
+                    "id": 6,
+                    "session": "1교시",
+                    "domain": "경영/프관",
+                    "qNum": 6,
+                    "question": "6. 애자일 원칙(Agile Principles)"
+          },
+          {
+                    "id": 7,
+                    "session": "1교시",
+                    "domain": "경영/프관",
+                    "qNum": 7,
+                    "question": "7. PLM (Product Lifecycle Management)"
+          },
+          {
+                    "id": 8,
+                    "session": "1교시",
+                    "domain": "경영/프관",
+                    "qNum": 8,
+                    "question": "8. 프로젝트 획득가치(Earned Value Management) 보고서의 주요요소"
+          },
+          {
+                    "id": 9,
+                    "session": "1교시",
+                    "domain": "경영/프관",
+                    "qNum": 9,
+                    "question": "9. 품질비용 (Cost of Quality)개념과 예를 설명하시오"
+          },
+          {
+                    "id": 10,
+                    "session": "1교시",
+                    "domain": "경영/프관",
+                    "qNum": 10,
+                    "question": "10. AI 거버넌스(AI Governance)"
+          },
+          {
+                    "id": 11,
+                    "session": "1교시",
+                    "domain": "경영/프관",
+                    "qNum": 11,
+                    "question": "11. ISP 및 ISMP의 각 단계별 활동 내용 및 산출물의 종류"
+          },
+          {
+                    "id": 12,
+                    "session": "1교시",
+                    "domain": "경영/프관",
+                    "qNum": 12,
+                    "question": "12. 프로젝트 위험관리 절차와 위험 대응방안"
+          },
+          {
+                    "id": 13,
+                    "session": "1교시",
+                    "domain": "경영/프관",
+                    "qNum": 13,
+                    "question": "13. OKR(Objectives and Key Results)과 KPI(Key Performance Indicator)의 비교"
+          },
+          {
+                    "id": 14,
+                    "session": "2교시",
+                    "domain": "경영/프관",
+                    "qNum": 1,
+                    "question": "1. 국내외 ESG 공시 의무화(EU CSRD, 국내 자본시장법 개정 등)가 본격화되는 가운데, 기업의 ESG 경영 실현을 위한 정보기술(IT)의 역할과 데이터 거버넌스 체계에 대하여 설명하시오."
+          },
+          {
+                    "id": 15,
+                    "session": "2교시",
+                    "domain": "경영/프관",
+                    "qNum": 2,
+                    "question": "2. BI(Business Intelligence)는 데이터를 기반으로 의사결정을 지원하는 체계이다. 이에 관하여 다음을\n설명하시오.\n가. BI의 개념과 기대효과\n나. 전통적 BI의 한계\n다. Self Service BI 와 Generative BI 설명"
+          },
+          {
+                    "id": 16,
+                    "session": "2교시",
+                    "domain": "경영/프관",
+                    "qNum": 3,
+                    "question": "3. IT 프로젝트의 성패는 기술 자체보다 조직의 가치 전달 체계(Value Delivery System)가 얼마나 정렬되고 작동하는가에 의해 결정된다. IT 프로젝트가 실패하는 주요 원인을 설명하고 IT 프로젝트를 성공적으로 수행하기 위한 전략을 기술하시오."
+          },
+          {
+                    "id": 17,
+                    "session": "2교시",
+                    "domain": "경영/프관",
+                    "qNum": 4,
+                    "question": "4. 경영환경을 분석하는 방법인 SWOT, 3C, PEST분석에 대하여 각 방법의 특성과 적용을 위한 조건 그리고 분석방법에 대하여 설명하시오."
+          },
+          {
+                    "id": 18,
+                    "session": "2교시",
+                    "domain": "경영/프관",
+                    "qNum": 5,
+                    "question": "5. 최근 생성형 AI 모델이 AI 학습에 활용되어 저작권 침해 및 부정경쟁 문제로 이어지고 있는 상황으로 지식 재산권에 대한 문제가 부각되고 있다. 다음 항목에 대해 설명하시오.\n가. 지식재산권의 개념과 종류\n나. AI 창작물에 대한 지식재산권 적용 문제와 해결 방안"
+          },
+          {
+                    "id": 19,
+                    "session": "2교시",
+                    "domain": "경영/프관",
+                    "qNum": 6,
+                    "question": "6. 클라우드 전환과 IT 아웃소싱이 확대되면서 서비스 수준을 정량적으로 관리하는 ITSM·SLA 체계의 중요성이 커지고 있다. 다음을 설명하시오.\n가. ITSM(IT Service Management)의 개념과 ITIL 기준 프로세스 체계\n나. SLA(Service Level Agreement) 구성요소와 서비스 수준 지표(SLI·SLO)\n다. SLA 위반 시 대응 체계 및 서비스 품질 개선 전략(적용 방안)"
+          },
+          {
+                    "id": 20,
+                    "session": "1교시",
+                    "domain": "SW공학",
+                    "qNum": 1,
+                    "question": "1. 개발방법론 테일러링(Tailoring)의 필요성"
+          },
+          {
+                    "id": 21,
+                    "session": "1교시",
+                    "domain": "SW공학",
+                    "qNum": 2,
+                    "question": "2. CBAM (Cost Benefit Analysis Method)"
+          },
+          {
+                    "id": 22,
+                    "session": "1교시",
+                    "domain": "SW공학",
+                    "qNum": 3,
+                    "question": "3. 소프트웨어 비용 산정 방법 중 상향식, 하향식, 수학적 방식의 비교"
+          },
+          {
+                    "id": 23,
+                    "session": "1교시",
+                    "domain": "SW공학",
+                    "qNum": 4,
+                    "question": "4. SP인증과 GS인증의 비교"
+          },
+          {
+                    "id": 24,
+                    "session": "1교시",
+                    "domain": "SW공학",
+                    "qNum": 5,
+                    "question": "5. 정보시스템 감리기준 고시(2021-4호, 2021.1.19)에 의거한 현장감리의 활동, 작업내용"
+          },
+          {
+                    "id": 25,
+                    "session": "1교시",
+                    "domain": "SW공학",
+                    "qNum": 6,
+                    "question": "6. 소프트웨어 유지보수 유형"
+          },
+          {
+                    "id": 26,
+                    "session": "1교시",
+                    "domain": "SW공학",
+                    "qNum": 7,
+                    "question": "7. 요구사항 추적표(Requirement Traceability Matrix)의 효과"
+          },
+          {
+                    "id": 27,
+                    "session": "1교시",
+                    "domain": "SW공학",
+                    "qNum": 8,
+                    "question": "8. 회귀 테스트(Regression Test)의 기법"
+          },
+          {
+                    "id": 28,
+                    "session": "1교시",
+                    "domain": "SW공학",
+                    "qNum": 9,
+                    "question": "9. 소프트웨어 설계의 원리"
+          },
+          {
+                    "id": 29,
+                    "session": "1교시",
+                    "domain": "SW공학",
+                    "qNum": 10,
+                    "question": "10. STPA(System Theoretic Process Analysis)"
+          },
+          {
+                    "id": 30,
+                    "session": "1교시",
+                    "domain": "SW공학",
+                    "qNum": 11,
+                    "question": "11. 노코드(No Code)와 바이브 코딩(Vibe Coding) 비교"
+          },
+          {
+                    "id": 31,
+                    "session": "1교시",
+                    "domain": "SW공학",
+                    "qNum": 12,
+                    "question": "12. 오픈소스 소프트웨어 라이선스의 유형"
+          },
+          {
+                    "id": 32,
+                    "session": "1교시",
+                    "domain": "SW공학",
+                    "qNum": 13,
+                    "question": "13. 소프트웨어 품질보증의 목적과 기능"
+          },
+          {
+                    "id": 33,
+                    "session": "2교시",
+                    "domain": "SW공학",
+                    "qNum": 1,
+                    "question": "1. 명확하지 않은 요구사항으로 인해 발생하는 소프트웨어 품질저하 문제를 아래의 관점에서 설명하시오.\n가. 기술부채(Technical Debt)\n나. 코드스멜(Code Smell)\n다. 리팩토링(Refactoring)"
+          },
+          {
+                    "id": 34,
+                    "session": "2교시",
+                    "domain": "SW공학",
+                    "qNum": 2,
+                    "question": "2. 생성형 AI 기반 코드 자동생성 도구(GitHub Copilot, Codex, Claude 등) 확산으로 소프트웨어 개발 패러다임이 변화하고 있다. 다음을 설명하시오.\n가. 소프트웨어의 주요 특성과 공학의 발전원리\n나. 소프트웨어 공학이 다루는 주제와 목표\n다. 개발 패러다임 변화에 따른 좋은 소프트웨어의 조건"
+          },
+          {
+                    "id": 35,
+                    "session": "2교시",
+                    "domain": "SW공학",
+                    "qNum": 3,
+                    "question": "3. 디지털 서비스의 경쟁력이 사용자 경험에 좌우되면서 UI/UX 설계의 체계화가 요구되고 있다. UI/UX 설계에 대하여 다음을 설명하시오.\n가. UI/UX의 개념 및 설계 절차\n나. UI/UX 주요 설계 기법\n다. 휴리스틱 평가와 사용성 테스트의 비교"
+          },
+          {
+                    "id": 36,
+                    "session": "2교시",
+                    "domain": "SW공학",
+                    "qNum": 4,
+                    "question": "4. 소프트웨어 무중단 배포(Zero Downtime Deployment) 방식에 대하여 설명하시오."
+          },
+          {
+                    "id": 37,
+                    "session": "2교시",
+                    "domain": "SW공학",
+                    "qNum": 5,
+                    "question": "5. 소프트웨어 개발 및 운영 과정에서 품질 보증의 핵심인 형상관리와 관련하여 다음을 설명하시오.\n가. 형상관리의 개념 및 표준 프로세스\n나. 형상관리의 기준선(Baseline) 유형 및 주요 산출물\n다. AI 서비스 환경에서의 형상관리 방안"
+          },
+          {
+                    "id": 38,
+                    "session": "2교시",
+                    "domain": "SW공학",
+                    "qNum": 6,
+                    "question": "6. 소프트웨어 테스트에 대하여 다음을 설명하시오.\n가. 소프트웨어 테스트의 원리\n나. 명세기반, 구조기반, 경험 기반 테스트\n다. 테스트 자동화 도입 시 고려사항"
+          },
+          {
+                    "id": 39,
+                    "session": "1교시",
+                    "domain": "디지털서비스",
+                    "qNum": 1,
+                    "question": "1. SOAP과 REST 비교"
+          },
+          {
+                    "id": 40,
+                    "session": "1교시",
+                    "domain": "디지털서비스",
+                    "qNum": 2,
+                    "question": "2. 멀티 클라우드(Multi-Cloud)"
+          },
+          {
+                    "id": 41,
+                    "session": "1교시",
+                    "domain": "디지털서비스",
+                    "qNum": 3,
+                    "question": "3. 엣지 컴퓨팅 (Edge Computing)의 주요기술"
+          },
+          {
+                    "id": 42,
+                    "session": "1교시",
+                    "domain": "디지털서비스",
+                    "qNum": 4,
+                    "question": "4. SDM(Software Defined Manufacturing)"
+          },
+          {
+                    "id": 43,
+                    "session": "1교시",
+                    "domain": "디지털서비스",
+                    "qNum": 5,
+                    "question": "5. APIM (API Management)"
+          },
+          {
+                    "id": 44,
+                    "session": "1교시",
+                    "domain": "디지털서비스",
+                    "qNum": 6,
+                    "question": "6. 온톨로지"
+          },
+          {
+                    "id": 45,
+                    "session": "1교시",
+                    "domain": "디지털서비스",
+                    "qNum": 7,
+                    "question": "7. 안면인식 결제 서비스"
+          },
+          {
+                    "id": 46,
+                    "session": "1교시",
+                    "domain": "디지털서비스",
+                    "qNum": 8,
+                    "question": "8. ADAS(Advanced Driver Assistance System)와 ADS(Automated Driving System)의 차이점"
+          },
+          {
+                    "id": 47,
+                    "session": "1교시",
+                    "domain": "디지털서비스",
+                    "qNum": 9,
+                    "question": "9. ISO 26262"
+          },
+          {
+                    "id": 48,
+                    "session": "1교시",
+                    "domain": "디지털서비스",
+                    "qNum": 10,
+                    "question": "10. 오픈소스(Open Source)와 오픈웨이트(Open Weight) 비교"
+          },
+          {
+                    "id": 49,
+                    "session": "1교시",
+                    "domain": "디지털서비스",
+                    "qNum": 11,
+                    "question": "11. 대규모 AI서비스를 위한 데이터센터 구축 기술"
+          },
+          {
+                    "id": 50,
+                    "session": "1교시",
+                    "domain": "디지털서비스",
+                    "qNum": 12,
+                    "question": "12. 서버리스 컴퓨팅 (Serverless Computing)"
+          },
+          {
+                    "id": 51,
+                    "session": "1교시",
+                    "domain": "디지털서비스",
+                    "qNum": 13,
+                    "question": "13. AI 네이티브 개발 플랫폼"
+          },
+          {
+                    "id": 52,
+                    "session": "2교시",
+                    "domain": "디지털서비스",
+                    "qNum": 1,
+                    "question": "1. 가상머신(Virtual Machine)과 컨테이너(Container)에 대해 다음을 설명하시오.\n가. 가상화의 개념\n나. 가상머신과 컨테이너의 차이점\n다. 쿠버네티스와 HPA"
+          },
+          {
+                    "id": 53,
+                    "session": "2교시",
+                    "domain": "디지털서비스",
+                    "qNum": 2,
+                    "question": "2. AI 자동화가 단순 반복 업무를 넘어 전문직·관리직의 핵심 업무까지 확산되면서, 기업의 조직 운영 방식과 인재 요구 조건이 급격히 변화 하고 있다. 특히 엔트리급 일자리 감소와 AI 네이티브 직무의 증가가 동시에 나타나며, AI 시대의 핵심 과제는 단순한 일자리 증감이 아닌 역량 전환으로 이동하고 있다. 다음 사항에 대하여 설명하시오.\n가. AI 기술발전에 따른 노동시장의 변화\n나. AI 시대 인재의 기본 역량\n다. AI 시대 인재육성 전략"
+          },
+          {
+                    "id": 54,
+                    "session": "2교시",
+                    "domain": "디지털서비스",
+                    "qNum": 3,
+                    "question": "3. 인공지능 기술이 활성화되면서 데이터센터의 전력수급 문제가 부각되고 있다. 다음을 설명하시오.\n가. 마이크로 그리드(Micro-Grid)\n나. AMI(Advance Metering Infrastructure)\n다. 인터미턴트 컴퓨팅(Intermittent computing)"
+          },
+          {
+                    "id": 55,
+                    "session": "2교시",
+                    "domain": "디지털서비스",
+                    "qNum": 4,
+                    "question": "4. NIA(한국지능정보사회진흥원)의 클라우드 네이티브 구축 및 운영 가이드(2026. 01) 에 대하여 다음을 설명하시오.\n가. 클라우드 네이티브 개념 및 구성요소\n나. 클라우드 네이티브 사업 유형\n다. 클라우드 네이티브 성숙도 모델"
+          },
+          {
+                    "id": 56,
+                    "session": "2교시",
+                    "domain": "디지털서비스",
+                    "qNum": 5,
+                    "question": "5. 중앙은행 디지털화폐(CBDC, Central Bank Digital Currency)가 블록체인 기반 금융 인프라의 핵심으로 논의되고 있다. 다음에 대하여 설명하시오.\n가. CBDC의 개념\n나. CBDC 구현 시 아키텍처 설계 방안\n다. CBDC 도입이 기존 금융 시스템 및 스테이블코인과의 관계에 미치는 영향"
+          },
+          {
+                    "id": 57,
+                    "session": "2교시",
+                    "domain": "디지털서비스",
+                    "qNum": 6,
+                    "question": "6. 제조업의 스마트팩토리 전환이 가속화되며, 가상 공간에서 생산 공정을 사전 시뮬레이션하는 디지털 트윈(Digital Twin) 기술이 핵심 동인으로 주목받고 있다. 다음을 설명하시오.\n가. 스마트팩토리(Smart Factory)에서 디지털 트윈(Digital Twin)의 역할과 구성요소\n나. 디지털 트윈 도입을 위한 고려사항"
+          },
+          {
+                    "id": 58,
+                    "session": "1교시",
+                    "domain": "AI/통계",
+                    "qNum": 1,
+                    "question": "1. 머신러닝에서 활용되는 의사결정나무(Decision Tree) 모델"
+          },
+          {
+                    "id": 59,
+                    "session": "1교시",
+                    "domain": "AI/통계",
+                    "qNum": 2,
+                    "question": "2. 데이터 분석에서 아웃라이어(Outlier)와 노이즈(Noise)의 비교"
+          },
+          {
+                    "id": 60,
+                    "session": "1교시",
+                    "domain": "AI/통계",
+                    "qNum": 3,
+                    "question": "3. 파인튜닝 (Fine-tuning)과 PEFT"
+          },
+          {
+                    "id": 61,
+                    "session": "1교시",
+                    "domain": "AI/통계",
+                    "qNum": 4,
+                    "question": "4. 데이터 분할 검증 기법인 Hold-out"
+          },
+          {
+                    "id": 62,
+                    "session": "1교시",
+                    "domain": "AI/통계",
+                    "qNum": 5,
+                    "question": "5. 인공지능 가드레일(AI guardrails)"
+          },
+          {
+                    "id": 63,
+                    "session": "1교시",
+                    "domain": "AI/통계",
+                    "qNum": 6,
+                    "question": "6. 머신러닝의 데이터 공격과 모델 공격"
+          },
+          {
+                    "id": 64,
+                    "session": "1교시",
+                    "domain": "AI/통계",
+                    "qNum": 7,
+                    "question": "7. 혼동 행렬(Confusion Matrix)과 관련지표"
+          },
+          {
+                    "id": 65,
+                    "session": "1교시",
+                    "domain": "AI/통계",
+                    "qNum": 8,
+                    "question": "8. 비지도학습의 군집화(Clustering)"
+          },
+          {
+                    "id": 66,
+                    "session": "1교시",
+                    "domain": "AI/통계",
+                    "qNum": 9,
+                    "question": "9. 정서 인공지능(Affective Artificial Intelligence)"
+          },
+          {
+                    "id": 67,
+                    "session": "1교시",
+                    "domain": "AI/통계",
+                    "qNum": 10,
+                    "question": "10. 클라우드 AI와 온디바이스 AI"
+          },
+          {
+                    "id": 68,
+                    "session": "1교시",
+                    "domain": "AI/통계",
+                    "qNum": 11,
+                    "question": "11. 회귀모형에서 오차의 등분산성(Homoscedasticity)과 다중공선성(Multicollinearity)"
+          },
+          {
+                    "id": 69,
+                    "session": "1교시",
+                    "domain": "AI/통계",
+                    "qNum": 12,
+                    "question": "12. 데이터 검색을 위한 ANN(Approximate Nearest Neighbor)알고리즘에 대해 설명하시오."
+          },
+          {
+                    "id": 70,
+                    "session": "1교시",
+                    "domain": "AI/통계",
+                    "qNum": 13,
+                    "question": "13. 인공지능 영향평가에 대해서 설명하시오."
+          },
+          {
+                    "id": 71,
+                    "session": "2교시",
+                    "domain": "AI/통계",
+                    "qNum": 1,
+                    "question": "1. A기업은 AI 전환(AX, AI Transformation) 추진을 위해 LLM(Large Language Model) 기반 AI 시스템을 구축하고자 한다. 다음을 설명하시오.\n가. 파인튜닝(Fine-Tuning)과 RAG(Retrieval-Augmented Generation)의 개념 및 역할\n나. LLM 정렬을 위한 RLHF(Reinforcement Learning from Human Feedback) 기반 학습 파이프라인과 RAFT(Retrieval Augmented Fine-Tuning) 기반 학습 파이프라인 비교"
+          },
+          {
+                    "id": 72,
+                    "session": "2교시",
+                    "domain": "AI/통계",
+                    "qNum": 2,
+                    "question": "2. MLOps가 LLM 서비스 운영을 위한 LLMOps로 진화하고 있다. 다음을 설명하시오.\n가. MLOps 와 LLMOps 의 개념 및 비교\n나. LLMOps 파이프라인 구성 요소\n다. 공공부문 LLM 서비스 도입 시 고려사항"
+          },
+          {
+                    "id": 73,
+                    "session": "2교시",
+                    "domain": "AI/통계",
+                    "qNum": 3,
+                    "question": "3. 기업의 LLM 도입이 확산되면서 OWASP가 제시한 LLM 보안 위협에 대한 체계적 대응이 요구되고 있다. 다음을 설명하시오.\n가. OWASP LLM Top 10의 주요 위협 유형\n나. LLM 서비스 계층별(데이터·모델·애플리케이션) 위협 발생 원인\n다. LLM 보안 대응 체계 구축 방안"
+          },
+          {
+                    "id": 74,
+                    "session": "2교시",
+                    "domain": "AI/통계",
+                    "qNum": 4,
+                    "question": "4. 폰노이만 아키텍처의 한계 극복방안과 뉴로모픽 컴퓨팅의 구조적 특징을 설명하시오."
+          },
+          {
+                    "id": 75,
+                    "session": "2교시",
+                    "domain": "AI/통계",
+                    "qNum": 5,
+                    "question": "5. 생성형 AI 모델의 성능과 신뢰성을 높이기 위해서는 고품질 데이터 구축이 필수이다. 이에 생성형 AI 데이터 품질관리 가이드라인 v2.0 이 2025 년 2 월 발간되었다. 다음에 대하여 설명하시오.\n가. 생성형 AI 의 정의 및 생성형 AI 데이터의 특성\n나. 생성형 AI 품질관리 프레임워크 프로세스\n다. 생성형 AI 데이터 품질지표"
+          },
+          {
+                    "id": 76,
+                    "session": "2교시",
+                    "domain": "AI/통계",
+                    "qNum": 6,
+                    "question": "6. 검색 증강 생성(RAG, Retrieval-Augmented Generation)은 LLM의 환각과 최신성 한계를 보완하는 방식으로 도입되었으나, 적용 범위가 넓어지면서 단순 검색 결합에서 모듈화, 자율 제어로 발전해 왔다. 다음을 설명하시오.\n가. RAG의 기본 개념과 동작 메커니즘\n나. Advanced RAG와 Modular RAG의 특징 및 비교\n다. 기존 RAG의 구조적 한계와 에이전트형 RAG(Agentic RAG) 적용 방안"
+          },
+          {
+                    "id": 77,
+                    "session": "1교시",
+                    "domain": "정보보안",
+                    "qNum": 1,
+                    "question": "1. 공격 표면(Attack Surface)에 대해 설명하시오."
+          },
+          {
+                    "id": 78,
+                    "session": "1교시",
+                    "domain": "정보보안",
+                    "qNum": 2,
+                    "question": "2. 변조(Modification)와 위조(Fabrication)"
+          },
+          {
+                    "id": 79,
+                    "session": "1교시",
+                    "domain": "정보보안",
+                    "qNum": 3,
+                    "question": "3. Security for AI 와 Security by AI 비교"
+          },
+          {
+                    "id": 80,
+                    "session": "1교시",
+                    "domain": "정보보안",
+                    "qNum": 4,
+                    "question": "4. HNDL(Harvest Now Decrypt Later) 공격"
+          },
+          {
+                    "id": 81,
+                    "session": "1교시",
+                    "domain": "정보보안",
+                    "qNum": 5,
+                    "question": "5. 지속적인 보안 위협관리(Continuous Threat Exposure Management, CTEM)"
+          },
+          {
+                    "id": 82,
+                    "session": "1교시",
+                    "domain": "정보보안",
+                    "qNum": 6,
+                    "question": "6. Shadow AI"
+          },
+          {
+                    "id": 83,
+                    "session": "1교시",
+                    "domain": "정보보안",
+                    "qNum": 7,
+                    "question": "7. PBD(Privacy By Design) 개념, 원칙, 전략에 대하여 설명하시오."
+          },
+          {
+                    "id": 84,
+                    "session": "1교시",
+                    "domain": "정보보안",
+                    "qNum": 8,
+                    "question": "8. 국가 망 보안체계(N2SF, National Network Security Framework)"
+          },
+          {
+                    "id": 85,
+                    "session": "1교시",
+                    "domain": "정보보안",
+                    "qNum": 9,
+                    "question": "9. 디지털 포렌식"
+          },
+          {
+                    "id": 86,
+                    "session": "1교시",
+                    "domain": "정보보안",
+                    "qNum": 10,
+                    "question": "10. 접근제어 정책 및 절차"
+          },
+          {
+                    "id": 87,
+                    "session": "1교시",
+                    "domain": "정보보안",
+                    "qNum": 11,
+                    "question": "11. PET의 기술 분류 및 핵심기술"
+          },
+          {
+                    "id": 88,
+                    "session": "1교시",
+                    "domain": "정보보안",
+                    "qNum": 12,
+                    "question": "12. 비인간 신원(NHI)에 대하여 설명하시오."
+          },
+          {
+                    "id": 89,
+                    "session": "1교시",
+                    "domain": "정보보안",
+                    "qNum": 13,
+                    "question": "13. 개인정보 영향평가(PIA, Privacy Impact Assessment)에 대하여 설명하시오."
+          },
+          {
+                    "id": 90,
+                    "session": "2교시",
+                    "domain": "정보보안",
+                    "qNum": 1,
+                    "question": "1. 제로 트러스트(Zero Trust)에 대해 다음을 설명하시오.\n가. 제로 트러스트(Zero Trust) 개념\n나. 제로 트러스트(Zero Trust) 아키텍처 구성\n다. 제로 트러스트(Zero Trust) 아키텍처 도입 시 고려사항"
+          },
+          {
+                    "id": 91,
+                    "session": "2교시",
+                    "domain": "정보보안",
+                    "qNum": 2,
+                    "question": "2. 최근 대형 유통 계열사에서 사용자 계정에 무단 접근을 시도하는 공격을 받아 개인정보 유출 사고가 발생했다. 이와 관련하여 다음을 설명하시오.\n가. 크리덴셜 스터핑(Credential Stuffing)\n나. 무차별 대입 공격(Brute Force Attack)과 크리덴셜 스터핑(Credential Stuffing) 비교\n다. 사이버 회복탄력성(Cyber Resilience)"
+          },
+          {
+                    "id": 92,
+                    "session": "2교시",
+                    "domain": "정보보안",
+                    "qNum": 3,
+                    "question": "3. MCP(Model Context Protocol)를 이용한 인공지능 서비스 구축 시 보안 취약점을 설명하고 대응 방안을 제시하시오."
+          },
+          {
+                    "id": 93,
+                    "session": "2교시",
+                    "domain": "정보보안",
+                    "qNum": 4,
+                    "question": "4. 식별(Identification)과 인증(Authentication)에 대하여 다음을 설명하시오.\n가. 개인 식별과 사용자 인증의 정의 및 차이점\n나. 사용자 인증 시 보안 요구사항\n다. 인증 방식에 따른 4가지 유형 및 적용 시 고려사항"
+          },
+          {
+                    "id": 94,
+                    "session": "2교시",
+                    "domain": "정보보안",
+                    "qNum": 5,
+                    "question": "5. 암호화에 대하여 다음을 설명하시오.\n가. 암호화의 원리 및 암호문 공격 유형\n나. 키의 갯수에 따른 암호화 유형 비교\n다. 전통적 암호화 알고리즘의 위기 해결을 위한 PQC"
+          },
+          {
+                    "id": 95,
+                    "session": "2교시",
+                    "domain": "정보보안",
+                    "qNum": 6,
+                    "question": "6. ISMS에 대하여 다음을 설명하시오.\n가. ISMS-P 제도의 개념 및 대상\n나. ISMS-P와 ISMS를 비교\n나. ISMS 간편인증"
+          },
+          {
+                    "id": 96,
+                    "session": "1교시",
+                    "domain": "데이터베이스",
+                    "qNum": 1,
+                    "question": "1. 데이터 거버넌스"
+          },
+          {
+                    "id": 97,
+                    "session": "1교시",
+                    "domain": "데이터베이스",
+                    "qNum": 2,
+                    "question": "2. 데이터 안심구역"
+          },
+          {
+                    "id": 98,
+                    "session": "1교시",
+                    "domain": "데이터베이스",
+                    "qNum": 3,
+                    "question": "3. 데이터 레이크(Data Lake)의 주요 아키텍처"
+          },
+          {
+                    "id": 99,
+                    "session": "1교시",
+                    "domain": "데이터베이스",
+                    "qNum": 4,
+                    "question": "4. 관계형 데이터베이스의 조인에 대해 설명하시오."
+          },
+          {
+                    "id": 100,
+                    "session": "1교시",
+                    "domain": "데이터베이스",
+                    "qNum": 5,
+                    "question": "5. DB 암호화에 대하여 설명하시오."
+          },
+          {
+                    "id": 101,
+                    "session": "1교시",
+                    "domain": "데이터베이스",
+                    "qNum": 6,
+                    "question": "6. 관계형 데이터베이스의 정규화와 역정규화"
+          },
+          {
+                    "id": 102,
+                    "session": "1교시",
+                    "domain": "데이터베이스",
+                    "qNum": 7,
+                    "question": "7. 데이터베이스 병행 제어 기법"
+          },
+          {
+                    "id": 103,
+                    "session": "1교시",
+                    "domain": "데이터베이스",
+                    "qNum": 8,
+                    "question": "8. 데이터 표준화의 필요성과 기대효과"
+          },
+          {
+                    "id": 104,
+                    "session": "1교시",
+                    "domain": "데이터베이스",
+                    "qNum": 9,
+                    "question": "9. Transaction Isolation Level"
+          },
+          {
+                    "id": 105,
+                    "session": "1교시",
+                    "domain": "데이터베이스",
+                    "qNum": 10,
+                    "question": "10. 비정형 데이터 마이닝 기법"
+          },
+          {
+                    "id": 106,
+                    "session": "1교시",
+                    "domain": "데이터베이스",
+                    "qNum": 11,
+                    "question": "11. 데이터 품질 인증 제도 (DQ인증)"
+          },
+          {
+                    "id": 107,
+                    "session": "1교시",
+                    "domain": "데이터베이스",
+                    "qNum": 12,
+                    "question": "12. 지식그래프와 벡터 DB 비교"
+          },
+          {
+                    "id": 108,
+                    "session": "1교시",
+                    "domain": "데이터베이스",
+                    "qNum": 13,
+                    "question": "13. AI 학습용 데이터 품질관리 활동"
+          },
+          {
+                    "id": 109,
+                    "session": "2교시",
+                    "domain": "데이터베이스",
+                    "qNum": 1,
+                    "question": "1. 데이터베이스 무결성 제약 조건에 대하여 다음을 설명하시오.\n가. 데이터베이스 무결성 제약 조건의 개념\n나. 데이터베이스 무결성 제약 조건의 종류\n다. 데이터베이스 무결성 제약 조건 생성시 고려사항"
+          },
+          {
+                    "id": 110,
+                    "session": "2교시",
+                    "domain": "데이터베이스",
+                    "qNum": 2,
+                    "question": "2. 데이터 모델링 단계 중 논리 데이터 모델링에 대하여 다음을 설명하시오.\n가. 논리 데이터 모델링의 개념, 목적 및 효과\n나. 논리 데이터 모델링의 절차 및 엔터티 상세화 주요 활동\n다. 데이터 이력 관리"
+          },
+          {
+                    "id": 111,
+                    "session": "2교시",
+                    "domain": "데이터베이스",
+                    "qNum": 3,
+                    "question": "3. NoSQL(Not only Structured Query Language)의 특징, 데이터 모델링 패턴 및 데이터 모델링 절차에 대하여 설명하시오."
+          },
+          {
+                    "id": 112,
+                    "session": "2교시",
+                    "domain": "데이터베이스",
+                    "qNum": 4,
+                    "question": "4. 데이터베이스 트랜잭션 회복(Recovery) 기법에 대하여 아래 사항을 설명하시오.\n가. REDO와 UNDO를 이용한 방법\n나. 체크포인트(Checkpoint)를 이용한 방법\n다. 그림자 페이징(Shadow Paging)을 이용한 방법"
+          },
+          {
+                    "id": 113,
+                    "session": "2교시",
+                    "domain": "데이터베이스",
+                    "qNum": 5,
+                    "question": "5. 다양한 형태의 웹서비스를 사용하면서 DBMS는 필수적인 기술 중 하나가 되었다.\n그리고 현장에서는 이러한  DBMS 기술에 지속적으로 성능의 문제가 발생하고 있고,\n해결을 위한 고민을 하고 있다. 이와 관련하여 다음의 물음에 답하시오.\n가. DBMS의 성능개선 목적\n나. DBMS의 성능저하 원인\n다. DBMS의 성능 개선방안"
+          },
+          {
+                    "id": 114,
+                    "session": "2교시",
+                    "domain": "데이터베이스",
+                    "qNum": 6,
+                    "question": "6. 트랜잭션에 대하여 다음 설명하시오.\n가. 트랜잭션의 개념\n나. 트랜잭션의 4가지 특징과 상태전이도\n다. 트랜잭션의 4가지 특징을 보장하기 위한 기법"
+          },
+          {
+                    "id": 115,
+                    "session": "1교시",
+                    "domain": "네트워크",
+                    "qNum": 1,
+                    "question": "1. 슈퍼네팅(Supernetting)과 서브네팅(Subnetting)의 비교"
+          },
+          {
+                    "id": 116,
+                    "session": "1교시",
+                    "domain": "네트워크",
+                    "qNum": 2,
+                    "question": "2. 6G의 주요 기술요소"
+          },
+          {
+                    "id": 117,
+                    "session": "1교시",
+                    "domain": "네트워크",
+                    "qNum": 3,
+                    "question": "3. TCP 프로토콜에서 3 Way handshake와 4 Way handshake를 설명하시오."
+          },
+          {
+                    "id": 118,
+                    "session": "1교시",
+                    "domain": "네트워크",
+                    "qNum": 4,
+                    "question": "4. 오버레이(Overlay) 네트워크와  언더레이(Underlay) 네트워크를  비교  설명하시오."
+          },
+          {
+                    "id": 119,
+                    "session": "1교시",
+                    "domain": "네트워크",
+                    "qNum": 5,
+                    "question": "5. CDN(Content Delivery Network) 트래픽 최적화 기술"
+          },
+          {
+                    "id": 120,
+                    "session": "1교시",
+                    "domain": "네트워크",
+                    "qNum": 6,
+                    "question": "6. 5G 네트워크 슬라이싱(5G Network Slicing)"
+          },
+          {
+                    "id": 121,
+                    "session": "1교시",
+                    "domain": "네트워크",
+                    "qNum": 7,
+                    "question": "7. Wi-Fi 7"
+          },
+          {
+                    "id": 122,
+                    "session": "1교시",
+                    "domain": "네트워크",
+                    "qNum": 8,
+                    "question": "8. XMPP, CoAP, MQTT 특징을 비교하시오."
+          },
+          {
+                    "id": 123,
+                    "session": "1교시",
+                    "domain": "네트워크",
+                    "qNum": 9,
+                    "question": "9. 소프트웨어 정의 네트워크(SDN)"
+          },
+          {
+                    "id": 124,
+                    "session": "1교시",
+                    "domain": "네트워크",
+                    "qNum": 10,
+                    "question": "10. 소켓( Socket) 통신의 개념과 종류"
+          },
+          {
+                    "id": 125,
+                    "session": "1교시",
+                    "domain": "네트워크",
+                    "qNum": 11,
+                    "question": "11. ISO 7498 에서 4 계층 오류제어와 2 계층 오류제어 비교"
+          },
+          {
+                    "id": 126,
+                    "session": "1교시",
+                    "domain": "네트워크",
+                    "qNum": 12,
+                    "question": "12. QoS 관리기법인 트래픽 폴리싱과 트래픽 쉐이핑 기법"
+          },
+          {
+                    "id": 127,
+                    "session": "1교시",
+                    "domain": "네트워크",
+                    "qNum": 13,
+                    "question": "13. 저궤도 위성통신에 대하여 설명하시오."
+          },
+          {
+                    "id": 128,
+                    "session": "2교시",
+                    "domain": "네트워크",
+                    "qNum": 1,
+                    "question": "1. 네트워크 프로토콜에 대하여 다음을 설명하시오.\n가. 프로토콜의 개념\n나. 프로토콜의 3가지 요소\n다. 프로토콜의 기능"
+          },
+          {
+                    "id": 129,
+                    "session": "2교시",
+                    "domain": "네트워크",
+                    "qNum": 2,
+                    "question": "2. 라우터(Router)는 네트워크 설계 시 필요한 핵심 장비이다. 다음에 대해 설명 하시오.\n가. 라우터를 사용하는 주요 목적\n나. 동적 라우팅 프로토콜(Dynamic Routing Protocol)\n다. RIP(Routing Information Protocol)와 OSPF(Open Shortest Path First) 비교"
+          },
+          {
+                    "id": 130,
+                    "session": "2교시",
+                    "domain": "네트워크",
+                    "qNum": 3,
+                    "question": "3. 데이터링크 계층은 네트워크에서 오류제어를 담당한다. 다음을 설명하시오.\n가. 오류제어방식의 개념과 종류\n나. 전진오류수정(FEC)과 검출 후 재전송(ARQ) 방식 비교\n다. ARQ 방식"
+          },
+          {
+                    "id": 131,
+                    "session": "2교시",
+                    "domain": "네트워크",
+                    "qNum": 4,
+                    "question": "4. 전송계층의 제공 기능인 흐름제어에 대하여 다음을 설명하시오.\n가. TCP 흐름제어 개념\n나. 슬라이딩 윈도우\n다. Silly Window Syndrome"
+          },
+          {
+                    "id": 132,
+                    "session": "2교시",
+                    "domain": "네트워크",
+                    "qNum": 5,
+                    "question": "5. AI-RAN의 개념, 기술요소를 설명하고, RAN과의 차이점을 설명하시오."
+          },
+          {
+                    "id": 133,
+                    "session": "2교시",
+                    "domain": "네트워크",
+                    "qNum": 6,
+                    "question": "6. 최근 생성형 AI 서비스 확산으로 대용량 학습 트래픽과 실시간 추론 트래픽이 동일 망을 공유하게 되면서, 트래픽 특성에 맞는 품질 보장이 중요해지고 있다.\n네트워크 QoS(Quality of Service)에 대하여 다음을 설명하시오.\n가. QoS의 개념과 주요 품질 지표\n나. QoS 제공 모델인 IntServ와 DiffServ의 비교\n다. AI 트래픽 환경에서의 QoS 요구사항과 적용 방안"
+          },
+          {
+                    "id": 134,
+                    "session": "1교시",
+                    "domain": "CA/OS",
+                    "qNum": 1,
+                    "question": "1. 교착상태(Deadlock)의 조건과 해결방안"
+          },
+          {
+                    "id": 135,
+                    "session": "1교시",
+                    "domain": "CA/OS",
+                    "qNum": 2,
+                    "question": "2. 프로세스 스레싱 (Thrashing)에 대하여 설명하시오."
+          },
+          {
+                    "id": 136,
+                    "session": "1교시",
+                    "domain": "CA/OS",
+                    "qNum": 3,
+                    "question": "3. GPU(Graphics Processing Unit)와 TPU(Tensor Processing Unit) 비교"
+          },
+          {
+                    "id": 137,
+                    "session": "1교시",
+                    "domain": "CA/OS",
+                    "qNum": 4,
+                    "question": "4. 인터럽트(Interrupt)에 대하여 설명하시오."
+          },
+          {
+                    "id": 138,
+                    "session": "1교시",
+                    "domain": "CA/OS",
+                    "qNum": 5,
+                    "question": "5. UPS(Uninterruptible Power Supply)의 주요기능과 구성요소"
+          },
+          {
+                    "id": 139,
+                    "session": "1교시",
+                    "domain": "CA/OS",
+                    "qNum": 6,
+                    "question": "6. 경쟁조건(Race Condition)"
+          },
+          {
+                    "id": 140,
+                    "session": "1교시",
+                    "domain": "CA/OS",
+                    "qNum": 7,
+                    "question": "7. 은행가 알고리즘(Banker's Algorithm)"
+          },
+          {
+                    "id": 141,
+                    "session": "1교시",
+                    "domain": "CA/OS",
+                    "qNum": 8,
+                    "question": "8. 파이프라인 해저드"
+          },
+          {
+                    "id": 142,
+                    "session": "1교시",
+                    "domain": "CA/OS",
+                    "qNum": 9,
+                    "question": "9. 선점형 스케쥴링(Preemptive Scheduling)"
+          },
+          {
+                    "id": 143,
+                    "session": "1교시",
+                    "domain": "CA/OS",
+                    "qNum": 10,
+                    "question": "10. 시스템 장애를 해결하기 위한 고가용성과 내고장성 기술 비교"
+          },
+          {
+                    "id": 144,
+                    "session": "1교시",
+                    "domain": "CA/OS",
+                    "qNum": 11,
+                    "question": "11. 뉴로모픽 컴퓨팅"
+          },
+          {
+                    "id": 145,
+                    "session": "1교시",
+                    "domain": "CA/OS",
+                    "qNum": 12,
+                    "question": "12. 운영체재 동기화 기법에 대하여 설명하시오"
+          },
+          {
+                    "id": 146,
+                    "session": "1교시",
+                    "domain": "CA/OS",
+                    "qNum": 13,
+                    "question": "13. 메모리 단편화와 해결방안"
+          },
+          {
+                    "id": 147,
+                    "session": "2교시",
+                    "domain": "CA/OS",
+                    "qNum": 1,
+                    "question": "1. 프로그램 실행 시 운영체제는 메모리를 4가지 주요 영역으로 나누어 할당 및 관리한다.\n각 영역의 역할과 특징 그리고 영역 간 동작 메커니즘에 대하여 다음 내용을 설명하시오.\n가. 코드(Code)\n나. 데이터(Data)\n다. 힙(Heap)\n라. 스택(Stack)"
+          },
+          {
+                    "id": 148,
+                    "session": "2교시",
+                    "domain": "CA/OS",
+                    "qNum": 2,
+                    "question": "2. 캐시메모리에 대하여 다음을 설명하시오.\n가. 캐시메모리의 개념\n나. 캐시메모리 교체 기법과 사상 기법 3가지\n다. 지역성과 캐시메모리 관리에서 지역성이 중요한 이유"
+          },
+          {
+                    "id": 149,
+                    "session": "2교시",
+                    "domain": "CA/OS",
+                    "qNum": 3,
+                    "question": "3. 운영체제의 문맥교환(Context Switching)에 대하여 다음 질문에 답하시오.\n가. 문맥의 개념과 유형\n나. 문맥교환의 개념과 프로세스 상태전이도에서의 문맥교환 발생시점\n다. 문맥교환의 절차"
+          },
+          {
+                    "id": 150,
+                    "session": "2교시",
+                    "domain": "CA/OS",
+                    "qNum": 4,
+                    "question": "4. 병렬 컴퓨팅에 대하여 다음을 설명하시오.\n가. 병렬 컴퓨팅 개념\n나. 병렬 프로세스(컴퓨팅) 분류"
+          },
+          {
+                    "id": 151,
+                    "session": "2교시",
+                    "domain": "CA/OS",
+                    "qNum": 5,
+                    "question": "5. 컴퓨터 시스템은 내부/외부에서 발생하는 각종 event 에 대처하기 위해, 다양한 방식으로\n인터럽트(interrupt)체계를 구현하고 있다. 이와 관련하여 아래 사항을 설명하시오.\n가. Polling 방식\n나. Daisy-Chain 방식\n다. Vector Interrupt 방식"
+          },
+          {
+                    "id": 152,
+                    "session": "2교시",
+                    "domain": "CA/OS",
+                    "qNum": 6,
+                    "question": "6. 인공지능 시대의 H/W 기술에 대하여 다음을 설명하시오.\n가. 메모리 월\n나. HBM와 HBF 비교\n다. CXL 3.0"
+          }
+];
+
+        // 앱 상태 변수
+        let currentSession = null;
+        let currentDomainFilter = 'ALL';
+        let currentQuestionIndex = 0;
+        let activeQuestions = []; // 현재 선택된 교시(+도메인)의 문제 목록
+
+        // 로컬 스토리지에서 답안 불러오기 (없으면 빈 객체)
+        function getStoredAnswers() {
+            try {
+                return JSON.parse(localStorage.getItem('tech_exam_answers')) || {};
+            } catch (e) {
+                return {};
+            }
+        }
+
+        // 답안 저장하기
+        function saveAnswer(id, text) {
+            const answers = getStoredAnswers();
+            answers[id] = text;
+            localStorage.setItem('tech_exam_answers', JSON.stringify(answers));
+            showSaveIndicator();
+        }
+
+        // 저장 완료 뱃지 깜빡임 효과
+        function showSaveIndicator() {
+            const indicator = document.getElementById('auto-save-status');
+            indicator.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> 저장 중...';
+            setTimeout(() => {
+                indicator.innerHTML = '<i class="fa-solid fa-check"></i> 저장됨';
+            }, 300);
+        }
+
+        // 뷰 전환 함수
+        function switchView(viewName) {
+            document.getElementById('view-mode-select').classList.add('hidden');
+            document.getElementById('view-dashboard').classList.add('hidden');
+            document.getElementById('view-solve').classList.add('hidden');
+
+            if (viewName === 'mode-select') {
+                document.getElementById('view-mode-select').classList.remove('hidden');
+            } else if (viewName === 'dashboard') {
+                document.getElementById('view-dashboard').classList.remove('hidden');
+                renderDashboard();
+            } else if (viewName === 'solve') {
+                document.getElementById('view-solve').classList.remove('hidden');
+                renderSolveView();
+            }
+        }
+
+        function updateActiveQuestions() {
+            activeQuestions = mockData.filter(q => {
+                if (q.session !== currentSession) return false;
+                if (currentDomainFilter !== 'ALL' && q.domain !== currentDomainFilter) return false;
+                return true;
+            });
+        }
+
+        // 교시 선택
+        function selectSession(session) {
+            currentSession = session;
+            currentDomainFilter = 'ALL';
+            updateActiveQuestions();
+            switchView('dashboard');
+        }
+
+        function selectDomainFilter(domain) {
+            currentDomainFilter = domain;
+            updateActiveQuestions();
+            renderDashboard();
+        }
+
+        function goBackToHome() {
+            currentSession = null;
+            switchView('mode-select');
+        }
+
+        function goBackToDashboard() {
+            switchView('dashboard');
+        }
+
+        // 대시보드 렌더링
+        function renderDashboard() {
+            document.getElementById('dashboard-title').innerText = `${currentSession} 모의고사 문제 목록`;
+            const container = document.getElementById('question-list-container');
+            const filterBar = document.getElementById('domain-filter-bar');
+            const answers = getStoredAnswers();
+
+            // 도메인 필터 버튼 렌더링
+            const sessionItems = mockData.filter(q => q.session === currentSession);
+            const domains = ['ALL', ...new Set(sessionItems.map(q => q.domain))];
+            filterBar.innerHTML = domains.map(d => {
+                const count = d === 'ALL' ? sessionItems.length : sessionItems.filter(q => q.domain === d).length;
+                const activeClass = currentDomainFilter === d
+                    ? 'bg-indigo-600 text-white border-indigo-500'
+                    : 'bg-slate-800 text-slate-300 border-slate-700 hover:border-indigo-400';
+                const label = d === 'ALL' ? `전체 (${count})` : `${d} (${count})`;
+                return `<button onclick="selectDomainFilter('${d}')" class="text-xs px-3 py-1.5 rounded-full border font-medium transition cursor-pointer ${activeClass}">${label}</button>`;
+            }).join('');
+
+            let completedCount = 0;
+            let html = '';
+
+            activeQuestions.forEach((q, idx) => {
+                const isAnswered = answers[q.id] && answers[q.id].trim().length > 0;
+                if (isAnswered) completedCount++;
+
+                html += `
+                    <div onclick="openSolveView(${idx})" class="bg-slate-800 hover:bg-slate-750 border border-slate-700/80 hover:border-indigo-500 rounded-xl p-4 transition cursor-pointer flex items-center justify-between group">
+                        <div class="flex items-center gap-3 overflow-hidden pr-2">
+                            <span class="text-xs font-semibold px-2 py-0.5 rounded bg-slate-700 text-sky-300 shrink-0">${q.domain}</span>
+                            <span class="text-sm font-bold text-slate-400 w-12 shrink-0">Q.${idx + 1}</span>
+                            <p class="text-sm text-slate-200 truncate font-medium">${q.question.split('\n')[0]}</p>
+                        </div>
+                        <div class="flex items-center gap-3 shrink-0">
+                            ${isAnswered 
+                                ? '<span class="text-xs bg-emerald-950 text-emerald-400 border border-emerald-800 px-3 py-1 rounded-full font-medium"><i class="fa-solid fa-check"></i> 작성 완료</span>' 
+                                : '<span class="text-xs bg-slate-700 text-slate-400 px-3 py-1 rounded-full font-medium">미작성 ⚪</span>'}
+                            <i class="fa-solid fa-chevron-right text-xs text-slate-500 group-hover:translate-x-1 transition"></i>
+                        </div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+            document.getElementById('completion-badge').innerText = `작성 완료: ${completedCount} / ${activeQuestions.length}`;
+        }
+
+        // 개별 문제 열기
+        function openSolveView(index) {
+            currentQuestionIndex = index;
+            switchView('solve');
+        }
+
+        // 작성 화면 렌더링
+        function renderSolveView() {
+            const q = activeQuestions[currentQuestionIndex];
+            const answers = getStoredAnswers();
+
+            document.getElementById('solve-session-badge').innerText = q.session;
+            document.getElementById('solve-domain-badge').innerText = q.domain;
+            document.getElementById('solve-qnum').innerText = `문제 ${currentQuestionIndex + 1} / ${activeQuestions.length}`;
+            document.getElementById('solve-question-text').innerText = q.question;
+            document.getElementById('answer-textarea').value = answers[q.id] || '';
+            document.getElementById('solve-nav-info').innerText = `[${q.domain}] ${currentQuestionIndex + 1}번 문제`;
+        }
+
+        // 타이핑 시 실시간 저장
+        function handleAnswerInput(value) {
+            const q = activeQuestions[currentQuestionIndex];
+            saveAnswer(q.id, value);
+        }
+
+        // 이전/다음 문제 이동
+        function moveQuestion(direction) {
+            const newIndex = currentQuestionIndex + direction;
+            if (newIndex >= 0 && newIndex < activeQuestions.length) {
+                currentQuestionIndex = newIndex;
+                renderSolveView();
+            }
+        }
+
+        // 📋 내가 푼 답안 전체 복사 기능
+        function copyAllAnswers() {
+            const answers = getStoredAnswers();
+            let exportText = "======================================\n";
+            exportText += "[정보관리기술사 실전 모의고사 백지 인출 답안]\n\n";
+
+            let count = 0;
+            mockData.forEach((q) => {
+                const userAns = answers[q.id];
+                if (userAns && userAns.trim().length > 0) {
+                    count++;
+                    exportText += `${count}. [${q.session} / ${q.domain}] 문제: ${q.question.replace(/\n/g, ' ')}\n`;
+                    exportText += `- 작성 내용:\n${userAns}\n\n--------------------------------------\n\n`;
+                }
+            });
+
+            if (count === 0) {
+                showToast("작성된 답안이 없습니다. 먼저 문제를 풀고 시도해주세요!", "bg-amber-600");
+                return;
+            }
+
+            exportText += "======================================\n";
+
+            // 클립보드 복사
+            navigator.clipboard.writeText(exportText).then(() => {
+                showToast(`총 ${count}개의 작성 답안이 클립보드에 복사되었습니다!`);
+            }).catch(() => {
+                showToast("복사에 실패했습니다. 권한을 확인해주세요.", "bg-rose-600");
+            });
+        }
+
+        // 토스트 알림 띄우기
+        function showToast(msg, bgClass = "bg-emerald-600") {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toast-msg');
+            toast.className = `fixed bottom-6 right-6 ${bgClass} text-white px-5 py-3 rounded-xl shadow-2xl transition-all duration-300 transform translate-y-0 opacity-100 font-medium flex items-center gap-2 z-50`;
+            toastMsg.innerText = msg;
+
+            setTimeout(() => {
+                toast.className = "fixed bottom-6 right-6 bg-emerald-600 text-white px-5 py-3 rounded-xl shadow-2xl transition-all duration-300 translate-y-20 opacity-0 pointer-events-none font-medium flex items-center gap-2 z-50";
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
