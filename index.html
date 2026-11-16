@@ -2,2004 +2,482 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>기술사 암기장</title>
-    <style>
-        :root {
-            --bg-color: #0f172a;
-            --card-bg: #1e293b;
-            --text-primary: #f8fafc;
-            --text-secondary: #94a3b8;
-            --accent: #38bdf8;
-            --accent-gradient: linear-gradient(135deg, #38bdf8 0%, #3b82f6 100%);
-            --test-accent: #c084fc;
-            --test-amber: #f59e0b;
-            --test-gradient: linear-gradient(135deg, #9333ea 0%, #f59e0b 100%);
-            --border-color: #334155;
-        }
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-        html, body { height: 100%; }
-        body { background-color: var(--bg-color); color: var(--text-primary); min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: column; }
-        .container { max-width: 820px; width: 100%; height: 100%; margin: 0 auto; padding: 12px; flex: 1; display: flex; flex-direction: column; }
-        
-        /* Header */
-        header { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; margin-bottom: 12px; border-bottom: 1px solid var(--border-color); }
-        h1 { font-size: 1.2rem; font-weight: 700; color: var(--accent); transition: color 0.2s; }
-        body.mode-test h1 { color: var(--test-accent); }
-        
-        /* Home View & Mode Switcher */
-        #home-view { display: flex; flex-direction: column; gap: 14px; flex: 1; }
-        .mode-switcher { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; background: rgba(15, 23, 42, 0.9); padding: 6px; border-radius: 14px; border: 1px solid var(--border-color); }
-        .mode-tab { background: transparent; border: 1px solid transparent; color: var(--text-secondary); padding: 11px 10px; border-radius: 10px; font-size: 0.92rem; font-weight: 800; cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; justify-content: center; gap: 6px; white-space: nowrap; }
-        .mode-tab.active-study { background: rgba(56, 189, 248, 0.16); border-color: rgba(56, 189, 248, 0.55); color: #38bdf8; box-shadow: 0 0 14px rgba(56, 189, 248, 0.22); }
-        .mode-tab.active-test { background: linear-gradient(135deg, rgba(168, 85, 247, 0.25) 0%, rgba(245, 158, 11, 0.25) 100%); border-color: #c084fc; color: #f3e8ff; box-shadow: 0 0 16px rgba(168, 85, 247, 0.35); }
-
-        .hero-card { background: var(--accent-gradient); border-radius: 16px; padding: 20px; color: #fff; text-align: center; cursor: pointer; box-shadow: 0 4px 12px rgba(56, 189, 248, 0.2); transition: all 0.2s; }
-        .hero-card.test-theme { background: var(--test-gradient); box-shadow: 0 6px 20px rgba(168, 85, 247, 0.32); }
-        .hero-card:active { transform: scale(0.98); }
-        .hero-card h2 { font-size: 1.3rem; margin-bottom: 6px; }
-        .hero-card p { font-size: 0.85rem; opacity: 0.92; }
-
-        .section-title { font-size: 0.95rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; }
-        .mode-indicator-pill { font-size: 0.74rem; font-weight: 800; padding: 3px 10px; border-radius: 999px; background: rgba(56, 189, 248, 0.15); color: var(--accent); border: 1px solid rgba(56, 189, 248, 0.35); }
-        body.mode-test .mode-indicator-pill { background: rgba(192, 132, 252, 0.18); color: #e9d5ff; border-color: rgba(192, 132, 252, 0.5); }
-        
-        /* Domain Grid - Optimized for Fold 7 Cover & Inner screens */
-        .domain-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
-        @media (min-width: 500px) { .domain-grid { grid-template-columns: repeat(3, 1fr); } }
-        
-        .domain-btn { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 14px 12px; text-align: left; cursor: pointer; color: var(--text-primary); transition: all 0.2s; display: flex; flex-direction: column; justify-content: space-between; min-height: 75px; }
-        .domain-btn:hover { border-color: var(--accent); }
-        .domain-btn.test-card-btn { background: linear-gradient(145deg, rgba(30, 27, 75, 0.82) 0%, rgba(30, 41, 59, 0.95) 100%); border-color: rgba(192, 132, 252, 0.45); }
-        .domain-btn.test-card-btn:hover { border-color: #f59e0b; box-shadow: 0 0 12px rgba(192, 132, 252, 0.28); }
-        .domain-btn:active { background: var(--border-color); }
-        .domain-name { font-weight: 700; font-size: 0.98rem; display: flex; align-items: center; justify-content: space-between; gap: 4px; }
-        .domain-count { font-size: 0.75rem; color: var(--text-secondary); margin-top: 4px; }
-        .test-card-btn .domain-name { color: #f3e8ff; }
-        .test-card-btn .domain-count { color: #fcd34d; font-weight: 600; }
-
-        /* Study View & Header Bar */
-        #study-view { display: none; flex-direction: column; flex: 1; min-height: 0; gap: 12px; }
-        .study-header { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: nowrap; width: 100%; }
-        .back-btn { background: none; border: 1px solid var(--border-color); color: var(--text-secondary); padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 0.85rem; white-space: nowrap; flex-shrink: 0; transition: all 0.15s; }
-        .back-btn:hover { border-color: var(--accent); color: var(--text-primary); }
-        .ai-tutor-btn { background: linear-gradient(135deg, rgba(56, 189, 248, 0.22) 0%, rgba(59, 130, 246, 0.35) 100%); border: 1px solid #38bdf8; color: #e0f2fe; padding: 6px 14px; border-radius: 999px; cursor: pointer; font-size: 0.85rem; font-weight: 700; white-space: nowrap; flex-shrink: 0; box-shadow: 0 0 12px rgba(56, 189, 248, 0.32), inset 0 0 8px rgba(56, 189, 248, 0.18); transition: all 0.2s ease; display: inline-flex; align-items: center; gap: 5px; }
-        .ai-tutor-btn:hover { background: linear-gradient(135deg, rgba(56, 189, 248, 0.38) 0%, rgba(59, 130, 246, 0.55) 100%); box-shadow: 0 0 18px rgba(56, 189, 248, 0.55); transform: translateY(-1px); }
-        .ai-tutor-btn:active { transform: scale(0.96); }
-        .progress-text, .card-counter { font-size: 0.85rem; color: var(--text-secondary); white-space: nowrap; flex-shrink: 0; text-align: right; min-width: 58px; font-variant-numeric: tabular-nums; }
-
-        /* Flashcard */
-        .card-container { perspective: 1000px; flex: 1; display: flex; flex-direction: column; min-height: 520px; cursor: pointer; position: relative; }
-        .card { flex: 1; width: 100%; height: 100%; position: relative; transform-style: preserve-3d; transition: transform 0.4s ease; border-radius: 16px; box-shadow: 0 6px 20px rgba(0,0,0,0.3); }
-        .card.is-flipped { transform: rotateY(180deg); }
-        .card-face { position: absolute; inset: 0; width: 100%; height: 100%; backface-visibility: hidden; -webkit-backface-visibility: hidden; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 16px; padding: 20px 18px; display: flex; flex-direction: column; justify-content: space-between; }
-        .card-back { transform: rotateY(180deg); background: #0f1d3a; border-color: #1e40af; }
-        
-        .card-tag { font-size: 0.75rem; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: 0.05em; }
-        .front-domain-pill { display: inline-block; font-size: 1.05rem; font-weight: 800; color: var(--accent); background: rgba(56, 189, 248, 0.15); border: 1px solid rgba(56, 189, 248, 0.4); padding: 6px 18px; border-radius: 999px; letter-spacing: 0.06em; }
-        .card-title { font-size: 1.2rem; font-weight: 700; margin: 6px 0; line-height: 1.35; }
-        .front-center-area { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 28px; padding: 16px 6px; width: 100%; }
-        .front-main-title { font-size: clamp(2.35rem, 7.2vw, 3.3rem); font-weight: 900; line-height: 1.28; color: #ffffff; word-break: keep-all; letter-spacing: -0.02em; text-shadow: 0 2px 10px rgba(0, 0, 0, 0.35); width: 100%; }
-        .front-mnemonic-box { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 16px 20px; background: rgba(250, 204, 21, 0.18); border: 2px solid rgba(250, 204, 21, 0.65); border-radius: 16px; color: #fef08a; font-size: clamp(1.4rem, 4.6vw, 2rem); font-weight: 800; letter-spacing: 0.02em; line-height: 1.4; word-break: keep-all; box-shadow: 0 6px 16px rgba(0, 0, 0, 0.28); }
-        .card-body { font-size: 0.88rem; color: var(--text-secondary); line-height: 1.45; flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; padding-right: 2px; }
-        .keywords-container { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 6px; }
-        .keyword-badge { background: rgba(56, 189, 248, 0.15); color: var(--accent); padding: 3px 8px; border-radius: 16px; font-size: 0.72rem; font-weight: 500; }
-
-        /* Back Section Labels */
-        .back-section-label { font-size: 0.72rem; font-weight: 700; color: #93c5fd; letter-spacing: 0.03em; margin-bottom: 4px; display: flex; align-items: center; gap: 5px; }
-        .back-section-label::before { content: ""; display: inline-block; width: 3px; height: 11px; background: var(--accent); border-radius: 2px; }
-
-        /* ⓪ Top Definition Callout Area */
-        .definition-wrapper { display: none; flex-direction: column; }
-        .definition-callout { background: linear-gradient(135deg, rgba(30, 58, 138, 0.55) 0%, rgba(15, 23, 42, 0.85) 100%); border: 1px solid rgba(56, 189, 248, 0.4); border-left: 4px solid var(--accent); padding: 10px 12px; border-radius: 8px; color: #f8fafc; font-size: 0.86rem; font-weight: 600; line-height: 1.45; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2); word-break: keep-all; }
-
-        /* ① Top Diagram Area */
-        .diagram-wrapper { display: none; flex-direction: column; }
-        .diagram-box { background: rgba(2, 6, 23, 0.55); border: 1px solid rgba(56, 189, 248, 0.25); padding: 10px 12px; border-radius: 8px; font-family: "Pretendard", "Malgun Gothic", monospace; font-size: 0.8rem; white-space: pre-wrap; line-height: 1.5; color: #e2e8f0; }
-        .diagram-box.has-image { background: #ffffff; padding: 8px; display: flex; flex-direction: column; gap: 10px; justify-content: center; align-items: center; white-space: normal; }
-        .diagram-box img { width: 100%; max-width: 100%; max-height: 380px; height: auto; object-fit: contain; border-radius: 6px; display: block; }
-
-        /* ② Bottom Sub-note Table Area */
-        .subnote-table-wrapper { display: none; flex-direction: column; }
-        .subnote-table { width: 100%; border-collapse: collapse; font-size: 0.78rem; background: rgba(15, 23, 42, 0.65); border-radius: 8px; overflow: hidden; border: 1px solid #334155; }
-        .subnote-table th { background: #1e3a8a; color: #e0f2fe; font-weight: 700; padding: 7px 8px; border: 1px solid #334155; text-align: center; font-size: 0.74rem; white-space: nowrap; }
-        .subnote-table td { padding: 7px 8px; border: 1px solid #334155; color: #f1f5f9; vertical-align: middle; line-height: 1.4; word-break: keep-all; }
-        .subnote-table td.col-major { width: 20%; font-weight: 700; color: #7dd3fc; background: rgba(30, 58, 138, 0.28); text-align: center; }
-        .subnote-table td.col-minor { width: 24%; font-weight: 600; color: #bae6fd; background: rgba(30, 41, 59, 0.5); text-align: center; }
-        .subnote-table td.col-desc { width: 56%; color: #e2e8f0; text-align: left; white-space: pre-line; }
-
-        /* ③ 3단락 실전 차별화 콜아웃 및 ASCII 다이어그램 스타일 */
-        .diff-callout { display: none; flex-direction: column; gap: 6px; background: linear-gradient(135deg, rgba(245, 158, 11, 0.16), rgba(244, 63, 94, 0.1)); border: 1px solid rgba(251, 191, 36, 0.55); border-left: 4px solid #f59e0b; border-radius: 10px; padding: 11px 13px; margin-top: 8px; box-shadow: 0 0 0 1px rgba(251, 191, 36, 0.08) inset; }
-        .diff-title { font-size: 0.8rem; font-weight: 800; color: #fbbf24; letter-spacing: 0.02em; }
-        .diff-text { font-size: 0.84rem; color: #fef3c7; line-height: 1.55; white-space: pre-line; word-break: keep-all; }
-        .details-ascii { background: rgba(2, 6, 23, 0.65); border: 1px solid rgba(56, 189, 248, 0.25); padding: 9px 10px; border-radius: 8px; font-family: "D2Coding", "Consolas", "Malgun Gothic", monospace; font-size: 0.72rem; line-height: 1.35; white-space: pre; overflow-x: auto; color: #e2e8f0; margin: 0; }
-        .details-note { font-size: 0.8rem; color: #cbd5e1; line-height: 1.45; white-space: pre-line; margin-top: 6px; }
-
-        /* Controls */
-        .controls { display: flex; gap: 8px; margin-top: 10px; padding-bottom: 10px; }
-        .ctrl-btn { flex: 1; background: var(--card-bg); border: 1px solid var(--border-color); color: var(--text-primary); padding: 13px 8px; border-radius: 10px; font-weight: 700; font-size: 0.92rem; cursor: pointer; transition: all 0.15s; white-space: nowrap; }
-        .ctrl-btn:active { transform: scale(0.97); background: var(--border-color); }
-        .ctrl-btn.check-btn { border-color: rgba(74, 222, 128, 0.45); color: #86efac; background: rgba(22, 101, 52, 0.25); }
-        .ctrl-btn.check-btn.is-mastered { background: #22c55e; color: #052e16; border-color: #22c55e; font-weight: 800; }
-        .ctrl-btn.primary { background: var(--accent); color: #0f172a; border: none; font-weight: 800; }
-
-        /* ==========================================
-         * 📝 실전 백지 테스트 세션 화면 (#test-view)
-         * ========================================== */
-        #test-view { display: none; flex-direction: column; flex: 1; min-height: 0; gap: 10px; padding-bottom: 20px; }
-        .test-header { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: nowrap; width: 100%; }
-        .test-domain-badge { background: rgba(192, 132, 252, 0.18); border: 1px solid rgba(192, 132, 252, 0.55); color: #e9d5ff; padding: 5px 14px; border-radius: 999px; font-size: 0.84rem; font-weight: 800; white-space: nowrap; box-shadow: 0 0 12px rgba(168, 85, 247, 0.25); }
-        .test-header-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
-
-        /* 상단 네비게이션 서브 헤더 (작성 현황 뱃지 + 푼 답안 복사 + 일괄 채점하기) */
-        .test-batch-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 6px; background: rgba(15, 23, 42, 0.92); border: 1px solid rgba(192, 132, 252, 0.35); border-radius: 12px; padding: 8px 10px; flex-wrap: wrap; }
-        .test-written-badge { font-size: 0.8rem; font-weight: 800; color: #e9d5ff; background: rgba(168, 85, 247, 0.18); border: 1px solid rgba(192, 132, 252, 0.45); padding: 5px 10px; border-radius: 999px; white-space: nowrap; }
-        .test-written-badge.has-items { color: #fde68a; border-color: rgba(251, 191, 36, 0.65); background: rgba(245, 158, 11, 0.18); }
-        .test-toolbar-actions { display: flex; align-items: center; gap: 6px; flex-wrap: nowrap; margin-left: auto; }
-        .test-copy-btn { background: rgba(30, 41, 59, 0.95); border: 1px solid rgba(56, 189, 248, 0.45); color: #bae6fd; padding: 7px 11px; border-radius: 9px; font-size: 0.78rem; font-weight: 800; cursor: pointer; white-space: nowrap; transition: all 0.15s; }
-        .test-copy-btn:hover { background: rgba(56, 189, 248, 0.2); border-color: #38bdf8; color: #fff; }
-        .test-copy-btn:active { transform: scale(0.97); }
-        .test-batch-grade-btn { background: rgba(51, 65, 85, 0.65); border: 1px solid rgba(148, 163, 184, 0.35); color: #94a3b8; padding: 7px 12px; border-radius: 9px; font-size: 0.8rem; font-weight: 800; cursor: pointer; white-space: nowrap; transition: all 0.18s; }
-        .test-batch-grade-btn.is-active { background: var(--test-gradient); border: 1px solid rgba(251, 191, 36, 0.7); color: #ffffff; box-shadow: 0 0 14px rgba(168, 85, 247, 0.45); }
-        .test-batch-grade-btn.is-active:hover { filter: brightness(1.08); transform: translateY(-1px); }
-        .test-batch-grade-btn:active { transform: scale(0.97); }
-
-        .test-prompt-card { background: linear-gradient(145deg, #1e1b4b 0%, #1e293b 100%); border: 1px solid rgba(192, 132, 252, 0.5); border-radius: 16px; padding: 20px 18px; text-align: center; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35), 0 0 18px rgba(168, 85, 247, 0.14); display: flex; flex-direction: column; align-items: center; gap: 10px; }
-        .test-prompt-sub { font-size: 0.78rem; font-weight: 700; color: #fcd34d; letter-spacing: 0.04em; text-transform: uppercase; }
-        .test-prompt-title { font-size: clamp(1.5rem, 5vw, 2.2rem); font-weight: 900; color: #ffffff; line-height: 1.32; word-break: keep-all; }
-
-        .test-textarea-wrapper { display: flex; flex-direction: column; gap: 5px; }
-        .test-autosave-hint { display: flex; justify-content: space-between; align-items: center; font-size: 0.73rem; color: #94a3b8; padding: 0 4px; }
-        .test-textarea { width: 100%; min-height: 160px; background: #0b1120; border: 1.5px solid rgba(192, 132, 252, 0.45); border-radius: 14px; padding: 14px; color: #f8fafc; font-size: 0.92rem; line-height: 1.55; resize: vertical; outline: none; transition: border-color 0.2s, box-shadow 0.2s; }
-        .test-textarea:focus { border-color: #f59e0b; box-shadow: 0 0 14px rgba(245, 158, 11, 0.25); }
-        .test-textarea::placeholder { color: #64748b; }
-
-        .test-action-row { display: flex; gap: 8px; }
-        .test-reveal-btn { flex: 1; background: rgba(30, 41, 59, 0.9); border: 1px solid rgba(251, 191, 36, 0.55); color: #fde68a; padding: 12px 10px; border-radius: 12px; font-size: 0.88rem; font-weight: 800; cursor: pointer; transition: all 0.15s; white-space: nowrap; }
-        .test-reveal-btn:hover { background: rgba(251, 191, 36, 0.15); }
-
-        /* 일괄 채점 종합 성적표 모달 (#batch-grade-modal) */
-        .batch-modal { width: 100%; max-width: 740px; height: min(90dvh, 820px); background: #0f172a; border: 1px solid rgba(192, 132, 252, 0.55); border-radius: 18px; box-shadow: 0 18px 50px rgba(0, 0, 0, 0.75), 0 0 28px rgba(168, 85, 247, 0.22); display: flex; flex-direction: column; overflow: hidden; }
-        .batch-modal-header { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 12px 14px; background: linear-gradient(90deg, rgba(88, 28, 135, 0.65) 0%, rgba(15, 23, 42, 0.96) 100%); border-bottom: 1px solid rgba(192, 132, 252, 0.35); flex-wrap: wrap; }
-        .batch-modal-title { font-size: 0.96rem; font-weight: 900; color: #f3e8ff; display: flex; align-items: center; gap: 6px; white-space: nowrap; }
-        .batch-header-actions { display: flex; align-items: center; gap: 6px; margin-left: auto; }
-        .batch-raw-copy-btn { background: linear-gradient(135deg, #0284c7 0%, #2563eb 100%); border: 1px solid rgba(125, 211, 252, 0.6); color: #ffffff; padding: 7px 11px; border-radius: 9px; font-size: 0.78rem; font-weight: 800; cursor: pointer; white-space: nowrap; box-shadow: 0 2px 10px rgba(2, 132, 199, 0.35); transition: all 0.15s; }
-        .batch-raw-copy-btn:hover { filter: brightness(1.1); }
-        .batch-raw-copy-btn:active { transform: scale(0.97); }
-        .batch-close-btn { background: rgba(30, 41, 59, 0.9); border: 1px solid var(--border-color); color: #e2e8f0; padding: 7px 11px; border-radius: 9px; font-size: 0.78rem; font-weight: 800; cursor: pointer; white-space: nowrap; }
-        .batch-close-btn:hover { border-color: #f87171; color: #fca5a5; }
-
-        .batch-progress-bar-wrap { padding: 10px 14px; background: rgba(15, 23, 42, 0.95); border-bottom: 1px solid rgba(51, 65, 85, 0.75); display: flex; flex-direction: column; gap: 6px; }
-        .batch-progress-text { font-family: monospace; font-size: 0.82rem; font-weight: 800; color: #fde68a; display: flex; justify-content: space-between; align-items: center; gap: 8px; }
-        .batch-progress-track { width: 100%; height: 8px; background: #1e293b; border-radius: 999px; overflow: hidden; border: 1px solid rgba(192, 132, 252, 0.3); }
-        .batch-progress-fill { height: 100%; width: 0%; background: linear-gradient(90deg, #a855f7 0%, #f59e0b 100%); transition: width 0.25s ease; }
-
-        .batch-summary-card { display: none; margin: 12px 14px 0 14px; padding: 12px 16px; background: linear-gradient(135deg, rgba(88, 28, 135, 0.4) 0%, rgba(30, 58, 138, 0.4) 100%); border: 1px solid rgba(251, 191, 36, 0.65); border-radius: 14px; align-items: center; justify-content: space-around; gap: 10px; text-align: center; box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3); }
-        .batch-summary-card.is-visible { display: flex; }
-        .batch-stat-item { display: flex; flex-direction: column; gap: 2px; }
-        .batch-stat-label { font-size: 0.74rem; color: #cbd5e1; font-weight: 700; }
-        .batch-stat-value { font-size: 1.2rem; font-weight: 900; color: #fde047; }
-
-        .batch-results-list { flex: 1; overflow-y: auto; padding: 12px 14px; display: flex; flex-direction: column; gap: 12px; background: #0b1120; }
-        .batch-item-card { background: #111827; border: 1px solid rgba(148, 163, 184, 0.3); border-left: 4px solid #a855f7; border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; }
-        .batch-item-card.is-done { border-left-color: #22c55e; }
-        .batch-item-card.is-error { border-left-color: #ef4444; border-color: rgba(239, 68, 68, 0.45); }
-        .batch-item-header { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 10px 13px; background: rgba(30, 41, 59, 0.75); cursor: pointer; user-select: none; }
-        .batch-item-title { font-size: 0.9rem; font-weight: 800; color: #f8fafc; word-break: keep-all; }
-        .batch-item-status { font-size: 0.78rem; font-weight: 800; color: #e9d5ff; white-space: nowrap; display: flex; align-items: center; gap: 6px; }
-        .batch-retry-btn { background: rgba(239, 68, 68, 0.2); border: 1px solid #ef4444; color: #fecaca; padding: 4px 9px; border-radius: 7px; font-size: 0.75rem; font-weight: 800; cursor: pointer; }
-        .batch-retry-btn:hover { background: #ef4444; color: #fff; }
-        .batch-item-body { padding: 12px 14px; display: flex; flex-direction: column; gap: 10px; border-top: 1px solid rgba(51, 65, 85, 0.6); }
-        .batch-item-body.is-collapsed { display: none; }
-        .batch-user-answer-box { background: rgba(15, 23, 42, 0.9); border: 1px dashed rgba(148, 163, 184, 0.35); border-radius: 8px; padding: 8px 10px; font-size: 0.8rem; color: #cbd5e1; white-space: pre-wrap; line-height: 1.5; }
-        .batch-user-answer-label { font-size: 0.72rem; font-weight: 800; color: #93c5fd; margin-bottom: 3px; }
-
-        .batch-modal-footer { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 10px 14px; background: #0f172a; border-top: 1px solid var(--border-color); }
-        .batch-footer-copy-btn { flex: 1; background: var(--accent-gradient); border: none; color: #ffffff; padding: 11px 12px; border-radius: 10px; font-size: 0.84rem; font-weight: 800; cursor: pointer; white-space: nowrap; }
-        .batch-footer-clear-btn { background: rgba(239, 68, 68, 0.16); border: 1px solid rgba(239, 68, 68, 0.45); color: #fca5a5; padding: 11px 12px; border-radius: 10px; font-size: 0.82rem; font-weight: 800; cursor: pointer; white-space: nowrap; }
-        .batch-footer-clear-btn:hover { background: rgba(239, 68, 68, 0.3); color: #fff; }
-
-        .test-grading-content { font-size: 0.86rem; line-height: 1.6; color: #f1f5f9; word-break: keep-all; overflow-wrap: anywhere; }
-        .test-grading-content h3, .test-grading-content h4 { color: #fcd34d; margin: 10px 0 4px 0; font-size: 0.94rem; }
-        .test-grading-content h3:first-child, .test-grading-content h4:first-child { margin-top: 0; }
-        .test-grading-content strong { color: #38bdf8; font-weight: 700; }
-        .test-grading-content code { background: rgba(30, 41, 59, 0.9); color: #f9a8d4; padding: 2px 5px; border-radius: 4px; font-family: monospace; font-size: 0.8rem; }
-        .test-grading-content pre { background: #0f172a; border: 1px solid #334155; padding: 8px 10px; border-radius: 8px; overflow-x: auto; margin: 6px 0; font-family: monospace; font-size: 0.78rem; color: #e2e8f0; white-space: pre; }
-        .test-grading-content table { width: 100%; border-collapse: collapse; margin: 8px 0; font-size: 0.76rem; }
-        .test-grading-content th, .test-grading-content td { border: 1px solid #334155; padding: 5px 7px; text-align: left; }
-        .test-grading-content th { background: #3b0764; color: #f3e8ff; }
-
-        /* Answer Accordion inside Test View */
-        .test-answer-accordion { display: none; flex-direction: column; gap: 12px; background: #0f1d3a; border: 1px solid #1e40af; border-radius: 16px; padding: 16px; margin-top: 4px; }
-        .test-answer-accordion.is-open { display: flex; }
-
-        /* AI Tutor Modal */
-        .modal-overlay { display: none; position: fixed; inset: 0; z-index: 1000; background: rgba(2, 6, 23, 0.78); backdrop-filter: blur(6px); align-items: center; justify-content: center; padding: 12px; }
-        .modal-overlay.is-open { display: flex; }
-        .tutor-modal { width: 100%; max-width: 680px; height: min(86dvh, 760px); background: #0f172a; border: 1px solid rgba(56, 189, 248, 0.45); border-radius: 18px; box-shadow: 0 16px 48px rgba(0, 0, 0, 0.65), 0 0 24px rgba(56, 189, 248, 0.18); display: flex; flex-direction: column; overflow: hidden; }
-        .tutor-modal-header { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 12px 14px; background: linear-gradient(90deg, rgba(30, 58, 138, 0.55) 0%, rgba(15, 23, 42, 0.95) 100%); border-bottom: 1px solid var(--border-color); }
-        .tutor-topic-badge { flex: 1; min-width: 0; display: flex; align-items: center; gap: 6px; font-size: 0.86rem; font-weight: 700; color: #e0f2fe; background: rgba(56, 189, 248, 0.14); border: 1px solid rgba(56, 189, 248, 0.35); padding: 5px 11px; border-radius: 999px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        .tutor-header-actions { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
-        .tutor-icon-btn { background: rgba(30, 41, 59, 0.85); border: 1px solid var(--border-color); color: var(--text-primary); width: 34px; height: 34px; border-radius: 9px; cursor: pointer; font-size: 0.95rem; display: inline-flex; align-items: center; justify-content: center; transition: all 0.15s; }
-        .tutor-icon-btn:hover { border-color: var(--accent); color: var(--accent); }
-
-        /* API Key Config Panel inside Modal */
-        .api-key-panel { display: none; flex-direction: column; gap: 8px; padding: 12px 14px; background: rgba(30, 41, 59, 0.95); border-bottom: 1px solid rgba(56, 189, 248, 0.35); }
-        .api-key-panel.is-visible { display: flex; }
-        .api-key-label { font-size: 0.78rem; color: #93c5fd; font-weight: 600; display: flex; justify-content: space-between; align-items: center; }
-        .api-key-row { display: flex; gap: 6px; }
-        .api-key-input { flex: 1; background: #0f172a; border: 1px solid var(--border-color); color: var(--text-primary); padding: 8px 10px; border-radius: 8px; font-size: 0.82rem; outline: none; }
-        .api-key-input:focus { border-color: var(--accent); }
-        .api-key-save-btn { background: var(--accent); color: #0f172a; border: none; padding: 8px 12px; border-radius: 8px; font-size: 0.8rem; font-weight: 800; cursor: pointer; white-space: nowrap; }
-        .api-key-clear-btn { background: rgba(239, 68, 68, 0.18); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.4); padding: 8px 10px; border-radius: 8px; font-size: 0.78rem; font-weight: 700; cursor: pointer; white-space: nowrap; }
-
-        /* Quick Actions */
-        .tutor-quick-actions { display: flex; gap: 6px; padding: 10px 12px; background: rgba(15, 23, 42, 0.9); border-bottom: 1px solid rgba(51, 65, 85, 0.7); overflow-x: auto; scrollbar-width: none; }
-        .tutor-quick-actions::-webkit-scrollbar { display: none; }
-        .quick-action-btn { background: rgba(30, 41, 59, 0.9); border: 1px solid rgba(56, 189, 248, 0.35); color: #bae6fd; padding: 7px 11px; border-radius: 999px; font-size: 0.78rem; font-weight: 700; cursor: pointer; white-space: nowrap; transition: all 0.15s; flex-shrink: 0; }
-        .quick-action-btn:hover { background: rgba(56, 189, 248, 0.2); border-color: var(--accent); color: #fff; }
-        .quick-action-btn:active { transform: scale(0.97); }
-
-        /* Chat Log Area */
-        .tutor-chat-log { flex: 1; overflow-y: auto; padding: 14px; display: flex; flex-direction: column; gap: 12px; background: #0b1120; }
-        .chat-msg { max-width: 90%; padding: 11px 14px; border-radius: 14px; font-size: 0.85rem; line-height: 1.55; word-break: keep-all; overflow-wrap: anywhere; }
-        .chat-msg.user { align-self: flex-end; background: linear-gradient(135deg, #0284c7 0%, #2563eb 100%); color: #ffffff; border-bottom-right-radius: 4px; }
-        .chat-msg.assistant { align-self: flex-start; background: #1e293b; color: #f1f5f9; border: 1px solid #334155; border-bottom-left-radius: 4px; width: 100%; max-width: 96%; }
-        .chat-msg.system-info { align-self: center; max-width: 96%; background: rgba(30, 58, 138, 0.3); border: 1px dashed rgba(56, 189, 248, 0.4); color: #bae6fd; font-size: 0.79rem; text-align: center; padding: 9px 12px; }
-        .chat-msg h3, .chat-msg h4 { color: #38bdf8; margin: 8px 0 4px 0; font-size: 0.92rem; }
-        .chat-msg h3:first-child, .chat-msg h4:first-child { margin-top: 0; }
-        .chat-msg strong { color: #fde047; font-weight: 700; }
-        .chat-msg code { background: rgba(15, 23, 42, 0.8); color: #7dd3fc; padding: 2px 5px; border-radius: 4px; font-family: monospace; font-size: 0.8rem; }
-        .chat-msg pre { background: #090d16; border: 1px solid #334155; padding: 8px 10px; border-radius: 8px; overflow-x: auto; margin: 6px 0; font-family: monospace; font-size: 0.78rem; color: #e2e8f0; white-space: pre; }
-        .chat-msg ul, .chat-msg ol { padding-left: 18px; margin: 4px 0; }
-        .chat-msg li { margin-bottom: 3px; }
-        .chat-msg table { width: 100%; border-collapse: collapse; margin: 8px 0; font-size: 0.76rem; }
-        .chat-msg th, .chat-msg td { border: 1px solid #334155; padding: 5px 7px; text-align: left; }
-        .chat-msg th { background: #1e3a8a; color: #e0f2fe; }
-
-        /* Chat Input Bar */
-        .tutor-input-bar { display: flex; gap: 8px; padding: 10px 12px; background: #0f172a; border-top: 1px solid var(--border-color); align-items: flex-end; }
-        .tutor-input { flex: 1; background: #1e293b; border: 1px solid var(--border-color); color: var(--text-primary); padding: 9px 12px; border-radius: 10px; font-size: 0.86rem; line-height: 1.4; max-height: 110px; min-height: 40px; resize: none; outline: none; }
-        .tutor-input:focus { border-color: var(--accent); }
-        .tutor-send-btn { background: var(--accent-gradient); color: #ffffff; border: none; padding: 0 16px; height: 40px; border-radius: 10px; font-size: 0.86rem; font-weight: 800; cursor: pointer; white-space: nowrap; flex-shrink: 0; transition: opacity 0.15s; }
-        .tutor-send-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>정보관리기술사 실전 모의고사 머신 및 암기장</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 </head>
-<body>
-    <div class="container">
-        <header id="app-header">
-            <h1>기술사 암기장</h1>
-            <div style="display:flex; align-items:center; gap:8px;">
-                <span id="total-badge" style="font-size: 0.8rem; color: var(--text-secondary);"></span>
-                <button class="tutor-icon-btn" style="width:30px; height:30px; font-size:0.82rem;" title="Gemini API 키 설정" onclick="promptApiKeyConfig()">⚙️</button>
+<body class="bg-slate-900 text-slate-100 min-h-screen font-sans antialiased">
+
+    <div class="max-w-4xl mx-auto px-4 py-8">
+        <!-- 상단 헤더 -->
+        <header class="flex justify-between items-center mb-8 pb-4 border-b border-slate-800">
+            <div>
+                <h1 class="text-2xl font-bold tracking-tight text-white flex items-center gap-2">
+                    <i class="fa-solid fa-pen-nib text-indigo-400"></i> 정보관리기술사 모의고사 머신
+                </h1>
+                <p class="text-sm text-slate-400 mt-1">실전 모의고사 백지 인출 및 자율 선택 시뮬레이터</p>
+            </div>
+            <div class="flex items-center gap-3">
+                <button onclick="switchMode('flashcard')" id="nav-btn-flashcard" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-4 py-2 rounded-lg text-sm font-medium transition cursor-pointer flex items-center gap-2">
+                    <i class="fa-solid fa-clone"></i> 모의고사 카드 보기
+                </button>
+                <button onclick="switchMode('mock')" id="nav-btn-mock" class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition shadow-lg cursor-pointer flex items-center gap-2">
+                    <i class="fa-solid fa-pen-nib"></i> 실전 모의고사 머신
+                </button>
             </div>
         </header>
 
-        <!-- Home View -->
-        <div id="home-view">
-            <!-- 1. 메인 홈 화면 모드 전환 탭 -->
-            <div class="mode-switcher">
-                <button class="mode-tab active-study" id="tab-study-mode" onclick="switchHomeMode('STUDY')">🎴 플래시카드 암기</button>
-                <button class="mode-tab" id="tab-test-mode" onclick="switchHomeMode('TEST')">📝 실전 백지 테스트</button>
-            </div>
-
-            <div class="hero-card" id="home-hero-card" onclick="handleHeroStart()">
-                <h2 id="home-hero-title">전체 셔플 학습</h2>
-                <p id="home-hero-desc">모든 도메인 카드를 무작위로 섞어서 풀기</p>
-            </div>
-
-            <div>
-                <div class="section-title">
-                    <span id="domain-section-label">도메인 선택</span>
-                    <span class="mode-indicator-pill" id="home-mode-pill">🎴 암기 모드</span>
-                </div>
-                <div class="domain-grid" id="domain-grid">
-                    <!-- Dynamic Loading -->
-                </div>
-            </div>
-        </div>
-
-        <!-- Study View (기존 플래시카드 뒤집기 모드) -->
-        <div id="study-view">
-            <div class="study-header">
-                <button class="back-btn" onclick="goHome()">← 홈으로</button>
-                <button class="ai-tutor-btn" id="ai-tutor-open-btn" onclick="openAiTutorModal(event)">🤖 AI 튜터</button>
-                <div class="progress-text card-counter" id="progress-text">1 / 10</div>
-            </div>
-
-            <div class="card-container" onclick="flipCard()">
-                <div class="card" id="flashcard">
-                    <!-- Front -->
-                    <div class="card-face card-front">
-                        <div style="text-align: center; padding-top: 4px;">
-                            <span class="front-domain-pill" id="front-domain">도메인</span>
-                        </div>
-                        <div class="front-center-area">
-                            <div class="front-main-title" id="front-title">토픽 제목</div>
-                            <div class="front-mnemonic-box" id="front-mnemonic">💡 두음: -</div>
-                        </div>
-                        <div style="text-align: center; font-size: 0.9rem; color: var(--text-secondary);">카드를 터치하여 뒷면 확인 ↻</div>
+        <!-- 메인 컨테이너 -->
+        <main id="app">
+            <!-- [모드 1] 모의고사 카드 학습 뷰 -->
+            <div id="view-flashcard" class="hidden space-y-6">
+                <div class="bg-slate-800 border border-slate-700 rounded-2xl p-8 shadow-xl relative min-h-[360px] flex flex-col justify-between">
+                    <div class="flex justify-between items-center mb-4">
+                        <span id="card-domain-badge" class="text-xs px-3 py-1 rounded-full font-semibold bg-indigo-950 text-indigo-300 border border-indigo-800">모의고사</span>
+                        <span id="card-counter" class="text-sm text-slate-400 font-mono">1 / 1</span>
                     </div>
-                    <!-- Back -->
-                    <div class="card-face card-back">
-                        <div class="card-body" id="back-scroll-body">
-                            <div>
-                                <span class="card-tag" id="back-domain" style="color: #93c5fd;">핵심 구성도 및 서브노트</span>
-                                <div class="card-title" id="back-title" style="font-size: 1.08rem; color: #f8fafc;">토픽 제목</div>
-                                <div class="keywords-container" id="back-keywords"></div>
-                            </div>
 
-                            <!-- ⓪ 최상단: 1단락 핵심 정의 콜아웃 영역 -->
-                            <div class="definition-wrapper" id="definition-wrapper">
-                                <div class="back-section-label">1단락 핵심 정의 (25~30자)</div>
-                                <div class="definition-callout" id="back-definition"></div>
-                            </div>
-
-                            <!-- ① 상단: 다이어그램(diagram) 영역 -->
-                            <div class="diagram-wrapper" id="diagram-wrapper">
-                                <div class="back-section-label">구성도 / 핵심 개념도</div>
-                                <div class="diagram-box" id="back-diagram"></div>
-                            </div>
-
-                            <!-- ② 하단: 기술사 서브노트 스타일 표(Table) 영역 -->
-                            <div class="subnote-table-wrapper" id="table-wrapper">
-                                <div class="back-section-label">핵심 서브노트 요약표</div>
-                                <table class="subnote-table">
-                                    <thead>
-                                        <tr>
-                                            <th>대분류</th>
-                                            <th>소분류</th>
-                                            <th>핵심 기술 및 특징</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="back-table-body"></tbody>
-                                </table>
-                            </div>
-
-                            <!-- ③ 최하단: 3단락 실전 차별화 영역 -->
-                            <div class="diff-callout" id="diff-wrapper">
-                                <div class="diff-title">🎯 [3단락] 기술사적 차별화 포인트</div>
-                                <div class="diff-text" id="back-diff"></div>
-                            </div>
+                    <div class="text-center my-auto space-y-4">
+                        <h2 id="card-topic" class="text-xl font-bold text-white">모의고사 문항</h2>
+                        <div id="card-content" class="text-slate-300 text-sm whitespace-pre-line leading-relaxed max-w-lg mx-auto bg-slate-900/60 p-4 rounded-xl border border-slate-750 font-medium">
+                            문제 지문 내용이 여기에 표시됩니다.
                         </div>
+                    </div>
 
-                        <div style="text-align: center; font-size: 0.75rem; color: #93c5fd; padding-top: 6px;">탭하여 앞면으로 ↻</div>
+                    <div class="flex justify-between items-center pt-6 border-t border-slate-700 mt-6">
+                        <button onclick="prevCard()" class="bg-slate-700 hover:bg-slate-600 text-white px-4 py-2 rounded-lg text-sm transition cursor-pointer">
+                            <i class="fa-solid fa-arrow-left"></i> 이전 문제
+                        </button>
+                        <span class="text-xs text-slate-400">노션 모의고사 전 문항 연동</span>
+                        <button onclick="nextCard()" class="bg-slate-700 hover:bg-slate-600 text-white px-4 py-2 rounded-lg text-sm transition cursor-pointer">
+                            다음 문제 <i class="fa-solid fa-arrow-right"></i>
+                        </button>
                     </div>
                 </div>
             </div>
 
-            <div class="controls">
-                <button class="ctrl-btn" onclick="prevCard(event)">← 이전</button>
-                <button class="ctrl-btn check-btn" id="master-btn" onclick="toggleMastered(event)">☐ 이해함</button>
-                <button class="ctrl-btn primary" onclick="nextCard(event)">다음 카드 →</button>
-            </div>
-        </div>
+            <!-- [모드 2] 실전 모의고사 머신 뷰 -->
+            <div id="view-mock" class="space-y-6">
+                <!-- 교시 선택 및 개수 설정 화면 -->
+                <div id="mock-config" class="bg-slate-800/50 border border-slate-700 rounded-2xl p-6 text-center space-y-6 max-w-lg mx-auto">
+                    <h2 class="text-xl font-bold text-white">실전 모의고사 백지 인출 세팅</h2>
+                    <p class="text-sm text-slate-400">연습할 교시와 풀고 싶은 문제 수를 선택하세요.</p>
+                    
+                    <div class="flex justify-center gap-3">
+                        <button onclick="selectMockSession('1교시')" id="session-btn-1" class="session-btn px-5 py-3 bg-indigo-950 border border-indigo-500 rounded-xl font-semibold text-indigo-200 cursor-pointer transition">1교시형 (단답형)</button>
+                        <button onclick="selectMockSession('2교시')" id="session-btn-2" class="session-btn px-5 py-3 bg-slate-900 border border-slate-700 rounded-xl font-semibold text-slate-400 cursor-pointer transition">2교시형 (서술형)</button>
+                    </div>
 
-        <!-- Test View (연속 답안 작성 및 일괄 종합 채점 시스템) -->
-        <div id="test-view">
-            <div class="test-header">
-                <button class="back-btn" onclick="goHome()">← 홈으로</button>
-                <span class="test-domain-badge" id="test-domain-badge">📝 실전 백지 테스트</span>
-                <div class="test-header-right">
-                    <button class="tutor-icon-btn" style="width:30px; height:30px; font-size:0.8rem;" title="API 키 설정" onclick="promptApiKeyConfig()">⚙️</button>
-                    <div class="progress-text card-counter" id="test-progress-text">1 / 40</div>
-                </div>
-            </div>
+                    <div class="grid grid-cols-3 gap-2">
+                        <button onclick="setMockCount(4)" class="count-btn p-2 bg-slate-900 border border-indigo-500 rounded-lg text-xs font-medium cursor-pointer text-indigo-300">⚡ 미니 (4제)</button>
+                        <button onclick="setMockCount(10)" class="count-btn p-2 bg-slate-900 border border-slate-700 rounded-lg text-xs font-medium cursor-pointer">🎯 표준 (10제)</button>
+                        <button onclick="setMockCount('all')" class="count-btn p-2 bg-slate-900 border border-slate-700 rounded-lg text-xs font-medium cursor-pointer">📚 전체 보기</button>
+                    </div>
 
-            <!-- 상단 네비게이션 헤더 UI: 작성 현황 뱃지 + [📋 푼 답안 복사] + [🏁 일괄 채점하기 (N개)] -->
-            <div class="test-batch-toolbar">
-                <span class="test-written-badge" id="test-written-badge">✍️ 작성 완료: 0개</span>
-                <div class="test-toolbar-actions">
-                    <button class="test-copy-btn" id="test-copy-answers-btn" onclick="copyAllUserAnswers()">📋 푼 답안 복사</button>
-                    <button class="test-batch-grade-btn" id="test-batch-grade-btn" onclick="openBatchGradeModal()">🏁 일괄 채점하기 (0개)</button>
-                </div>
-            </div>
-
-            <!-- 토픽명과 분류만 노출되는 문제 카드 (정의/키워드/표/차별화 완벽 숨김) -->
-            <div class="test-prompt-card">
-                <span class="test-prompt-sub" id="test-domain-pill">DOMAIN · 백지 인출 문제</span>
-                <div class="test-prompt-title" id="test-topic-title">토픽 제목</div>
-            </div>
-
-            <!-- 수험생 답안 작성 Textarea (토픽별 실시간 자동 저장) -->
-            <div class="test-textarea-wrapper">
-                <div class="test-autosave-hint">
-                    <span>💡 입력 즉시 자동 저장 · 문제 이동 시에도 안전하게 보존됩니다</span>
-                    <span id="test-autosave-status" style="color:#4ade80; font-weight:700;"></span>
-                </div>
-                <textarea id="test-answer-input" class="test-textarea" oninput="handleTestAnswerInput()" placeholder="1단락 정의 요약, 두음, 개념도 구성요소, 3단락 차별화 포인트를 자유롭게 작성하세요. 작성 후 [다음 문제 →]로 연속 풀이하거나 상단 [🏁 일괄 채점하기]를 누르세요."></textarea>
-            </div>
-
-            <!-- 정답 확인 액션 버튼 (개별 실시간 채점 버튼 제거 - 딜레이 제로) -->
-            <div class="test-action-row">
-                <button class="test-reveal-btn" id="test-reveal-btn" onclick="toggleTestAnswerSheet()">👁️ 정답 카드 확인</button>
-            </div>
-
-            <!-- 정답 카드 확인 아코디언 영역 -->
-            <div class="test-answer-accordion" id="test-answer-accordion">
-                <div>
-                    <span class="card-tag" style="color: #93c5fd;">모범 답안 서브노트</span>
-                    <div class="card-title" id="test-ans-title" style="font-size: 1.05rem; color: #f8fafc;"></div>
-                    <div class="keywords-container" id="test-ans-keywords"></div>
+                    <button onclick="startMockSession()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white py-3 rounded-xl font-bold transition shadow-lg cursor-pointer">
+                        🎲 모의고사 세트 시작하기
+                    </button>
                 </div>
 
-                <div class="definition-wrapper" id="test-ans-def-wrapper" style="display:flex;">
-                    <div class="back-section-label">1단락 핵심 정의 (25~30자)</div>
-                    <div class="definition-callout" id="test-ans-definition"></div>
-                </div>
+                <!-- 모의고사 문제 풀이 화면 -->
+                <div id="mock-solve-area" class="hidden space-y-4">
+                    <div class="flex justify-between items-center bg-slate-800/40 p-3 rounded-xl border border-slate-800">
+                        <button onclick="backToMockConfig()" class="text-sm text-indigo-400 hover:text-indigo-300 transition flex items-center gap-2 cursor-pointer font-medium">
+                            <i class="fa-solid fa-arrow-left"></i> 세팅 화면으로
+                        </button>
+                        <div id="mock-progress-info" class="text-xs text-slate-400">문제 1 / 4</div>
+                        <button onclick="copyMockAnswers()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-1.5 rounded-lg text-xs font-medium transition cursor-pointer flex items-center gap-1.5">
+                            <i class="fa-solid fa-copy"></i> 📋 푼 답안 전체 복사
+                        </button>
+                    </div>
 
-                <div class="diagram-wrapper" id="test-ans-diag-wrapper">
-                    <div class="back-section-label">구성도 / 핵심 개념도</div>
-                    <div class="diagram-box" id="test-ans-diagram"></div>
-                </div>
+                    <div class="bg-slate-800 border border-slate-700 rounded-xl p-6 shadow-md">
+                        <div class="flex items-center gap-2 mb-3">
+                            <span id="mock-solve-badge" class="text-xs px-2.5 py-1 rounded font-semibold bg-indigo-900 text-indigo-200">1교시</span>
+                            <span id="mock-solve-title" class="text-sm font-bold text-slate-300">모의고사 문항</span>
+                        </div>
+                        <div id="mock-solve-question" class="text-base text-slate-100 whitespace-pre-line leading-relaxed font-medium">
+                            문제 지문 내용
+                        </div>
+                    </div>
 
-                <div class="subnote-table-wrapper" id="test-ans-table-wrapper">
-                    <div class="back-section-label">핵심 서브노트 요약표</div>
-                    <table class="subnote-table">
-                        <thead>
-                            <tr>
-                                <th>대분류</th>
-                                <th>소분류</th>
-                                <th>핵심 기술 및 특징</th>
-                            </tr>
-                        </thead>
-                        <tbody id="test-ans-table-body"></tbody>
-                    </table>
-                </div>
+                    <div class="bg-slate-800 border border-slate-700 rounded-xl p-4 shadow-md space-y-2">
+                        <div class="flex justify-between items-center text-xs text-slate-400 px-1">
+                            <span>✍️ 백지 인출 답안 작성 (실시간 자동 저장됨)</span>
+                            <span id="mock-save-status" class="text-emerald-400 font-medium"><i class="fa-solid fa-check"></i> 저장됨</span>
+                        </div>
+                        <textarea id="mock-textarea" rows="12" 
+                            class="w-full bg-slate-900 border border-slate-700 rounded-lg p-4 text-slate-100 focus:outline-none focus:border-indigo-500 font-mono text-sm leading-relaxed"
+                            placeholder="키워드 및 답안을 거침없이 타이핑하세요..."
+                            oninput="saveMockAnswer(this.value)"></textarea>
+                    </div>
 
-                <div class="diff-callout" id="test-ans-diff-wrapper">
-                    <div class="diff-title">🎯 [3단락] 기술사적 차별화 포인트</div>
-                    <div class="diff-text" id="test-ans-diff"></div>
+                    <div class="flex justify-between pt-2">
+                        <button onclick="moveMockQuestion(-1)" class="bg-slate-800 hover:bg-slate-700 px-4 py-2 rounded-lg text-sm text-slate-300 transition cursor-pointer">
+                            <i class="fa-solid fa-chevron-left"></i> 이전 문제
+                        </button>
+                        <button onclick="moveMockQuestion(1)" class="bg-slate-800 hover:bg-slate-700 px-4 py-2 rounded-lg text-sm text-slate-300 transition cursor-pointer">
+                            다음 문제 <i class="fa-solid fa-chevron-right"></i>
+                        </button>
+                    </div>
                 </div>
             </div>
-
-            <!-- 이전/다음 문제 네비게이션 -->
-            <div class="controls">
-                <button class="ctrl-btn" onclick="prevTestCard()">← 이전 문제</button>
-                <button class="ctrl-btn primary" style="background: var(--test-gradient); color:#fff;" onclick="nextTestCard()">다음 문제 →</button>
-            </div>
-        </div>
+        </main>
     </div>
 
-    <!-- 일괄 채점 종합 성적표 모달 레이어 (#batch-grade-modal) -->
-    <div class="modal-overlay" id="batch-grade-modal" onclick="handleBatchModalOverlayClick(event)">
-        <div class="batch-modal" onclick="event.stopPropagation()">
-            <!-- 1) 모달 헤더: 타이틀 + 우측 상단 고정 [📋 내가 푼 원본 답안 복사], [✕ 닫기] -->
-            <div class="batch-modal-header">
-                <div class="batch-modal-title">📊 실전 백지 인출 종합 성적표</div>
-                <div class="batch-header-actions">
-                    <button class="batch-raw-copy-btn" onclick="copyAllUserAnswers()">📋 내가 푼 원본 답안 복사</button>
-                    <button class="batch-close-btn" onclick="closeBatchGradeModal()">✕ 닫기</button>
-                </div>
-            </div>
-
-            <!-- 2) 채점 진행률 프로그레스 바 -->
-            <div class="batch-progress-bar-wrap">
-                <div class="batch-progress-text">
-                    <span id="batch-progress-label">채점 준비 중...</span>
-                    <span id="batch-progress-ascii">[          ]</span>
-                </div>
-                <div class="batch-progress-track">
-                    <div class="batch-progress-fill" id="batch-progress-fill"></div>
-                </div>
-            </div>
-
-            <!-- 3) 전체 완료 시 상단 요약 카드: [평균 점수 / 합격권(6.0점 이상) 달성 개수] -->
-            <div class="batch-summary-card" id="batch-summary-card">
-                <div class="batch-stat-item">
-                    <span class="batch-stat-label">📊 평균 점수 (10점 만점)</span>
-                    <span class="batch-stat-value" id="batch-avg-score">0.0점</span>
-                </div>
-                <div style="width:1px; height:32px; background:rgba(148,163,184,0.3);"></div>
-                <div class="batch-stat-item">
-                    <span class="batch-stat-label">🏆 합격권(6.0점 이상) 달성 개수</span>
-                    <span class="batch-stat-value" id="batch-pass-count">0 / 0개</span>
-                </div>
-            </div>
-
-            <!-- 4) 토픽별 채점 결과 카드 리스트 -->
-            <div class="batch-results-list" id="batch-results-list"></div>
-
-            <!-- 5) 모달 하단 액션 버튼: [📋 채점 결과 전체 복사] 및 [🗑️ 작성 답안 초기화] -->
-            <div class="batch-modal-footer">
-                <button class="batch-footer-copy-btn" onclick="copyAllBatchResults()">📋 채점 결과 전체 복사</button>
-                <button class="batch-footer-clear-btn" onclick="clearAllTestAnswers()">🗑️ 작성 답안 초기화</button>
-            </div>
-        </div>
+    <!-- 토스트 알림 -->
+    <div id="toast" class="fixed bottom-6 right-6 bg-emerald-600 text-white px-5 py-3 rounded-xl shadow-2xl transition-all duration-300 translate-y-20 opacity-0 pointer-events-none font-medium flex items-center gap-2 z-50">
+        <i class="fa-solid fa-circle-check text-lg"></i> <span id="toast-msg">복사되었습니다!</span>
     </div>
 
-    <!-- AI 튜터 모달 레이어 -->
-    <div class="modal-overlay" id="ai-tutor-modal" onclick="handleModalOverlayClick(event)">
-        <div class="tutor-modal" onclick="event.stopPropagation()">
-            <!-- 1) 상단 바: 현재 카드 토픽명 배지 + 설정(⚙️), 닫기(✕) -->
-            <div class="tutor-modal-header">
-                <div class="tutor-topic-badge" id="tutor-topic-badge">🤖 AI 튜터 · 토픽명</div>
-                <div class="tutor-header-actions">
-                    <button class="tutor-icon-btn" title="Gemini API 키 설정" onclick="toggleApiKeyPanel()">⚙️</button>
-                    <button class="tutor-icon-btn" title="닫기" onclick="closeAiTutorModal()">✕</button>
-                </div>
-            </div>
-
-            <!-- API 키 설정 패널 (저장된 키가 없거나 ⚙️ 클릭 시 노출) -->
-            <div class="api-key-panel" id="api-key-panel">
-                <div class="api-key-label">
-                    <span>🔑 Gemini API Key (브라우저 localStorage 전용 저장)</span>
-                    <span id="api-key-status" style="font-size:0.72rem; color:#94a3b8;">미등록</span>
-                </div>
-                <div class="api-key-row">
-                    <input type="password" id="gemini-api-key-input" class="api-key-input" placeholder="AIzaSy... (Google AI Studio API 키 입력)" autocomplete="off">
-                    <button class="api-key-save-btn" onclick="saveGeminiApiKey()">저장</button>
-                    <button class="api-key-clear-btn" onclick="clearGeminiApiKey()">삭제</button>
-                </div>
-            </div>
-
-            <!-- 2) 빠른 검증 프리셋 버튼 (Quick Actions) -->
-            <div class="tutor-quick-actions">
-                <button class="quick-action-btn" onclick="runQuickAction('ESSAY_OUTLINE')">📝 2교시 서술형 목차 제안</button>
-                <button class="quick-action-btn" onclick="runQuickAction('DIFF_BOOST')">🎯 3단락 실전 차별화 보강</button>
-                <button class="quick-action-btn" onclick="runQuickAction('GRADE_ANSWER')">💡 내 답안 키워드 채점/검증</button>
-            </div>
-
-            <!-- 3) 대화 로그 영역 -->
-            <div class="tutor-chat-log" id="tutor-chat-log"></div>
-
-            <!-- 4) 하단 바: 텍스트 입력창 및 전송 버튼 -->
-            <div class="tutor-input-bar">
-                <textarea id="tutor-user-input" class="tutor-input" rows="1" placeholder="질문이나 내가 작성한 1단락 정의/키워드를 입력하세요... (Enter 전송, Shift+Enter 줄바꿈)" onkeydown="handleTutorInputKeydown(event)"></textarea>
-                <button id="tutor-send-btn" class="tutor-send-btn" onclick="sendTutorMessage()">전송</button>
-            </div>
-        </div>
-    </div>
-
-    <script src="topics.js"></script>
     <script>
-        let currentDeck = [];
-        let currentIndex = 0;
-        let isFlipped = false;
-        let homeMode = 'STUDY'; // 'STUDY' | 'TEST'
-        let masteredSet = new Set();
-        const MASTERED_STORAGE_KEY = 'itpe_mastered_topics_v1';
-        const GEMINI_KEY_STORAGE = 'gemini_api_key';
-        let tutorChatHistory = [];
-        let lastTutorTopicKey = '';
-        let isTutorLoading = false;
-        let isTestGrading = false;
-        let activeStreamAbortController = null;
-
-        function loadMastered() {
-            try {
-                const raw = localStorage.getItem(MASTERED_STORAGE_KEY);
-                if (raw) {
-                    masteredSet = new Set(JSON.parse(raw));
-                }
-            } catch (e) {
-                masteredSet = new Set();
-            }
-        }
-
-        function saveMastered() {
-            try {
-                localStorage.setItem(MASTERED_STORAGE_KEY, JSON.stringify([...masteredSet]));
-            } catch (e) {}
-        }
-
-        function getTopicKey(card) {
-            return `${card.domain}::${card.topic}`;
-        }
-
-        function isMastered(card) {
-            return masteredSet.has(getTopicKey(card));
-        }
-
-        function switchHomeMode(mode) {
-            homeMode = mode === 'TEST' ? 'TEST' : 'STUDY';
-            const studyTab = document.getElementById('tab-study-mode');
-            const testTab = document.getElementById('tab-test-mode');
-            const heroCard = document.getElementById('home-hero-card');
-            const heroTitle = document.getElementById('home-hero-title');
-            const heroDesc = document.getElementById('home-hero-desc');
-            const modePill = document.getElementById('home-mode-pill');
-            const sectionLabel = document.getElementById('domain-section-label');
-
-            if (homeMode === 'TEST') {
-                document.body.classList.add('mode-test');
-                studyTab.className = 'mode-tab';
-                testTab.className = 'mode-tab active-test';
-                heroCard.classList.add('test-theme');
-                heroTitle.innerText = '전체 셔플 테스트';
-                heroDesc.innerText = `전체 ${typeof topics !== 'undefined' ? topics.length : 382}개 토픽 무작위 백지 인출 및 초고속 AI 실시간 채점`;
-                modePill.innerText = '📝 실전 백지 테스트 모드';
-                sectionLabel.innerText = '도메인별 실전 백지 테스트 선택';
-            } else {
-                document.body.classList.remove('mode-test');
-                studyTab.className = 'mode-tab active-study';
-                testTab.className = 'mode-tab';
-                heroCard.classList.remove('test-theme');
-                heroTitle.innerText = '전체 셔플 학습';
-                heroDesc.innerText = '모든 도메인 카드를 무작위로 섞어서 풀기';
-                modePill.innerText = '🎴 암기 모드';
-                sectionLabel.innerText = '도메인 선택';
-            }
-            initApp();
-        }
-
-        function handleHeroStart() {
-            if (homeMode === 'TEST') {
-                startTestMode('ALL');
-            } else {
-                startStudy('ALL');
-            }
-        }
-
-        function initApp() {
-            loadMastered();
-            if (typeof topics === 'undefined' || !topics.length) {
-                document.getElementById('domain-grid').innerHTML = '<p style="color:red; grid-column:span 2;">topics.js 로드 대기 중...</p>';
-                return;
-            }
-            
-            document.getElementById('total-badge').innerText = `총 ${topics.length}개 토픽`;
-
-            const domainCounts = {};
-            const domainMasteredCounts = {};
-            topics.forEach(t => {
-                domainCounts[t.domain] = (domainCounts[t.domain] || 0) + 1;
-                if (isMastered(t)) {
-                    domainMasteredCounts[t.domain] = (domainMasteredCounts[t.domain] || 0) + 1;
-                }
-            });
-
-            const grid = document.getElementById('domain-grid');
-            grid.innerHTML = '';
-
-            Object.keys(domainCounts).forEach(domain => {
-                const total = domainCounts[domain];
-                const done = domainMasteredCounts[domain] || 0;
-                const btn = document.createElement('div');
-                if (homeMode === 'TEST') {
-                    btn.className = 'domain-btn test-card-btn';
-                    btn.onclick = () => startTestMode(domain);
-                    btn.innerHTML = `
-                        <div class="domain-name"><span>${domain} 테스트</span><span>📝</span></div>
-                        <div class="domain-count">${domain} 테스트(${total}개) · 백지 인출</div>
-                    `;
-                } else {
-                    btn.className = 'domain-btn';
-                    btn.onclick = () => startStudy(domain);
-                    btn.innerHTML = `
-                        <div class="domain-name">${domain}</div>
-                        <div class="domain-count">${total}개 토픽 ${done > 0 ? `<span style="color:#4ade80;">(이해 ${done})</span>` : ''}</div>
-                    `;
-                }
-                grid.appendChild(btn);
-            });
-        }
-
-        function startStudy(domain) {
-            const pool = domain === 'ALL' ? [...topics] : topics.filter(t => t.domain === domain);
-
-            if (pool.length === 0) {
-                alert('해당 도메인에 토픽이 없습니다.');
-                return;
-            }
-
-            const unmastered = pool.filter(t => !isMastered(t)).sort(() => Math.random() - 0.5);
-            const mastered = pool.filter(t => isMastered(t)).sort(() => Math.random() - 0.5);
-            currentDeck = [...unmastered, ...mastered];
-
-            currentIndex = 0;
-            isFlipped = false;
-            document.getElementById('app-header').style.display = 'none';
-            document.getElementById('home-view').style.display = 'none';
-            document.getElementById('test-view').style.display = 'none';
-            document.getElementById('study-view').style.display = 'flex';
-            renderCard();
-        }
-
-        function startTestMode(domain) {
-            const pool = domain === 'ALL' ? [...topics] : topics.filter(t => t.domain === domain);
-            if (pool.length === 0) {
-                alert('해당 도메인에 토픽이 없습니다.');
-                return;
-            }
-
-            currentDeck = [...pool].sort(() => Math.random() - 0.5);
-            currentIndex = 0;
-
-            document.getElementById('app-header').style.display = 'none';
-            document.getElementById('home-view').style.display = 'none';
-            document.getElementById('study-view').style.display = 'none';
-            document.getElementById('test-view').style.display = 'flex';
-            document.getElementById('test-domain-badge').innerText = domain === 'ALL' ? '📝 전체 셔플 테스트' : `📝 ${domain} 테스트`;
-            renderTestCard();
-        }
-
-        function goHome() {
-            if (activeStreamAbortController) {
-                try { activeStreamAbortController.abort(); } catch (e) {}
-                activeStreamAbortController = null;
-            }
-            isTestGrading = false;
-            document.getElementById('study-view').style.display = 'none';
-            document.getElementById('test-view').style.display = 'none';
-            document.getElementById('app-header').style.display = 'flex';
-            document.getElementById('home-view').style.display = 'flex';
-            initApp();
-        }
-
-        let justSwiped = false;
-        function flipCard() {
-            if (justSwiped) {
-                justSwiped = false;
-                return;
-            }
-            const card = document.getElementById('flashcard');
-            isFlipped = !isFlipped;
-            if (isFlipped) {
-                card.classList.add('is-flipped');
-            } else {
-                card.classList.remove('is-flipped');
-            }
-        }
-
-        function parseMdTableRows(mdText) {
-            if (!mdText) return null;
-            const lines = mdText.split('\n').map(l => l.trim()).filter(l => l.startsWith('|'));
-            if (lines.length < 3) return null;
-            const parseCells = l => {
-                let t = l;
-                if (t.startsWith('|')) t = t.slice(1);
-                if (t.endsWith('|')) t = t.slice(0, -1);
-                return t.split('|').map(c => c.trim());
-            };
-            const body = lines.slice(2).map(parseCells);
-            return body.map(row => {
-                if (row.length >= 3) {
-                    return { major: row[0], minor: row[1], desc: row.slice(2).join(' | ') };
-                } else if (row.length === 2) {
-                    return { major: row[0], minor: '', desc: row[1] };
-                }
-                return { major: row[0] || '', minor: '', desc: '' };
-            });
-        }
-
-        function renderSubnoteTableInto(rows, wrapperId, tbodyId) {
-            const tableWrapper = document.getElementById(wrapperId);
-            const tbody = document.getElementById(tbodyId);
-            tbody.innerHTML = '';
-
-            if (!Array.isArray(rows) || rows.length === 0) {
-                tableWrapper.style.display = 'none';
-                return;
-            }
-
-            tableWrapper.style.display = 'flex';
-
-            const normalized = rows.map(r => {
-                if (Array.isArray(r)) {
-                    return { major: r[0] || '', minor: r[1] || '', desc: r[2] || '' };
-                }
-                return {
-                    major: r.major ?? r.category ?? r.대분류 ?? '',
-                    minor: r.minor ?? r.sub ?? r.subCategory ?? r.소분류 ?? '',
-                    desc: r.desc ?? r.feature ?? r.특징 ?? ''
-                };
-            });
-
-            const rowspans = new Array(normalized.length).fill(1);
-            for (let i = 0; i < normalized.length; i++) {
-                if (rowspans[i] === 0) continue;
-                let span = 1;
-                while (
-                    i + span < normalized.length &&
-                    normalized[i].major !== '' &&
-                    (normalized[i + span].major === '' || normalized[i + span].major === normalized[i].major)
-                ) {
-                    rowspans[i + span] = 0;
-                    span++;
-                }
-                rowspans[i] = span;
-            }
-
-            normalized.forEach((row, idx) => {
-                const tr = document.createElement('tr');
-
-                if (rowspans[idx] > 0) {
-                    const tdMajor = document.createElement('td');
-                    tdMajor.className = 'col-major';
-                    if (rowspans[idx] > 1) {
-                        tdMajor.rowSpan = rowspans[idx];
-                    }
-                    tdMajor.innerText = row.major;
-                    tr.appendChild(tdMajor);
-                }
-
-                const tdMinor = document.createElement('td');
-                tdMinor.className = 'col-minor';
-                tdMinor.innerText = row.minor;
-                tr.appendChild(tdMinor);
-
-                const tdDesc = document.createElement('td');
-                tdDesc.className = 'col-desc';
-                tdDesc.innerText = row.desc;
-                tr.appendChild(tdDesc);
-
-                tbody.appendChild(tr);
-            });
-        }
-
-        function renderSubnoteTable(rows) {
-            renderSubnoteTableInto(rows, 'table-wrapper', 'back-table-body');
-        }
-
-        function populateDiagramAndTable(card, diagWrapperId, diagBoxId, tableWrapperId, tableBodyId) {
-            const diagWrapper = document.getElementById(diagWrapperId);
-            const diagBox = document.getElementById(diagBoxId);
-            diagBox.classList.remove('has-image');
-            diagBox.innerHTML = '';
-
-            const imgSrc = card.diagramImg || (typeof card.diagram === 'string' && /\.(png|jpe?g|gif|webp|svg)$/i.test(card.diagram.trim()) ? card.diagram.trim() : null);
-
-            let asciiPart = '';
-            let mdTableRows = null;
-
-            if (card.details && typeof card.details === 'string') {
-                const lines = card.details.replace(/\r\n/g, '\n').split('\n');
-                const sepIdx = lines.findIndex(l => /^\s*\|\s*:?-{2,}/.test(l));
-                if (sepIdx > 0) {
-                    asciiPart = lines.slice(0, sepIdx - 1).join('\n').trim();
-                    const tableText = lines.slice(sepIdx - 1).join('\n');
-                    mdTableRows = parseMdTableRows(tableText);
-                } else {
-                    asciiPart = card.details.trim();
-                }
-            }
-
-            if (imgSrc) {
-                diagWrapper.style.display = 'flex';
-                diagBox.classList.add('has-image');
-                let imgHtml = `<img src="${imgSrc}" alt="${card.topic} 구성도">`;
-                if (asciiPart) {
-                    imgHtml += `<pre class="details-ascii" style="width:100%; margin-top:8px;">${asciiPart}</pre>`;
-                }
-                diagBox.innerHTML = imgHtml;
-            } else if (typeof card.diagram === 'string' && card.diagram.trim().startsWith('<img')) {
-                diagWrapper.style.display = 'flex';
-                diagBox.classList.add('has-image');
-                diagBox.innerHTML = card.diagram;
-            } else if (asciiPart) {
-                diagWrapper.style.display = 'flex';
-                diagBox.innerHTML = `<pre class="details-ascii">${asciiPart}</pre>`;
-            } else if (card.diagram && card.diagram.trim() !== '') {
-                diagWrapper.style.display = 'flex';
-                diagBox.innerText = card.diagram;
-            } else {
-                diagWrapper.style.display = 'none';
-            }
-
-            const finalTableRows = card.tableRows || mdTableRows;
-            renderSubnoteTableInto(finalTableRows, tableWrapperId, tableBodyId);
-        }
-
-        function renderCard() {
-            const card = currentDeck[currentIndex];
-            document.getElementById('flashcard').classList.remove('is-flipped');
-            isFlipped = false;
-
-            document.getElementById('front-domain').innerText = card.domain;
-            document.getElementById('front-title').innerText = card.topic;
-
-            const mnemonicEl = document.getElementById('front-mnemonic');
-            if (card.mnemonic && card.mnemonic.trim() !== '') {
-                mnemonicEl.style.display = 'flex';
-                mnemonicEl.innerText = `💡 두음: ${card.mnemonic}`;
-            } else {
-                mnemonicEl.style.display = 'none';
-            }
-            
-            document.getElementById('back-domain').innerText = `${card.domain} · 서브노트`;
-            document.getElementById('back-title').innerText = card.topic;
-            
-            const kwContainer = document.getElementById('back-keywords');
-            kwContainer.innerHTML = '';
-            if (card.keywords && card.keywords.length) {
-                kwContainer.style.display = 'flex';
-                card.keywords.forEach(kw => {
-                    const span = document.createElement('span');
-                    span.className = 'keyword-badge';
-                    span.innerText = kw;
-                    kwContainer.appendChild(span);
-                });
-            } else {
-                kwContainer.style.display = 'none';
-            }
-
-            const defWrapper = document.getElementById('definition-wrapper');
-            const defBox = document.getElementById('back-definition');
-            if (card.definition && card.definition.trim() !== '') {
-                defWrapper.style.display = 'flex';
-                defBox.innerText = card.definition;
-            } else {
-                defWrapper.style.display = 'none';
-                defBox.innerText = '';
-            }
-
-            populateDiagramAndTable(card, 'diagram-wrapper', 'back-diagram', 'table-wrapper', 'back-table-body');
-
-            const diffWrapper = document.getElementById('diff-wrapper');
-            const diffBox = document.getElementById('back-diff');
-            if (card.differentiation && card.differentiation.trim() !== '') {
-                diffWrapper.style.display = 'flex';
-                diffBox.innerText = card.differentiation;
-            } else {
-                diffWrapper.style.display = 'none';
-                diffBox.innerText = '';
-            }
-
-            const backScroll = document.getElementById('back-scroll-body');
-            if (backScroll) backScroll.scrollTop = 0;
-
-            const masterBtn = document.getElementById('master-btn');
-            const mastered = isMastered(card);
-            if (masterBtn) {
-                if (mastered) {
-                    masterBtn.classList.add('is-mastered');
-                    masterBtn.innerText = '✅ 이해완료';
-                } else {
-                    masterBtn.classList.remove('is-mastered');
-                    masterBtn.innerText = '☐ 이해함';
-                }
-            }
-
-            document.getElementById('front-domain').innerText = mastered ? `${card.domain} · ✅ 이해완료` : card.domain;
-            document.getElementById('progress-text').innerText = `${currentIndex + 1} / ${currentDeck.length}`;
-        }
-
-        /* ==========================================
-         * 📝 실전 백지 테스트: 연속 답안 작성 & 일괄 종합 채점 시스템
-         * ========================================== */
-        const TEST_ANSWERS_STORAGE_KEY = 'itpe_test_answers_v1';
-        let testAnswersMap = {}; // { [topicKey]: { topicKey, domain, topic, answer, updatedAt } }
-        let batchResultsMap = {}; // { [topicKey]: { status: 'pending'|'done'|'error', score: number|null, markdown: string, errorMsg: string } }
-        let isBatchGradingRunning = false;
-        let batchGradingAbortFlag = false;
-
-        function loadTestAnswers() {
-            try {
-                const raw = localStorage.getItem(TEST_ANSWERS_STORAGE_KEY);
-                if (raw) {
-                    const parsed = JSON.parse(raw);
-                    if (parsed && typeof parsed === 'object') {
-                        testAnswersMap = parsed;
-                    }
-                }
-            } catch (e) {
-                testAnswersMap = {};
-            }
-        }
-
-        function saveTestAnswers() {
-            try {
-                localStorage.setItem(TEST_ANSWERS_STORAGE_KEY, JSON.stringify(testAnswersMap));
-            } catch (e) {}
-        }
-
-        function getWrittenAnswerEntries() {
-            loadTestAnswers();
-            return Object.values(testAnswersMap)
-                .filter(item => item && typeof item.answer === 'string' && item.answer.trim().length > 0)
-                .sort((a, b) => (a.updatedAt || 0) - (b.updatedAt || 0));
-        }
-
-        function updateTestHeaderStatus() {
-            const entries = getWrittenAnswerEntries();
-            const count = entries.length;
-            const badgeEl = document.getElementById('test-written-badge');
-            const gradeBtn = document.getElementById('test-batch-grade-btn');
-
-            if (badgeEl) {
-                badgeEl.innerText = `✍️ 작성 완료: ${count}개`;
-                if (count > 0) {
-                    badgeEl.classList.add('has-items');
-                } else {
-                    badgeEl.classList.remove('has-items');
-                }
-            }
-
-            if (gradeBtn) {
-                gradeBtn.innerText = `🏁 일괄 채점하기 (${count}개)`;
-                if (count > 0) {
-                    gradeBtn.classList.add('is-active');
-                } else {
-                    gradeBtn.classList.remove('is-active');
-                }
-            }
-        }
-
-        function handleTestAnswerInput() {
-            if (!currentDeck.length) return;
-            const card = currentDeck[currentIndex];
-            const key = getTopicKey(card);
-            const inputEl = document.getElementById('test-answer-input');
-            const val = inputEl ? inputEl.value : '';
-
-            if (val.trim().length > 0) {
-                const existing = testAnswersMap[key];
-                testAnswersMap[key] = {
-                    topicKey: key,
-                    domain: card.domain,
-                    topic: card.topic,
-                    answer: val,
-                    updatedAt: existing && existing.updatedAt ? existing.updatedAt : Date.now()
-                };
-            } else {
-                delete testAnswersMap[key];
-            }
-
-            saveTestAnswers();
-            updateTestHeaderStatus();
-
-            const statusEl = document.getElementById('test-autosave-status');
-            if (statusEl) {
-                statusEl.innerText = val.trim().length > 0 ? '✓ 자동 저장됨' : '';
-            }
-        }
-
-        function renderTestCard() {
-            loadTestAnswers();
-            const card = currentDeck[currentIndex];
-            const key = getTopicKey(card);
-
-            document.getElementById('test-domain-pill').innerText = `${card.domain} 도메인 · 실전 백지 인출`;
-            document.getElementById('test-topic-title').innerText = card.topic;
-            document.getElementById('test-progress-text').innerText = `${currentIndex + 1} / ${currentDeck.length}`;
-
-            // 기존 작성 내용 즉시 복원 (딜레이 제로)
-            const inputEl = document.getElementById('test-answer-input');
-            const savedEntry = testAnswersMap[key];
-            inputEl.value = (savedEntry && typeof savedEntry.answer === 'string') ? savedEntry.answer : '';
-
-            const statusEl = document.getElementById('test-autosave-status');
-            if (statusEl) {
-                statusEl.innerText = inputEl.value.trim().length > 0 ? '✓ 저장된 답안 복원됨' : '';
-            }
-
-            updateTestHeaderStatus();
-
-            // 정답 아코디언 초기화 (모범 답안 완벽 숨김)
-            const acc = document.getElementById('test-answer-accordion');
-            acc.classList.remove('is-open');
-            document.getElementById('test-reveal-btn').innerText = '👁️ 정답 카드 확인';
-
-            // 아코디언 내부 모범 답안 데이터 바인딩 (펼치기 전까지 DOM 상 숨김)
-            document.getElementById('test-ans-title').innerText = card.topic;
-            const kwBox = document.getElementById('test-ans-keywords');
-            kwBox.innerHTML = '';
-            if (Array.isArray(card.keywords) && card.keywords.length) {
-                card.keywords.forEach(kw => {
-                    const span = document.createElement('span');
-                    span.className = 'keyword-badge';
-                    span.innerText = kw;
-                    kwBox.appendChild(span);
-                });
-            }
-            document.getElementById('test-ans-definition').innerText = card.definition || '';
-            populateDiagramAndTable(card, 'test-ans-diag-wrapper', 'test-ans-diagram', 'test-ans-table-wrapper', 'test-ans-table-body');
-
-            const diffWrapper = document.getElementById('test-ans-diff-wrapper');
-            const diffBox = document.getElementById('test-ans-diff');
-            if (card.differentiation && card.differentiation.trim() !== '') {
-                diffWrapper.style.display = 'flex';
-                diffBox.innerText = card.differentiation;
-            } else {
-                diffWrapper.style.display = 'none';
-                diffBox.innerText = '';
-            }
-        }
-
-        function toggleTestAnswerSheet() {
-            const acc = document.getElementById('test-answer-accordion');
-            const btn = document.getElementById('test-reveal-btn');
-            const isOpen = acc.classList.toggle('is-open');
-            btn.innerText = isOpen ? '🙈 정답 카드 접기' : '👁️ 정답 카드 확인';
-        }
-
-        function nextTestCard() {
-            if (currentIndex < currentDeck.length - 1) {
-                currentIndex++;
-                renderTestCard();
-            } else {
-                alert('마지막 문제입니다!');
-            }
-        }
-
-        function prevTestCard() {
-            if (currentIndex > 0) {
-                currentIndex--;
-                renderTestCard();
-            } else {
-                alert('첫 번째 문제입니다!');
-            }
-        }
-
-        /* ==========================================
-         * 📋 상시 답안 복사 기능 (채점 중/언제든 즉시 클립보드 복사)
-         * ========================================== */
-        async function copyTextToClipboard(text) {
-            if (navigator.clipboard && navigator.clipboard.writeText) {
-                try {
-                    await navigator.clipboard.writeText(text);
-                    return true;
-                } catch (e) {}
-            }
-            const ta = document.createElement('textarea');
-            ta.value = text;
-            ta.style.position = 'fixed';
-            ta.style.left = '-9999px';
-            document.body.appendChild(ta);
-            ta.select();
-            try {
-                document.execCommand('copy');
-                document.body.removeChild(ta);
-                return true;
-            } catch (e) {
-                document.body.removeChild(ta);
-                return false;
-            }
-        }
-
-        function buildFormattedUserAnswersText() {
-            const entries = getWrittenAnswerEntries();
-            if (!entries.length) return '';
-
-            const blocks = entries.map((item, idx) => {
-                return `${idx + 1}. 토픽명: ${item.topic}\n- 작성 내용:\n${item.answer.trim()}`;
-            }).join('\n\n');
-
-            return `======================================\n[정보관리기술사 실전 백지 인출 답안]\n\n${blocks}\n======================================`;
-        }
-
-        async function copyAllUserAnswers() {
-            const formatted = buildFormattedUserAnswersText();
-            if (!formatted) {
-                alert('아직 작성된 답안이 없습니다. 먼저 문제에 답안을 작성해 주세요!');
-                return;
-            }
-            const entries = getWrittenAnswerEntries();
-            const ok = await copyTextToClipboard(formatted);
-            if (ok) {
-                alert(`📋 내가 푼 원본 답안(${entries.length}개 토픽)이 클립보드에 복사되었습니다!\n외부(Gemini 웹 등)에 바로 붙여넣어 활용하실 수 있습니다.`);
-            } else {
-                alert('클립보드 복사에 실패했습니다.');
-            }
-        }
-
-        /* ==========================================
-         * 🏁 일괄 채점 모달 및 순차 API 호출 파이프라인 (Gemini 3.8 Flash)
-         * ========================================== */
-        function delay(ms) {
-            return new Promise(resolve => setTimeout(resolve, ms));
-        }
-
-        function findCardByTopicKey(topicKey, fallbackItem) {
-            if (typeof topics !== 'undefined' && Array.isArray(topics)) {
-                const found = topics.find(t => getTopicKey(t) === topicKey || t.topic === (fallbackItem && fallbackItem.topic));
-                if (found) return found;
-            }
-            return {
-                domain: (fallbackItem && fallbackItem.domain) || '',
-                topic: (fallbackItem && fallbackItem.topic) || topicKey,
-                definition: '',
-                mnemonic: '',
-                keywords: [],
-                tableRows: [],
-                differentiation: ''
-            };
-        }
-
-        function buildExaminerSystemPrompt(card) {
-            const topic = card.topic || '';
-            const definition = card.definition || '';
-            const mnemonic = card.mnemonic || '';
-            const keywords = Array.isArray(card.keywords) ? card.keywords.join(', ') : '';
-            const differentiation = card.differentiation || '';
-
-            let tableSummary = '';
-            if (Array.isArray(card.tableRows) && card.tableRows.length > 0) {
-                tableSummary = card.tableRows
-                    .map(r => `[${r.major || r.category || ''}] ${r.minor || r.sub || ''}: ${r.desc || ''}`)
-                    .join(' / ');
-            } else if (typeof card.details === 'string' && card.details.trim()) {
-                tableSummary = card.details.trim();
-            }
-
-            return `당신은 정보관리기술사 실전 채점위원입니다. 인사말 없이 두괄식 마크다운으로 10점 만점 기준 채점을 수행하십시오:
-1. 📊 예상 점수 (10점 만점)
-2. 🎯 키워드 매칭 분석 (인출 키워드 vs 필수 누락 키워드)
-3. ✍️ 1단락 정의 첨삭 (목적-메커니즘-종결어 30자 규격 점검)
-4. 💡 3단락 실전 차별화 제언
-
-[원본 카드 모범 답안 기준]
-- 토픽명: ${topic}
-- 핵심 두음: ${mnemonic}
-- 1단락 정의(모범): ${definition}
-- 필수 채점 키워드: ${keywords}
-- 2단락 핵심 구성요소(표/개념도): ${tableSummary}
-- 3단락 실전 차별화 포인트: ${differentiation}`;
-        }
-
-        function parseScoreFromMarkdown(mdText) {
-            if (!mdText) return null;
-            // "8.5점", "7.0 / 10", "예상 점수: 6.5" 등 추출
-            const m1 = mdText.match(/([0-9]+(?:\.[0-9]+)?)\s*\/\s*10/);
-            if (m1) {
-                const v = parseFloat(m1[1]);
-                if (!isNaN(v) && v >= 0 && v <= 10) return v;
-            }
-            const m2 = mdText.match(/예상\s*점수[^\d\n]*([0-9]+(?:\.[0-9]+)?)\s*점?/);
-            if (m2) {
-                const v = parseFloat(m2[1]);
-                if (!isNaN(v) && v >= 0 && v <= 10) return v;
-            }
-            const m3 = mdText.match(/([0-9]+(?:\.[0-9]+)?)\s*점/);
-            if (m3) {
-                const v = parseFloat(m3[1]);
-                if (!isNaN(v) && v >= 0 && v <= 10) return v;
-            }
-            return null;
-        }
-
-        function buildAsciiProgress(done, total) {
-            const slots = 10;
-            if (total <= 0) return '[          ]';
-            const filled = Math.min(slots, Math.round((done / total) * slots));
-            if (filled >= slots) return '[==========]';
-            const eq = '='.repeat(Math.max(0, filled));
-            const arrow = filled < slots ? '>' : '';
-            const spaces = ' '.repeat(Math.max(0, slots - filled - (arrow ? 1 : 0)));
-            return `[${eq}${arrow}${spaces}]`;
-        }
-
-        function updateBatchProgressUI(doneCount, totalCount, isFinished) {
-            const labelEl = document.getElementById('batch-progress-label');
-            const asciiEl = document.getElementById('batch-progress-ascii');
-            const fillEl = document.getElementById('batch-progress-fill');
-
-            const pct = totalCount > 0 ? Math.min(100, Math.round((doneCount / totalCount) * 100)) : 0;
-            const ascii = buildAsciiProgress(doneCount, totalCount);
-
-            if (labelEl) {
-                labelEl.innerText = isFinished
-                    ? `✅ 일괄 채점 완료! ${doneCount} / ${totalCount} 완료`
-                    : `채점 진행 중... ${doneCount} / ${totalCount} 완료`;
-            }
-            if (asciiEl) asciiEl.innerText = ascii;
-            if (fillEl) fillEl.style.width = `${pct}%`;
-
-            updateBatchSummaryCard(totalCount, isFinished);
-        }
-
-        function updateBatchSummaryCard(totalCount, forceVisible) {
-            const summaryCard = document.getElementById('batch-summary-card');
-            const avgEl = document.getElementById('batch-avg-score');
-            const passEl = document.getElementById('batch-pass-count');
-
-            const results = Object.values(batchResultsMap);
-            const scored = results.filter(r => r && r.status === 'done' && typeof r.score === 'number');
-            const finishedCount = results.filter(r => r && (r.status === 'done' || r.status === 'error')).length;
-
-            if (scored.length > 0) {
-                const sum = scored.reduce((acc, cur) => acc + cur.score, 0);
-                const avg = (sum / scored.length).toFixed(1);
-                const passCount = scored.filter(r => r.score >= 6.0).length;
-                if (avgEl) avgEl.innerText = `${avg}점`;
-                if (passEl) passEl.innerText = `${passCount} / ${totalCount}개`;
-            } else {
-                if (avgEl) avgEl.innerText = `- 점`;
-                if (passEl) passEl.innerText = `0 / ${totalCount}개`;
-            }
-
-            if (summaryCard) {
-                if (forceVisible || (totalCount > 0 && finishedCount >= totalCount)) {
-                    summaryCard.classList.add('is-visible');
-                } else {
-                    summaryCard.classList.remove('is-visible');
-                }
-            }
-        }
-
-        function toggleBatchItemAccordion(cardDomId) {
-            const el = document.getElementById(cardDomId);
-            if (!el) return;
-            const body = el.querySelector('.batch-item-body');
-            if (body) body.classList.toggle('is-collapsed');
-        }
-
-        async function requestSingleTopicGrade(entry, apiKey) {
-            const card = findCardByTopicKey(entry.topicKey, entry);
-            const systemPrompt = buildExaminerSystemPrompt(card);
-            const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${encodeURIComponent(apiKey)}`;
-
-            const response = await fetch(endpoint, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    system_instruction: {
-                        parts: [{ text: systemPrompt }]
-                    },
-                    contents: [
-                        {
-                            role: 'user',
-                            parts: [{ text: `[수험생 백지 인출 답안]\n${entry.answer}` }]
-                        }
-                    ],
-                    generationConfig: {
-                        temperature: 0.2,
-                        maxOutputTokens: 1000
-                    }
-                })
-            });
-
-            const data = await response.json();
-            if (!response.ok) {
-                const errMsg = (data && data.error && data.error.message) ? data.error.message : `HTTP ${response.status}`;
-                throw new Error(errMsg);
-            }
-
-            const replyText = data?.candidates?.[0]?.content?.parts?.map(p => p.text || '').join('\n') || '응답을 생성하지 못했습니다.';
-            return replyText;
-        }
-
-        function renderBatchItemCard(entry, index) {
-            const listEl = document.getElementById('batch-results-list');
-            const safeId = `batch-card-${index}`;
-            let cardEl = document.getElementById(safeId);
-
-            if (!cardEl) {
-                cardEl = document.createElement('div');
-                cardEl.id = safeId;
-                cardEl.className = 'batch-item-card';
-                listEl.appendChild(cardEl);
-            }
-
-            const state = batchResultsMap[entry.topicKey] || { status: 'pending' };
-
-            if (state.status === 'pending') {
-                cardEl.className = 'batch-item-card';
-                cardEl.innerHTML = `
-                    <div class="batch-item-header" onclick="toggleBatchItemAccordion('${safeId}')">
-                        <div class="batch-item-title">${index + 1}. ${escapeHtml(entry.topic)}</div>
-                        <div class="batch-item-status">⏳ 채점 대기/진행 중...</div>
-                    </div>
-                    <div class="batch-item-body">
-                        <div>
-                            <div class="batch-user-answer-label">✍️ 내가 작성한 답안</div>
-                            <div class="batch-user-answer-box">${escapeHtml(entry.answer)}</div>
-                        </div>
-                        <div class="test-grading-content" style="color:#94a3b8;">⏳ Gemini 3.8 Flash 채점위원이 답안을 분석하고 있습니다...</div>
-                    </div>
-                `;
-            } else if (state.status === 'done') {
-                cardEl.className = 'batch-item-card is-done';
-                const scoreBadge = typeof state.score === 'number'
-                    ? `<span style="color:${state.score >= 6.0 ? '#4ade80' : '#fcd34d'};">📊 ${state.score.toFixed(1)}점 / 10점</span>`
-                    : `<span style="color:#4ade80;">✅ 채점 완료</span>`;
-                cardEl.innerHTML = `
-                    <div class="batch-item-header" onclick="toggleBatchItemAccordion('${safeId}')">
-                        <div class="batch-item-title">${index + 1}. ${escapeHtml(entry.topic)}</div>
-                        <div class="batch-item-status">${scoreBadge} <span>▾</span></div>
-                    </div>
-                    <div class="batch-item-body">
-                        <div>
-                            <div class="batch-user-answer-label">✍️ 내가 작성한 답안</div>
-                            <div class="batch-user-answer-box">${escapeHtml(entry.answer)}</div>
-                        </div>
-                        <div class="test-grading-content">${renderMarkdown(state.markdown || '')}</div>
-                    </div>
-                `;
-            } else if (state.status === 'error') {
-                cardEl.className = 'batch-item-card is-error';
-                const encodedKey = encodeURIComponent(entry.topicKey);
-                cardEl.innerHTML = `
-                    <div class="batch-item-header" onclick="toggleBatchItemAccordion('${safeId}')">
-                        <div class="batch-item-title">${index + 1}. ${escapeHtml(entry.topic)}</div>
-                        <div class="batch-item-status" onclick="event.stopPropagation()">
-                            <span style="color:#fca5a5;">⚠️ 일시 지연</span>
-                            <button class="batch-retry-btn" onclick="retrySingleTopicGrade(decodeURIComponent('${encodedKey}'), ${index})">🔄 재시도</button>
-                        </div>
-                    </div>
-                    <div class="batch-item-body">
-                        <div>
-                            <div class="batch-user-answer-label">✍️ 내가 작성한 답안</div>
-                            <div class="batch-user-answer-box">${escapeHtml(entry.answer)}</div>
-                        </div>
-                        <div style="color:#fca5a5; font-size:0.8rem; background:rgba(239,68,68,0.12); border:1px solid rgba(239,68,68,0.4); padding:8px 10px; border-radius:8px;">
-                            ⚠️ 채점 호출 일시 지연 (${escapeHtml(state.errorMsg || '네트워크/서버 응답 지연')}) — 우측 상단 <b>[🔄 재시도]</b> 버튼을 누르면 이 토픽만 즉시 다시 채점합니다.
-                        </div>
-                    </div>
-                `;
-            }
-        }
-
-        async function openBatchGradeModal() {
-            const entries = getWrittenAnswerEntries();
-            if (!entries.length) {
-                alert('먼저 최소 1개 이상의 문제에 답안을 작성해 주세요!');
-                return;
-            }
-
-            const apiKey = ensureApiKeyOrPrompt();
-            if (!apiKey) return;
-
-            const modal = document.getElementById('batch-grade-modal');
-            modal.classList.add('is-open');
-
-            if (isBatchGradingRunning) return;
-
-            const listEl = document.getElementById('batch-results-list');
-            listEl.innerHTML = '';
-            batchResultsMap = {};
-            document.getElementById('batch-summary-card').classList.remove('is-visible');
-
-            isBatchGradingRunning = true;
-            batchGradingAbortFlag = false;
-
-            const total = entries.length;
-            let completed = 0;
-            updateBatchProgressUI(0, total, false);
-
-            // for...of 순차 호출 파이프라인 (Rate Limit 및 503 방어 + 0.5초 간격)
-            let idx = 0;
-            for (const entry of entries) {
-                if (batchGradingAbortFlag) break;
-
-                const currentIdx = idx++;
-                batchResultsMap[entry.topicKey] = { status: 'pending', score: null, markdown: '', errorMsg: '' };
-                renderBatchItemCard(entry, currentIdx);
-
-                try {
-                    const replyMarkdown = await requestSingleTopicGrade(entry, apiKey);
-                    const score = parseScoreFromMarkdown(replyMarkdown);
-                    batchResultsMap[entry.topicKey] = {
-                        status: 'done',
-                        score: score,
-                        markdown: replyMarkdown,
-                        errorMsg: ''
-                    };
-                } catch (err) {
-                    batchResultsMap[entry.topicKey] = {
-                        status: 'error',
-                        score: null,
-                        markdown: '',
-                        errorMsg: err.message || String(err)
-                    };
-                }
-
-                completed++;
-                renderBatchItemCard(entry, currentIdx);
-                updateBatchProgressUI(completed, total, completed >= total);
-
-                if (completed < total && !batchGradingAbortFlag) {
-                    await delay(500);
-                }
-            }
-
-            isBatchGradingRunning = false;
-            updateBatchProgressUI(completed, total, true);
-        }
-
-        async function retrySingleTopicGrade(topicKey, index) {
-            const entries = getWrittenAnswerEntries();
-            const entry = entries.find(e => e.topicKey === topicKey);
-            if (!entry) return;
-
-            const apiKey = ensureApiKeyOrPrompt();
-            if (!apiKey) return;
-
-            batchResultsMap[topicKey] = { status: 'pending', score: null, markdown: '', errorMsg: '' };
-            renderBatchItemCard(entry, index);
-
-            try {
-                const replyMarkdown = await requestSingleTopicGrade(entry, apiKey);
-                const score = parseScoreFromMarkdown(replyMarkdown);
-                batchResultsMap[topicKey] = {
-                    status: 'done',
-                    score: score,
-                    markdown: replyMarkdown,
-                    errorMsg: ''
-                };
-            } catch (err) {
-                batchResultsMap[topicKey] = {
-                    status: 'error',
-                    score: null,
-                    markdown: '',
-                    errorMsg: err.message || String(err)
-                };
-            }
-
-            renderBatchItemCard(entry, index);
-            const total = entries.length;
-            const doneCount = Object.values(batchResultsMap).filter(r => r && (r.status === 'done' || r.status === 'error')).length;
-            updateBatchProgressUI(doneCount, total, doneCount >= total);
-        }
-
-        function closeBatchGradeModal() {
-            batchGradingAbortFlag = true;
-            isBatchGradingRunning = false;
-            document.getElementById('batch-grade-modal').classList.remove('is-open');
-        }
-
-        function handleBatchModalOverlayClick(event) {
-            if (event.target.id === 'batch-grade-modal') {
-                closeBatchGradeModal();
-            }
-        }
-
-        async function copyAllBatchResults() {
-            const entries = getWrittenAnswerEntries();
-            if (!entries.length) {
-                alert('복사할 답안이나 채점 결과가 없습니다.');
-                return;
-            }
-
-            const lines = [];
-            lines.push('======================================');
-            lines.push('[정보관리기술사 실전 백지 인출 종합 성적표]');
-            lines.push('');
-
-            entries.forEach((entry, idx) => {
-                const res = batchResultsMap[entry.topicKey];
-                lines.push(`${idx + 1}. 토픽명: ${entry.topic}`);
-                lines.push(`- 작성 내용:\n${entry.answer.trim()}`);
-                if (res && res.status === 'done' && res.markdown) {
-                    lines.push(`\n[AI 채점 피드백]\n${res.markdown.trim()}`);
-                } else if (res && res.status === 'error') {
-                    lines.push(`\n[AI 채점 피드백] (미완료: ${res.errorMsg || '일시 지연'})`);
-                }
-                lines.push('--------------------------------------');
-            });
-            lines.push('======================================');
-
-            const ok = await copyTextToClipboard(lines.join('\n'));
-            if (ok) {
-                alert('📋 작성 답안 및 채점 결과 전체가 클립보드에 복사되었습니다!');
-            } else {
-                alert('클립보드 복사에 실패했습니다.');
-            }
-        }
-
-        function clearAllTestAnswers() {
-            const entries = getWrittenAnswerEntries();
-            if (!entries.length) {
-                alert('초기화할 작성 답안이 없습니다.');
-                return;
-            }
-            if (!confirm(`작성된 답안 ${entries.length}개를 모두 초기화하시겠습니까?`)) {
-                return;
-            }
-            batchGradingAbortFlag = true;
-            isBatchGradingRunning = false;
-            testAnswersMap = {};
-            batchResultsMap = {};
-            try {
-                localStorage.removeItem(TEST_ANSWERS_STORAGE_KEY);
-            } catch (e) {}
-
-            closeBatchGradeModal();
-            renderTestCard();
-            alert('🗑️ 작성된 모든 답안이 초기화되었습니다.');
-        }
-
-        function toggleMastered(event) {
-            if (event) event.stopPropagation();
-            if (!currentDeck.length) return;
-
-            const card = currentDeck[currentIndex];
-            const key = getTopicKey(card);
-
-            if (masteredSet.has(key)) {
-                masteredSet.delete(key);
-                saveMastered();
-                renderCard();
-            } else {
-                masteredSet.add(key);
-                saveMastered();
-
-                if (currentDeck.length > 1) {
-                    const [movedCard] = currentDeck.splice(currentIndex, 1);
-                    currentDeck.push(movedCard);
-                    if (currentIndex >= currentDeck.length) {
-                        currentIndex = 0;
-                    }
-                }
-                renderCard();
-            }
-        }
-
-        function nextCard(event) {
-            if (event) event.stopPropagation();
-            if (currentIndex < currentDeck.length - 1) {
-                currentIndex++;
-                renderCard();
-            } else {
-                alert('마지막 카드입니다!');
-            }
-        }
-
-        function prevCard(event) {
-            if (event) event.stopPropagation();
-            if (currentIndex > 0) {
-                currentIndex--;
-                renderCard();
-            } else {
-                alert('첫 번째 카드입니다!');
-            }
-        }
-
-        function setupSwipeGesture() {
-            const container = document.querySelector('.card-container');
-            if (!container) return;
-
-            let startX = 0;
-            let startY = 0;
-
-            container.addEventListener('touchstart', (e) => {
-                if (!e.touches || e.touches.length !== 1) return;
-                startX = e.touches[0].clientX;
-                startY = e.touches[0].clientY;
-                justSwiped = false;
-            }, { passive: true });
-
-            container.addEventListener('touchend', (e) => {
-                if (!e.changedTouches || e.changedTouches.length !== 1) return;
-                const endX = e.changedTouches[0].clientX;
-                const endY = e.changedTouches[0].clientY;
-                const dx = endX - startX;
-                const dy = endY - startY;
-
-                if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.4) {
-                    justSwiped = true;
-                    if (dx < 0) {
-                        nextCard();
-                    } else {
-                        prevCard();
-                    }
-                }
-            }, { passive: true });
-        }
-
-        /* ==========================================
-         * 🤖 AI 튜터 (Gemini 3.8 Flash) 모달 & API 로직
-         * ========================================== */
-        function getSavedApiKey() {
-            try {
-                return (localStorage.getItem(GEMINI_KEY_STORAGE) || '').trim();
-            } catch (e) {
-                return '';
-            }
-        }
-
-        function promptApiKeyConfig() {
-            const current = getSavedApiKey();
-            const msg = current
-                ? `현재 저장된 Gemini API 키: ${current.slice(0, 6)}...\n새 API 키를 입력하면 교체되며, 비워두고 확인을 누르면 유지됩니다.`
-                : 'Google AI Studio에서 발급받은 Gemini API 키를 입력해 주세요 (브라우저 localStorage에만 안전하게 저장됩니다):';
-            const entered = window.prompt(msg, current);
-            if (entered !== null && entered.trim()) {
-                try {
-                    localStorage.setItem(GEMINI_KEY_STORAGE, entered.trim());
-                    updateApiKeyUiStatus();
-                    alert('✅ Gemini API 키가 저장되었습니다.');
-                } catch (e) {}
-            }
-        }
-
-        function updateApiKeyUiStatus() {
-            const key = getSavedApiKey();
-            const statusEl = document.getElementById('api-key-status');
-            const inputEl = document.getElementById('gemini-api-key-input');
-            if (!statusEl || !inputEl) return;
-            if (key) {
-                statusEl.innerText = '✅ 저장됨 (' + key.slice(0, 6) + '...)';
-                statusEl.style.color = '#4ade80';
-                inputEl.value = key;
-            } else {
-                statusEl.innerText = '⚠️ 미등록 (키 입력 필요)';
-                statusEl.style.color = '#fbbf24';
-                inputEl.value = '';
-            }
-        }
-
-        function toggleApiKeyPanel(forceShow) {
-            const panel = document.getElementById('api-key-panel');
-            updateApiKeyUiStatus();
-            if (typeof forceShow === 'boolean') {
-                panel.classList.toggle('is-visible', forceShow);
-            } else {
-                panel.classList.toggle('is-visible');
-            }
-            if (panel.classList.contains('is-visible')) {
-                setTimeout(() => document.getElementById('gemini-api-key-input').focus(), 50);
-            }
-        }
-
-        function saveGeminiApiKey() {
-            const inputEl = document.getElementById('gemini-api-key-input');
-            const val = (inputEl.value || '').trim();
-            if (!val) {
-                alert('유효한 Gemini API 키를 입력해 주세요.');
-                return;
-            }
-            try {
-                localStorage.setItem(GEMINI_KEY_STORAGE, val);
-                updateApiKeyUiStatus();
-                document.getElementById('api-key-panel').classList.remove('is-visible');
-                appendChatBubble('system-info', '🔑 Gemini API 키가 브라우저(localStorage)에 안전하게 저장되었습니다. 이제 프리셋 버튼이나 질문을 전송해 보세요!');
-            } catch (e) {
-                alert('localStorage 저장에 실패했습니다.');
-            }
-        }
-
-        function clearGeminiApiKey() {
-            try {
-                localStorage.removeItem(GEMINI_KEY_STORAGE);
-                updateApiKeyUiStatus();
-                appendChatBubble('system-info', '🗑️ 저장된 Gemini API 키가 삭제되었습니다.');
-            } catch (e) {}
-        }
-
-        function ensureApiKeyOrPrompt() {
-            let key = getSavedApiKey();
-            if (key) return key;
-            const modalOpen = document.getElementById('ai-tutor-modal').classList.contains('is-open');
-            if (modalOpen) {
-                toggleApiKeyPanel(true);
-            }
-            const entered = window.prompt('Gemini API 키가 설정되지 않았습니다.\nGoogle AI Studio에서 발급받은 Gemini API 키를 입력해 주세요 (브라우저 localStorage에만 저장됩니다):');
-            if (entered && entered.trim()) {
-                key = entered.trim();
-                try {
-                    localStorage.setItem(GEMINI_KEY_STORAGE, key);
-                } catch (e) {}
-                updateApiKeyUiStatus();
-                const panel = document.getElementById('api-key-panel');
-                if (panel) panel.classList.remove('is-visible');
-                return key;
-            }
-            return '';
-        }
-
-        function openAiTutorModal(event) {
-            if (event) event.stopPropagation();
-            if (!currentDeck.length) return;
-            const card = currentDeck[currentIndex];
-            const topicKey = getTopicKey(card);
-
-            document.getElementById('tutor-topic-badge').innerText = `🤖 [${card.domain}] ${card.topic}`;
-            document.getElementById('ai-tutor-modal').classList.add('is-open');
-            updateApiKeyUiStatus();
-
-            if (lastTutorTopicKey !== topicKey) {
-                lastTutorTopicKey = topicKey;
-                tutorChatHistory = [];
-                const logEl = document.getElementById('tutor-chat-log');
-                logEl.innerHTML = '';
-                appendChatBubble(
-                    'system-info',
-                    `📌 <strong>${escapeHtml(card.topic)}</strong> 카드의 컨텍스트(1단락 정의, 핵심 키워드, 구성요소 표, 3단락 차별화)가 AI 수석 코치에 자동 바인딩되었습니다.<br>상단 빠른 검증 버튼을 누르거나 궁금한 점·내 답안을 아래에 입력해 보세요.`
-                );
-            }
-
-            if (!getSavedApiKey()) {
-                toggleApiKeyPanel(true);
-            } else {
-                toggleApiKeyPanel(false);
-            }
-        }
-
-        function closeAiTutorModal() {
-            document.getElementById('ai-tutor-modal').classList.remove('is-open');
-        }
-
-        function handleModalOverlayClick(event) {
-            if (event.target.id === 'ai-tutor-modal') {
-                closeAiTutorModal();
-            }
-        }
-
-        function escapeHtml(str) {
-            return String(str || '')
-                .replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;')
-                .replace(/"/g, '&quot;');
-        }
-
-        function renderMarkdown(md) {
-            if (!md) return '';
-            let text = escapeHtml(md).replace(/\r\n/g, '\n');
-
-            text = text.replace(/```([a-zA-Z0-9_-]*)\n([\s\S]*?)```/g, (_, lang, code) => {
-                return `<pre><code>${code.trim()}</code></pre>`;
-            });
-
-            const lines = text.split('\n');
-            const outLines = [];
-            let i = 0;
-            while (i < lines.length) {
-                if (
-                    lines[i].trim().startsWith('|') &&
-                    i + 1 < lines.length &&
-                    /^\s*\|\s*:?-{2,}/.test(lines[i + 1])
-                ) {
-                    const parseRow = l => l.trim().replace(/^\||\|$/g, '').split('|').map(c => c.trim());
-                    const headers = parseRow(lines[i]);
-                    i += 2;
-                    let tableHtml = '<table><thead><tr>' + headers.map(h => `<th>${ formatInlineMd(h) }</th>`).join('') + '</tr></thead><tbody>';
-                    while (i < lines.length && lines[i].trim().startsWith('|')) {
-                        const cells = parseRow(lines[i]);
-                        tableHtml += '<tr>' + cells.map(c => `<td>${ formatInlineMd(c) }</td>`).join('') + '</tr>';
-                        i++;
-                    }
-                    tableHtml += '</tbody></table>';
-                    outLines.push(tableHtml);
-                    continue;
-                }
-                outLines.push(lines[i]);
-                i++;
-            }
-
-            return outLines.map(line => {
-                const t = line.trim();
-                if (t.startsWith('<pre>') || t.startsWith('<table>')) return line;
-                if (/^###\s+(.+)/.test(t)) return `<h3>${formatInlineMd(t.replace(/^###\s+/, ''))}</h3>`;
-                if (/^##\s+(.+)/.test(t)) return `<h3>${formatInlineMd(t.replace(/^##\s+/, ''))}</h3>`;
-                if (/^####\s+(.+)/.test(t)) return `<h4>${formatInlineMd(t.replace(/^####\s+/, ''))}</h4>`;
-                if (/^[-*]\s+(.+)/.test(t)) return `<div style="padding-left:10px;">• ${formatInlineMd(t.replace(/^[-*]\s+/, ''))}</div>`;
-                return formatInlineMd(line);
-            }).join('<br>');
-        }
-
-        function formatInlineMd(str) {
-            return str
-                .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-                .replace(/`([^`]+)`/g, '<code>$1</code>');
-        }
-
-        function appendChatBubble(role, contentHtmlOrMd, isMarkdown = false) {
-            const logEl = document.getElementById('tutor-chat-log');
-            const div = document.createElement('div');
-            div.className = `chat-msg ${role}`;
-            div.innerHTML = isMarkdown ? renderMarkdown(contentHtmlOrMd) : contentHtmlOrMd;
-            logEl.appendChild(div);
-            logEl.scrollTop = logEl.scrollHeight;
-            return div;
-        }
-
-        function buildCardSystemPrompt(card) {
-            const topic = card.topic || '';
-            const definition = card.definition || '';
-            const keywords = Array.isArray(card.keywords) ? card.keywords.join(', ') : '';
-            const differentiation = card.differentiation || '';
-
-            let tableSummary = '';
-            if (Array.isArray(card.tableRows) && card.tableRows.length > 0) {
-                tableSummary = card.tableRows
-                    .map(r => `[${r.major || r.category || ''}] ${r.minor || r.sub || ''}: ${r.desc || ''}`)
-                    .join(' / ');
-            } else if (typeof card.details === 'string' && card.details.trim()) {
-                tableSummary = card.details.trim();
-            }
-
-            return `당신은 정보관리기술사 수험 전문 수석 코치입니다. 인사말과 서론은 생략하고 즉시 본론부터 마크다운으로 답변하십시오.
-현재 수험생이 학습 중인 토픽 정보:
-- 토픽명: ${topic}
-- 1단락 정의: ${definition}
-- 주요 키워드: ${keywords}
-- 2단락 핵심 구성요소: ${tableSummary}
-- 차별화 포인트: ${differentiation}
-
-수험생의 질문이나 작성 답안에 대해 정보관리기술사 1교시/2교시 실전 채점 기준(단락 구성, 차별화 키워드, 실무 적합성)에 맞추어 날카롭고 핵심 위주로 피드백하십시오.`;
-        }
-
-        function runQuickAction(actionType) {
-            if (!currentDeck.length || isTutorLoading) return;
-            const card = currentDeck[currentIndex];
-            const inputEl = document.getElementById('tutor-user-input');
-            const userDraft = (inputEl.value || '').trim();
-
-            let promptText = '';
-            if (actionType === 'ESSAY_OUTLINE') {
-                promptText = `[📝 2교시 서술형 목차 제안 요청]\n현재 토픽(${card.topic})이 정보관리기술사 2교시 서술형(25점 만점, 3페이지 분량) 문제로 출제되었다고 가정하고, 고득점(16점 이상)을 받을 수 있는 실전 4단락 표준 목차(1. 개요/배경, 2. 핵심 기술/아키텍처 및 메커니즘, 3. 비교/트레이드오프 및 실무 도입 이슈, 4. 기술사적 제언/결론)와 단락별 핵심 채점 키워드를 구체적으로 제안해 주세요.`;
-            } else if (actionType === 'DIFF_BOOST') {
-                promptText = `[🎯 3단락 실전 차별화 보강 요청]\n현재 카드의 3단락 차별화 내용을 바탕으로, 실제 시험장에서 채점위원의 눈길을 사로잡을 수 있는 추가 차별화 포인트 3가지(① 유사·경쟁 기술 정량 비교표, ② 실무 운영 시 한계점과 튜닝/극복 방안, ③ 최신 기술 표준·법제도·AX 트렌드 연계 제언)를 실전 답안 문장 형태로 보강해 주세요.`;
-            } else if (actionType === 'GRADE_ANSWER') {
-                if (userDraft) {
-                    promptText = `[💡 내 답안 키워드 채점/검증 요청]\n다음은 제가 암기해서 작성해 본 답안(정의/키워드/요약)입니다:\n"${userDraft}"\n\n현재 토픽의 모범 답안 기준에 비추어 ① 1단락 정의 적합성(목적+핵심키워드+종결어), ② 필수 채점 키워드 포함 및 누락 여부, ③ 1교시(10점 만점) 예상 점수와 보완할 한 줄 코멘트를 날카롭게 채점해 주세요.`;
-                    inputEl.value = '';
-                } else {
-                    promptText = `[💡 내 답안 키워드 채점/검증 가이드 요청]\n현재 토픽(${card.topic})의 백지 복습 자가점검을 위해, 수험생이 반드시 떠올려야 할 '필수 암기 체크리스트 5선(핵심 두음, 1단락 필수 어구, 2단락 핵심 구성요소, 3단락 비교 키워드)'을 먼저 제시해 주시고, 제가 바로 이어서 답안을 입력하면 채점해 주세요.`;
-                }
-            }
-
-            if (promptText) {
-                sendTutorMessage(promptText);
-            }
-        }
-
-        function handleTutorInputKeydown(event) {
-            if (event.key === 'Enter' && !event.shiftKey) {
-                event.preventDefault();
-                sendTutorMessage();
-            }
-        }
-
-        async function sendTutorMessage(overrideText) {
-            if (isTutorLoading || !currentDeck.length) return;
-            const inputEl = document.getElementById('tutor-user-input');
-            const userText = typeof overrideText === 'string' ? overrideText : (inputEl.value || '').trim();
-            if (!userText) return;
-
-            const apiKey = ensureApiKeyOrPrompt();
-            if (!apiKey) {
-                appendChatBubble('system-info', '⚠️ Gemini API 키를 먼저 입력하고 [저장]을 눌러주세요.');
-                return;
-            }
-
-            if (typeof overrideText !== 'string') {
-                inputEl.value = '';
-            }
-
-            const card = currentDeck[currentIndex];
-            const systemPrompt = buildCardSystemPrompt(card);
-
-            appendChatBubble('user', escapeHtml(userText).replace(/\n/g, '<br>'), false);
-            tutorChatHistory.push({ role: 'user', parts: [{ text: userText }] });
-
-            isTutorLoading = true;
-            document.getElementById('tutor-send-btn').disabled = true;
-            const loadingBubble = appendChatBubble('assistant', '⚡ 실시간 스트리밍 응답 수신 중...', false);
-            const logEl = document.getElementById('tutor-chat-log');
-
-            try {
-                const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${encodeURIComponent(apiKey)}`;
-                const response = await fetch(endpoint, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        system_instruction: {
-                            parts: [{ text: systemPrompt }]
-                        },
-                        contents: tutorChatHistory,
-                        generationConfig: {
-                            temperature: 0.4,
-                            maxOutputTokens: 2048
-                        }
-                    })
-                });
-
-                const data = await response.json();
-                if (!response.ok) {
-                    const errMsg = (data && data.error && data.error.message) ? data.error.message : `HTTP ${response.status}`;
-                    throw new Error(errMsg);
-                }
-
-                const replyText = data?.candidates?.[0]?.content?.parts?.map(p => p.text || '').join('\n') || '응답을 생성하지 못했습니다.';
-                tutorChatHistory.push({ role: 'model', parts: [{ text: replyText }] });
-                loadingBubble.innerHTML = renderMarkdown(replyText);
-            } catch (err) {
-                tutorChatHistory.pop();
-                loadingBubble.innerHTML = `<span style="color:#fca5a5;">❌ 호출 오류: ${escapeHtml(err.message)}</span><br><span style="font-size:0.78rem; color:#94a3b8;">상단 ⚙️ 버튼을 눌러 Gemini API 키가 정확한지 확인해 주세요.</span>`;
-            } finally {
-                isTutorLoading = false;
-                document.getElementById('tutor-send-btn').disabled = false;
-                logEl.scrollTop = logEl.scrollHeight;
-            }
-        }
-        window.onload = () => {
-            initApp();
-            setupSwipeGesture();
+        // 노션 '모의고사' 페이지 전 문항 연동 (1교시 104문항 + 2교시 48문항 = 총 152문항)
+        const mockData = [
+            // ==========================================
+            // [Set 1] IT경영 / PM 모의고사 (1교시 13문항, 2교시 6문항)
+            // ==========================================
+            { id: 1, session: "1교시", question: "1. 공공 SLA 도입의 필요성" },
+            { id: 2, session: "1교시", question: "2. BCP와 BIA에 대하여 설명하시오." },
+            { id: 3, session: "1교시", question: "3. ISO 21500" },
+            { id: 4, session: "1교시", question: "4. 공급망관리(SCM, Supply Chain Management)" },
+            { id: 5, session: "1교시", question: "5. IT 투자성과지표와 프레임워크" },
+            { id: 6, session: "1교시", question: "6. 애자일 원칙(Agile Principles)" },
+            { id: 7, session: "1교시", question: "7. PLM (Product Lifecycle Management)" },
+            { id: 8, session: "1교시", question: "8. 프로젝트 획득가치(Earned Value Management) 보고서의 주요요소" },
+            { id: 9, session: "1교시", question: "9. 품질비용(Cost of Quality) 개념과 예를 설명하시오." },
+            { id: 10, session: "1교시", question: "10. AI 거버넌스(AI Governance)" },
+            { id: 11, session: "1교시", question: "11. ISP 및 ISMP의 각 단계별 활동 내용 및 산출물의 종류" },
+            { id: 12, session: "1교시", question: "12. 프로젝트 위험관리 절차와 위험 대응방안" },
+            { id: 13, session: "1교시", question: "13. OKR(Objectives and Key Results)과 KPI(Key Performance Indicator)의 비교" },
+
+            { id: 14, session: "2교시", question: "1. 국내외 ESG 공시 의무화(EU CSRD, 국내 자본시장법 개정 등)가 본격화되는 가운데, 기업의 ESG 경영 실현을 위한 정보기술(IT)의 역할과 데이터 거버넌스 체계에 대하여 설명하시오." },
+            { id: 15, session: "2교시", question: "2. BI(Business Intelligence)는 데이터를 기반으로 의사결정을 지원하는 체계이다. 이에 관하여 다음을 설명하시오.\n가. BI의 개념과 기대효과\n나. 전통적 BI의 한계\n다. Self Service BI 와 Generative BI 설명" },
+            { id: 16, session: "2교시", question: "3. IT 프로젝트의 성패는 기술 자체보다 조직의 가치 전달 체계(Value Delivery System)가 얼마나 정렬되고 작동하는가에 의해 결정된다. IT 프로젝트가 실패하는 주요 원인을 설명하고 IT 프로젝트를 성공적으로 수행하기 위한 전략을 기술하시오." },
+            { id: 17, session: "2교시", question: "4. 경영환경을 분석하는 방법인 SWOT, 3C, PEST분석에 대하여 각 방법의 특성과 적용을 위한 조건 그리고 분석방법에 대하여 설명하시오." },
+            { id: 18, session: "2교시", question: "5. 최근 생성형 AI 모델이 AI 학습에 활용되어 저작권 침해 및 부정경쟁 문제로 이어지고 있는 상황으로 지식 재산권에 대한 문제가 부각되고 있다. 다음 항목에 대해 설명하시오.\n가. 지식재산권의 개념과 종류\n나. AI 창작물에 대한 지식재산권 적용 문제와 해결 방안" },
+            { id: 19, session: "2교시", question: "6. 클라우드 전환과 IT 아웃소싱이 확대되면서 서비스 수준을 정량적으로 관리하는 ITSM·SLA 체계의 중요성이 커지고 있다. 다음을 설명하시오.\n가. ITSM(IT Service Management)의 개념과 ITIL 기준 프로세스 체계\n나. SLA(Service Level Agreement) 구성요소와 서비스 수준 지표(SLI·SLO)\n다. SLA 위반 시 대응 체계 및 서비스 품질 개선 전략(적용 방안)" },
+
+            // ==========================================
+            // [Set 2] 소프트웨어공학 모의고사 (1교시 13문항, 2교시 6문항)
+            // ==========================================
+            { id: 20, session: "1교시", question: "1. 개발방법론 테일러링(Tailoring)의 필요성" },
+            { id: 21, session: "1교시", question: "2. CBAM (Cost Benefit Analysis Method)" },
+            { id: 22, session: "1교시", question: "3. 소프트웨어 비용 산정 방법 중 상향식, 하향식, 수학적 방식의 비교" },
+            { id: 23, session: "1교시", question: "4. SP인증과 GS인증의 비교" },
+            { id: 24, session: "1교시", question: "5. 정보시스템 감리기준 고시(2021-4호, 2021.1.19)에 의거한 현장감리의 활동, 작업내용" },
+            { id: 25, session: "1교시", question: "6. 소프트웨어 유지보수 유형" },
+            { id: 26, session: "1교시", question: "7. 요구사항 추적표(Requirement Traceability Matrix)의 효과" },
+            { id: 27, session: "1교시", question: "8. 회귀 테스트(Regression Test)의 기법" },
+            { id: 28, session: "1교시", question: "9. 소프트웨어 설계의 원리" },
+            { id: 29, session: "1교시", question: "10. STPA(System Theoretic Process Analysis)" },
+            { id: 30, session: "1교시", question: "11. 노코드(No Code)와 바이브 코딩(Vibe Coding) 비교" },
+            { id: 31, session: "1교시", question: "12. 오픈소스 소프트웨어 라이선스의 유형" },
+            { id: 32, session: "1교시", question: "13. 소프트웨어 품질보증의 목적과 기능" },
+
+            { id: 33, session: "2교시", question: "1. 명확하지 않은 요구사항으로 인해 발생하는 소프트웨어 품질저하 문제를 아래의 관점에서 설명하시오.\n가. 기술부채(Technical Debt)\n나. 코드스멜(Code Smell)\n다. 리팩토링(Refactoring)" },
+            { id: 34, session: "2교시", question: "2. 생성형 AI 기반 코드 자동생성 도구(GitHub Copilot, Codex, Claude 등) 확산으로 소프트웨어 개발 패러다임이 변화하고 있다. 다음을 설명하시오.\n가. 소프트웨어의 주요 특성과 공학의 발전원리\n나. 소프트웨어 공학이 다루는 주제와 목표\n다. 개발 패러다임 변화에 따른 좋은 소프트웨어의 조건" },
+            { id: 35, session: "2교시", question: "3. 디지털 서비스의 경쟁력이 사용자 경험에 좌우되면서 UI/UX 설계의 체계화가 요구되고 있다. UI/UX 설계에 대하여 다음을 설명하시오.\n가. UI/UX의 개념 및 설계 절차\n나. UI/UX 주요 설계 기법\n다. 휴리스틱 평가와 사용성 테스트의 비교" },
+            { id: 36, session: "2교시", question: "4. 소프트웨어 무중단 배포(Zero Downtime Deployment) 방식에 대하여 설명하시오." },
+            { id: 37, session: "2교시", question: "5. 소프트웨어 개발 및 운영 과정에서 품질 보증의 핵심인 형상관리와 관련하여 다음을 설명하시오.\n가. 형상관리의 개념 및 표준 프로세스\n나. 형상관리의 기준선(Baseline) 유형 및 주요 산출물\n다. AI 서비스 환경에서의 형상관리 방안" },
+            { id: 38, session: "2교시", question: "6. 소프트웨어 테스트에 대하여 다음을 설명하시오.\n가. 소프트웨어 테스트의 원리\n나. 명세기반, 구조기반, 경험 기반 테스트\n다. 테스트 자동화 도입 시 고려사항" },
+
+            // ==========================================
+            // [Set 3] 디지털서비스 / 신기술 모의고사 (1교시 13문항, 2교시 6문항)
+            // ==========================================
+            { id: 39, session: "1교시", question: "1. SOAP과 REST 비교" },
+            { id: 40, session: "1교시", question: "2. 멀티 클라우드(Multi-Cloud)" },
+            { id: 41, session: "1교시", question: "3. 엣지 컴퓨팅 (Edge Computing)의 주요기술" },
+            { id: 42, session: "1교시", question: "4. SDM(Software Defined Manufacturing)" },
+            { id: 43, session: "1교시", question: "5. APIM (API Management)" },
+            { id: 44, session: "1교시", question: "6. 온톨로지(Ontology)" },
+            { id: 45, session: "1교시", question: "7. 안면인식 결제 서비스" },
+            { id: 46, session: "1교시", question: "8. ADAS(Advanced Driver Assistance System)와 ADS(Automated Driving System)의 차이점" },
+            { id: 47, session: "1교시", question: "9. ISO 26262" },
+            { id: 48, session: "1교시", question: "10. 오픈소스(Open Source)와 오픈웨이트(Open Weight) 비교" },
+            { id: 49, session: "1교시", question: "11. 대규모 AI서비스를 위한 데이터센터 구축 기술" },
+            { id: 50, session: "1교시", question: "12. 서버리스 컴퓨팅 (Serverless Computing)" },
+            { id: 51, session: "1교시", question: "13. AI 네이티브 개발 플랫폼 (AI-Native Dev Platforms)" },
+
+            { id: 52, session: "2교시", question: "1. 가상머신(Virtual Machine)과 컨테이너(Container)에 대해 다음을 설명하시오.\n가. 가상화의 개념\n나. 가상머신과 컨테이너의 차이점\n다. 쿠버네티스와 HPA" },
+            { id: 53, session: "2교시", question: "2. AI 자동화가 단순 반복 업무를 넘어 전문직·관리직의 핵심 업무까지 확산되면서, 기업의 조직 운영 방식과 인재 요구 조건이 급격히 변화하고 있다. 특히 엔트리급 일자리 감소와 AI 네이티브 직무의 증가가 동시에 나타나며, AI 시대의 핵심 과제는 단순한 일자리 증감이 아닌 역량 전환으로 이동하고 있다. 다음 사항에 대하여 설명하시오.\n가. AI 기술발전에 따른 노동시장의 변화\n나. AI 시대 인재의 기본 역량\n다. AI 시대 인재육성 전략" },
+            { id: 54, session: "2교시", question: "3. 인공지능 기술이 활성화되면서 데이터센터의 전력수급 문제가 부각되고 있다. 다음을 설명하시오.\n가. 마이크로 그리드(Micro-Grid)\n나. AMI(Advance Metering Infrastructure)\n다. 인터미턴트 컴퓨팅(Intermittent computing)" },
+            { id: 55, session: "2교시", question: "4. NIA(한국지능정보사회진흥원)의 클라우드 네이티브 구축 및 운영 가이드(2026. 01)에 대하여 다음을 설명하시오.\n가. 클라우드 네이티브 개념 및 구성요소\n나. 클라우드 네이티브 사업 유형\n다. 클라우드 네이티브 성숙도 모델" },
+            { id: 56, session: "2교시", question: "5. 중앙은행 디지털화폐(CBDC, Central Bank Digital Currency)가 블록체인 기반 금융 인프라의 핵심으로 논의되고 있다. 다음에 대하여 설명하시오.\n가. CBDC의 개념\n나. CBDC 구현 시 아키텍처 설계 방안\n다. CBDC 도입이 기존 금융 시스템 및 스테이블코인과의 관계에 미치는 영향" },
+            { id: 57, session: "2교시", question: "6. 제조업의 스마트팩토리 전환이 가속화되며, 가상 공간에서 생산 공정을 사전 시뮬레이션하는 디지털 트윈(Digital Twin) 기술이 핵심 동인으로 주목받고 있다. 다음을 설명하시오.\n가. 스마트팩토리(Smart Factory)에서 디지털 트윈(Digital Twin)의 역할과 구성요소\n나. 디지털 트윈 도입을 위한 고려사항" },
+
+            // ==========================================
+            // [Set 4] 인공지능(AI) / 데이터사이언스 모의고사 (1교시 13문항, 2교시 6문항)
+            // ==========================================
+            { id: 58, session: "1교시", question: "1. 머신러닝에서 활용되는 의사결정나무(Decision Tree) 모델" },
+            { id: 59, session: "1교시", question: "2. 데이터 분석에서 아웃라이어(Outlier)와 노이즈(Noise)의 비교" },
+            { id: 60, session: "1교시", question: "3. 파인튜닝 (Fine-tuning)과 PEFT" },
+            { id: 61, session: "1교시", question: "4. 데이터 분할 검증 기법인 Hold-out" },
+            { id: 62, session: "1교시", question: "5. 인공지능 가드레일(AI guardrails)" },
+            { id: 63, session: "1교시", question: "6. 머신러닝의 데이터 공격과 모델 공격" },
+            { id: 64, session: "1교시", question: "7. 혼동 행렬(Confusion Matrix)과 관련지표" },
+            { id: 65, session: "1교시", question: "8. 비지도학습의 군집화(Clustering)" },
+            { id: 66, session: "1교시", question: "9. 정서 인공지능(Affective Artificial Intelligence)" },
+            { id: 67, session: "1교시", question: "10. 클라우드 AI와 온디바이스 AI" },
+            { id: 68, session: "1교시", question: "11. 회귀모형에서 오차의 등분산성(Homoscedasticity)과 다중공선성(Multicollinearity)" },
+            { id: 69, session: "1교시", question: "12. 데이터 검색을 위한 ANN(Approximate Nearest Neighbor) 알고리즘에 대해 설명하시오." },
+            { id: 70, session: "1교시", question: "13. 인공지능 영향평가에 대해서 설명하시오." },
+
+            { id: 71, session: "2교시", question: "1. A기업은 AI 전환(AX, AI Transformation) 추진을 위해 LLM(Large Language Model) 기반 AI 시스템을 구축하고자 한다. 다음을 설명하시오.\n가. 파인튜닝(Fine-Tuning)과 RAG(Retrieval-Augmented Generation)의 개념 및 역할\n나. LLM 정렬을 위한 RLHF(Reinforcement Learning from Human Feedback) 기반 학습 파이프라인과 RAFT(Retrieval Augmented Fine-Tuning) 기반 학습 파이프라인 비교" },
+            { id: 72, session: "2교시", question: "2. MLOps가 LLM 서비스 운영을 위한 LLMOps로 진화하고 있다. 다음을 설명하시오.\n가. MLOps 와 LLMOps 의 개념 및 비교\n나. LLMOps 파이프라인 구성 요소\n다. 공공부문 LLM 서비스 도입 시 고려사항" },
+            { id: 73, session: "2교시", question: "3. 기업의 LLM 도입이 확산되면서 OWASP가 제시한 LLM 보안 위협에 대한 체계적 대응이 요구되고 있다. 다음을 설명하시오.\n가. OWASP LLM Top 10의 주요 위협 유형\n나. LLM 서비스 계층별(데이터·모델·애플리케이션) 위협 발생 원인\n다. LLM 보안 대응 체계 구축 방안" },
+            { id: 74, session: "2교시", question: "4. 폰노이만 아키텍처의 한계 극복방안과 뉴로모픽 컴퓨팅의 구조적 특징을 설명하시오." },
+            { id: 75, session: "2교시", question: "5. 생성형 AI 모델의 성능과 신뢰성을 높이기 위해서는 고품질 데이터 구축이 필수이다. 이에 생성형 AI 데이터 품질관리 가이드라인 v2.0 이 2025년 2월 발간되었다. 다음에 대하여 설명하시오.\n가. 생성형 AI 의 정의 및 생성형 AI 데이터의 특성\n나. 생성형 AI 품질관리 프레임워크 프로세스\n다. 생성형 AI 데이터 품질지표" },
+            { id: 76, session: "2교시", question: "6. 검색 증강 생성(RAG, Retrieval-Augmented Generation)은 LLM의 환각과 최신성 한계를 보완하는 방식으로 도입되었으나, 적용 범위가 넓어지면서 단순 검색 결합에서 모듈화, 자율 제어로 발전해 왔다. 다음을 설명하시오.\n가. RAG의 기본 개념과 동작 메커니즘\n나. Advanced RAG와 Modular RAG의 특징 및 비교\n다. 기존 RAG의 구조적 한계와 에이전트형 RAG(Agentic RAG) 적용 방안" },
+
+            // ==========================================
+            // [Set 5] 정보보안 모의고사 (1교시 13문항, 2교시 6문항)
+            // ==========================================
+            { id: 77, session: "1교시", question: "1. 공격 표면(Attack Surface)에 대해 설명하시오." },
+            { id: 78, session: "1교시", question: "2. 변조(Modification)와 위조(Fabrication)" },
+            { id: 79, session: "1교시", question: "3. Security for AI 와 Security by AI 비교" },
+            { id: 80, session: "1교시", question: "4. HNDL(Harvest Now Decrypt Later) 공격" },
+            { id: 81, session: "1교시", question: "5. 지속적인 보안 위협관리(Continuous Threat Exposure Management, CTEM)" },
+            { id: 82, session: "1교시", question: "6. Shadow AI" },
+            { id: 83, session: "1교시", question: "7. PBD(Privacy By Design) 개념, 원칙, 전략에 대하여 설명하시오." },
+            { id: 84, session: "1교시", question: "8. 국가 망 보안체계(N2SF, National Network Security Framework)" },
+            { id: 85, session: "1교시", question: "9. 디지털 포렌식" },
+            { id: 86, session: "1교시", question: "10. 접근제어 정책 및 절차" },
+            { id: 87, session: "1교시", question: "11. PET의 기술 분류 및 핵심기술" },
+            { id: 88, session: "1교시", question: "12. 비인간 신원(NHI)에 대하여 설명하시오." },
+            { id: 89, session: "1교시", question: "13. 개인정보 영향평가(PIA, Privacy Impact Assessment)에 대하여 설명하시오." },
+
+            { id: 90, session: "2교시", question: "1. 제로 트러스트(Zero Trust)에 대해 다음을 설명하시오.\n가. 제로 트러스트(Zero Trust) 개념\n나. 제로 트러스트(Zero Trust) 아키텍처 구성\n다. 제로 트러스트(Zero Trust) 아키텍처 도입 시 고려사항" },
+            { id: 91, session: "2교시", question: "2. 최근 대형 유통 계열사에서 사용자 계정에 무단 접근을 시도하는 공격을 받아 개인정보 유출 사고가 발생했다. 이와 관련하여 다음을 설명하시오.\n가. 크리덴셜 스터핑(Credential Stuffing)\n나. 무차별 대입 공격(Brute Force Attack)과 크리덴셜 스터핑(Credential Stuffing) 비교\n다. 사이버 회복탄력성(Cyber Resilience)" },
+            { id: 92, session: "2교시", question: "3. MCP(Model Context Protocol)를 이용한 인공지능 서비스 구축 시 보안 취약점을 설명하고 대응 방안을 제시하시오." },
+            { id: 93, session: "2교시", question: "4. 식별(Identification)과 인증(Authentication)에 대하여 다음을 설명하시오.\n가. 개인 식별과 사용자 인증의 정의 및 차이점\n나. 사용자 인증 시 보안 요구사항\n다. 인증 방식에 따른 4가지 유형 및 적용 시 고려사항" },
+            { id: 94, session: "2교시", question: "5. 암호화에 대하여 다음을 설명하시오.\n가. 암호화의 원리 및 암호문 공격 유형\n나. 키의 갯수에 따른 암호화 유형 비교\n다. 전통적 암호화 알고리즘의 위기 해결을 위한 PQC" },
+            { id: 95, session: "2교시", question: "6. ISMS에 대하여 다음을 설명하시오.\n가. ISMS-P 제도의 개념 및 대상\n나. ISMS-P와 ISMS를 비교\n다. ISMS 간편인증" },
+
+            // ==========================================
+            // [Set 6] 데이터베이스(DB) 모의고사 (1교시 13문항, 2교시 6문항)
+            // ==========================================
+            { id: 96, session: "1교시", question: "1. 데이터 거버넌스" },
+            { id: 97, session: "1교시", question: "2. 데이터 안심구역" },
+            { id: 98, session: "1교시", question: "3. 데이터 레이크(Data Lake)의 주요 아키텍처" },
+            { id: 99, session: "1교시", question: "4. 관계형 데이터베이스의 조인에 대해 설명하시오." },
+            { id: 100, session: "1교시", question: "5. DB 암호화에 대하여 설명하시오." },
+            { id: 101, session: "1교시", question: "6. 관계형 데이터베이스의 정규화와 역정규화" },
+            { id: 102, session: "1교시", question: "7. 데이터베이스 병행 제어 기법" },
+            { id: 103, session: "1교시", question: "8. 데이터 표준화의 필요성과 기대효과" },
+            { id: 104, session: "1교시", question: "9. Transaction Isolation Level" },
+            { id: 105, session: "1교시", question: "10. 비정형 데이터 마이닝 기법" },
+            { id: 106, session: "1교시", question: "11. 데이터 품질 인증 제도 (DQ인증)" },
+            { id: 107, session: "1교시", question: "12. 지식그래프와 벡터 DB 비교" },
+            { id: 108, session: "1교시", question: "13. AI 학습용 데이터 품질관리 활동" },
+
+            { id: 109, session: "2교시", question: "1. 데이터베이스 무결성 제약 조건에 대하여 다음을 설명하시오.\n가. 데이터베이스 무결성 제약 조건의 개념\n나. 데이터베이스 무결성 제약 조건의 종류\n다. 데이터베이스 무결성 제약 조건 생성시 고려사항" },
+            { id: 110, session: "2교시", question: "2. 데이터 모델링 단계 중 논리 데이터 모델링에 대하여 다음을 설명하시오.\n가. 논리 데이터 모델링의 개념, 목적 및 효과\n나. 논리 데이터 모델링의 절차 및 엔터티 상세화 주요 활동\n다. 데이터 이력 관리" },
+            { id: 111, session: "2교시", question: "3. NoSQL(Not only Structured Query Language)의 특징, 데이터 모델링 패턴 및 데이터 모델링 절차에 대하여 설명하시오." },
+            { id: 112, session: "2교시", question: "4. 데이터베이스 트랜잭션 회복(Recovery) 기법에 대하여 아래 사항을 설명하시오.\n가. REDO와 UNDO를 이용한 방법\n나. 체크포인트(Checkpoint)를 이용한 방법\n다. 그림자 페이징(Shadow Paging)을 이용한 방법" },
+            { id: 113, session: "2교시", question: "5. 다양한 형태의 웹서비스를 사용하면서 DBMS는 필수적인 기술 중 하나가 되었다. 그리고 현장에서는 이러한 DBMS 기술에 지속적으로 성능의 문제가 발생하고 있고, 해결을 위한 고민을 하고 있다. 이와 관련하여 다음의 물음에 답하시오.\n가. DBMS의 성능개선 목적\n나. DBMS의 성능저하 원인\n다. DBMS의 성능 개선방안" },
+            { id: 114, session: "2교시", question: "6. 트랜잭션에 대하여 다음 설명하시오.\n가. 트랜잭션의 개념\n나. 트랜잭션의 4가지 특징과 상태전이도\n다. 트랜잭션의 4가지 특징을 보장하기 위한 기법" },
+
+            // ==========================================
+            // [Set 7] 네트워크(NW) 모의고사 (1교시 13문항, 2교시 6문항)
+            // ==========================================
+            { id: 115, session: "1교시", question: "1. 슈퍼네팅(Supernetting)과 서브네팅(Subnetting)의 비교" },
+            { id: 116, session: "1교시", question: "2. 6G의 주요 기술요소" },
+            { id: 117, session: "1교시", question: "3. TCP 프로토콜에서 3 Way handshake와 4 Way handshake를 설명하시오." },
+            { id: 118, session: "1교시", question: "4. 오버레이(Overlay) 네트워크와 언더레이(Underlay) 네트워크를 비교 설명하시오." },
+            { id: 119, session: "1교시", question: "5. CDN(Content Delivery Network) 트래픽 최적화 기술" },
+            { id: 120, session: "1교시", question: "6. 5G 네트워크 슬라이싱(5G Network Slicing)" },
+            { id: 121, session: "1교시", question: "7. Wi-Fi 7" },
+            { id: 122, session: "1교시", question: "8. XMPP, CoAP, MQTT 특징을 비교하시오." },
+            { id: 123, session: "1교시", question: "9. 소프트웨어 정의 네트워크(SDN)" },
+            { id: 124, session: "1교시", question: "10. 소켓(Socket) 통신의 개념과 종류" },
+            { id: 125, session: "1교시", question: "11. ISO 7498에서 4계층 오류제어와 2계층 오류제어 비교" },
+            { id: 126, session: "1교시", question: "12. QoS 관리기법인 트래픽 폴리싱과 트래픽 쉐이핑 기법" },
+            { id: 127, session: "1교시", question: "13. 저궤도 위성통신에 대하여 설명하시오." },
+
+            { id: 128, session: "2교시", question: "1. 네트워크 프로토콜에 대하여 다음을 설명하시오.\n가. 프로토콜의 개념\n나. 프로토콜의 3가지 요소\n다. 프로토콜의 기능" },
+            { id: 129, session: "2교시", question: "2. 라우터(Router)는 네트워크 설계 시 필요한 핵심 장비이다. 다음에 대해 설명하시오.\n가. 라우터를 사용하는 주요 목적\n나. 동적 라우팅 프로토콜(Dynamic Routing Protocol)\n다. RIP(Routing Information Protocol)와 OSPF(Open Shortest Path First) 비교" },
+            { id: 130, session: "2교시", question: "3. 데이터링크 계층은 네트워크에서 오류제어를 담당한다. 다음을 설명하시오.\n가. 오류제어방식의 개념과 종류\n나. 전진오류수정(FEC)과 검출 후 재전송(ARQ) 방식 비교\n다. ARQ 방식" },
+            { id: 131, session: "2교시", question: "4. 전송계층의 제공 기능인 흐름제어에 대하여 다음을 설명하시오.\n가. TCP 흐름제어 개념\n나. 슬라이딩 윈도우\n다. Silly Window Syndrome" },
+            { id: 132, session: "2교시", question: "5. AI-RAN의 개념, 기술요소를 설명하고, RAN과의 차이점을 설명하시오." },
+            { id: 133, session: "2교시", question: "6. 최근 생성형 AI 서비스 확산으로 대용량 학습 트래픽과 실시간 추론 트래픽이 동일 망을 공유하게 되면서, 트래픽 특성에 맞는 품질 보장이 중요해지고 있다. 네트워크 QoS(Quality of Service)에 대하여 다음을 설명하시오.\n가. QoS의 개념과 주요 품질 지표\n나. QoS 제공 모델인 IntServ와 DiffServ의 비교\n다. AI 트래픽 환경에서의 QoS 요구사항과 적용 방안" },
+
+            // ==========================================
+            // [Set 8] 컴퓨터구조 및 운영체제(CAOS) 모의고사 (1교시 13문항, 2교시 6문항)
+            // ==========================================
+            { id: 134, session: "1교시", question: "1. 교착상태(Deadlock)의 조건과 해결방안" },
+            { id: 135, session: "1교시", question: "2. 프로세스 스레싱(Thrashing)에 대하여 설명하시오." },
+            { id: 136, session: "1교시", question: "3. GPU(Graphics Processing Unit)와 TPU(Tensor Processing Unit) 비교" },
+            { id: 137, session: "1교시", question: "4. 인터럽트(Interrupt)에 대하여 설명하시오." },
+            { id: 138, session: "1교시", question: "5. UPS(Uninterruptible Power Supply)의 주요기능과 구성요소" },
+            { id: 139, session: "1교시", question: "6. 경쟁조건(Race Condition)" },
+            { id: 140, session: "1교시", question: "7. 은행가 알고리즘(Banker's Algorithm)" },
+            { id: 141, session: "1교시", question: "8. 파이프라인 해저드" },
+            { id: 142, session: "1교시", question: "9. 선점형 스케줄링(Preemptive Scheduling)" },
+            { id: 143, session: "1교시", question: "10. 시스템 장애를 해결하기 위한 고가용성과 내고장성 기술 비교" },
+            { id: 144, session: "1교시", question: "11. 뉴로모픽 컴퓨팅" },
+            { id: 145, session: "1교시", question: "12. 운영체제 동기화 기법에 대하여 설명하시오." },
+            { id: 146, session: "1교시", question: "13. 메모리 단편화와 해결방안" },
+
+            { id: 147, session: "2교시", question: "1. 프로그램 실행 시 운영체제는 메모리를 4가지 주요 영역으로 나누어 할당 및 관리한다. 각 영역의 역할과 특징 그리고 영역 간 동작 메커니즘에 대하여 다음 내용을 설명하시오.\n가. 코드(Code)\n나. 데이터(Data)\n다. 힙(Heap)\n라. 스택(Stack)" },
+            { id: 148, session: "2교시", question: "2. 캐시메모리에 대하여 다음을 설명하시오.\n가. 캐시메모리의 개념\n나. 캐시메모리 교체 기법과 사상 기법 3가지\n다. 지역성과 캐시메모리 관리에서 지역성이 중요한 이유" },
+            { id: 149, session: "2교시", question: "3. 운영체제의 문맥교환(Context Switching)에 대하여 다음 질문에 답하시오.\n가. 문맥의 개념과 유형\n나. 문맥교환의 개념과 프로세스 상태전이도에서의 문맥교환 발생시점\n다. 문맥교환의 절차" },
+            { id: 150, session: "2교시", question: "4. 병렬 컴퓨팅에 대하여 다음을 설명하시오.\n가. 병렬 컴퓨팅 개념\n나. 병렬 프로세스(컴퓨팅) 분류" },
+            { id: 151, session: "2교시", question: "5. 컴퓨터 시스템은 내부/외부에서 발생하는 각종 event에 대처하기 위해, 다양한 방식으로 인터럽트(interrupt) 체계를 구현하고 있다. 이와 관련하여 아래 사항을 설명하시오.\n가. Polling 방식\n나. Daisy-Chain 방식\n다. Vector Interrupt 방식" },
+            { id: 152, session: "2교시", question: "6. 인공지능 시대의 H/W 기술에 대하여 다음을 설명하시오.\n가. 메모리 월(Memory Wall)\n나. HBM와 HBF 비교\n다. CXL 3.0" }
+        ];
+
+        let currentMode = 'mock'; // 기본 진입을 모의고사 머신으로
+        let currentCardIndex = 0;
+
+        let mockSession = '1교시';
+        let mockCount = 4;
+        let activeMockQuestions = [];
+        let currentMockIndex = 0;
+
+        window.onload = function() {
+            switchMode('mock');
         };
+
+        function switchMode(mode) {
+            currentMode = mode;
+            document.getElementById('view-flashcard').classList.add('hidden');
+            document.getElementById('view-mock').classList.add('hidden');
+            
+            document.getElementById('nav-btn-flashcard').className = "bg-slate-800 hover:bg-slate-700 text-slate-300 px-4 py-2 rounded-lg text-sm font-medium transition cursor-pointer flex items-center gap-2";
+            document.getElementById('nav-btn-mock').className = "bg-slate-800 hover:bg-slate-700 text-slate-300 px-4 py-2 rounded-lg text-sm font-medium transition cursor-pointer flex items-center gap-2";
+
+            if (mode === 'flashcard') {
+                document.getElementById('view-flashcard').classList.remove('hidden');
+                document.getElementById('nav-btn-flashcard').className = "bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition shadow-lg cursor-pointer flex items-center gap-2";
+                updateCardView();
+            } else {
+                document.getElementById('view-mock').classList.remove('hidden');
+                document.getElementById('nav-btn-mock').className = "bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition shadow-lg cursor-pointer flex items-center gap-2";
+            }
+        }
+
+        function updateCardView() {
+            if (mockData.length === 0) return;
+            const item = mockData[currentCardIndex];
+            document.getElementById('card-counter').innerText = `${currentCardIndex + 1} / ${mockData.length}`;
+            document.getElementById('card-topic').innerText = `[${item.session}] 모의고사 문항 ${currentCardIndex + 1}`;
+            document.getElementById('card-content').innerText = item.question;
+        }
+
+        function nextCard() {
+            if (currentCardIndex < mockData.length - 1) {
+                currentCardIndex++;
+                updateCardView();
+            }
+        }
+
+        function prevCard() {
+            if (currentCardIndex > 0) {
+                currentCardIndex--;
+                updateCardView();
+            }
+        }
+
+        function selectMockSession(session) {
+            mockSession = session;
+            document.querySelectorAll('.session-btn').forEach(b => {
+                b.className = "session-btn px-5 py-3 bg-slate-900 border border-slate-700 rounded-xl font-semibold text-slate-400 cursor-pointer transition";
+            });
+            if (session === '1교시') {
+                document.getElementById('session-btn-1').className = "session-btn px-5 py-3 bg-indigo-950 border border-indigo-500 rounded-xl font-semibold text-indigo-200 cursor-pointer transition";
+            } else {
+                document.getElementById('session-btn-2').className = "session-btn px-5 py-3 bg-indigo-950 border border-indigo-500 rounded-xl font-semibold text-indigo-200 cursor-pointer transition";
+            }
+        }
+
+        function setMockCount(count) {
+            mockCount = count;
+            document.querySelectorAll('.count-btn').forEach(b => {
+                b.className = "count-btn p-2 bg-slate-900 border border-slate-700 rounded-lg text-xs font-medium cursor-pointer";
+            });
+            event.target.className = "count-btn p-2 bg-slate-900 border border-indigo-500 rounded-lg text-xs font-medium cursor-pointer text-indigo-300";
+        }
+
+        function startMockSession() {
+            const pool = mockData.filter(i => i.session === mockSession);
+            const shuffled = [...pool].sort(() => 0.5 - Math.random());
+            activeMockQuestions = mockCount === 'all' ? shuffled : shuffled.slice(0, Math.min(mockCount, shuffled.length));
+            
+            if (activeMockQuestions.length === 0) {
+                showToast("해당 조건의 문제가 없습니다!", "bg-amber-600");
+                return;
+            }
+
+            currentMockIndex = 0;
+            document.getElementById('mock-config').classList.add('hidden');
+            document.getElementById('mock-solve-area').classList.remove('hidden');
+            renderMockSolve();
+        }
+
+        function backToMockConfig() {
+            document.getElementById('mock-solve-area').classList.add('hidden');
+            document.getElementById('mock-config').classList.remove('hidden');
+        }
+
+        function renderMockSolve() {
+            const q = activeMockQuestions[currentMockIndex];
+            const stored = getStoredMockAnswers();
+            document.getElementById('mock-solve-badge').innerText = q.session;
+            document.getElementById('mock-solve-title').innerText = `모의고사 문항 (${currentMockIndex + 1}/${activeMockQuestions.length})`;
+            document.getElementById('mock-solve-question').innerText = q.question;
+            document.getElementById('mock-progress-info').innerText = `문제 ${currentMockIndex + 1} / ${activeMockQuestions.length}`;
+            document.getElementById('mock-textarea').value = stored[q.id] || '';
+        }
+
+        function getStoredMockAnswers() {
+            try { return JSON.parse(localStorage.getItem('tech_mock_answers')) || {}; } catch(e) { return {}; }
+        }
+
+        function saveMockAnswer(val) {
+            const q = activeMockQuestions[currentMockIndex];
+            const stored = getStoredMockAnswers();
+            stored[q.id] = val;
+            localStorage.setItem('tech_mock_answers', JSON.stringify(stored));
+        }
+
+        function moveMockQuestion(dir) {
+            const next = currentMockIndex + dir;
+            if (next >= 0 && next < activeMockQuestions.length) {
+                currentMockIndex = next;
+                renderMockSolve();
+            }
+        }
+
+        function copyMockAnswers() {
+            const stored = getStoredMockAnswers();
+            let text = "======================================\n[정보관리기술사 실전 모의고사 백지 인출 답안]\n\n";
+            let cnt = 0;
+            activeMockQuestions.forEach((q, idx) => {
+                const ans = stored[q.id];
+                if (ans && ans.trim().length > 0) {
+                    cnt++;
+                    text += `${cnt}. 문제:\n${q.question}\n\n- 작성 내용:\n${ans}\n\n--------------------------------------\n\n`;
+                }
+            });
+            if (cnt === 0) {
+                showToast("작성된 답안이 없습니다!", "bg-amber-600");
+                return;
+            }
+            navigator.clipboard.writeText(text).then(() => {
+                showToast(`총 ${cnt}개의 작성 답안이 클립보드에 복사되었습니다!`);
+            });
+        }
+
+        function showToast(msg, bg = "bg-emerald-600") {
+            const t = document.getElementById('toast');
+            document.getElementById('toast-msg').innerText = msg;
+            t.className = `fixed bottom-6 right-6 ${bg} text-white px-5 py-3 rounded-xl shadow-2xl transition-all duration-300 transform translate-y-0 opacity-100 font-medium flex items-center gap-2 z-50`;
+            setTimeout(() => {
+                t.className = "fixed bottom-6 right-6 bg-emerald-600 text-white px-5 py-3 rounded-xl shadow-2xl transition-all duration-300 translate-y-20 opacity-0 pointer-events-none font-medium flex items-center gap-2 z-50";
+            }, 3000);
+        }
     </script>
 </body>
 </html>
