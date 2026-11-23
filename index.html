@@ -396,10 +396,11 @@
                 </div>
             </div>
 
-            <!-- 상단 네비게이션 헤더 UI: 작성 현황 뱃지 + [📋 푼 답안 복사] + [🏁 일괄 채점하기 (N개)] -->
+            <!-- 상단 네비게이션 헤더 UI: 작성 현황 뱃지 + [🗑️ 전체 답안 초기화] + [📋 푼 답안 복사] + [🏁 일괄 채점하기 (N개)] -->
             <div class="test-batch-toolbar">
                 <span class="test-written-badge" id="test-written-badge">✍️ 작성 완료: 0개</span>
                 <div class="test-toolbar-actions">
+                    <button class="test-copy-btn" style="background: rgba(239, 68, 68, 0.16); border-color: rgba(239, 68, 68, 0.45); color: #fca5a5;" id="test-clear-answers-btn" onclick="clearAllTestAnswers()">🗑️ 전체 답안 초기화</button>
                     <button class="test-copy-btn" id="test-copy-answers-btn" onclick="copyAllUserAnswers()">📋 푼 답안 복사</button>
                     <button class="test-batch-grade-btn" id="test-batch-grade-btn" onclick="openBatchGradeModal()">🏁 일괄 채점하기 (0개)</button>
                 </div>
@@ -1579,12 +1580,7 @@
         }
 
         function clearAllTestAnswers() {
-            const entries = getWrittenAnswerEntries();
-            if (!entries.length) {
-                alert('초기화할 작성 답안이 없습니다.');
-                return;
-            }
-            if (!confirm(`작성된 답안 ${entries.length}개를 모두 초기화하시겠습니까?`)) {
+            if (!confirm('작성한 모든 답안을 초기화하시겠습니까?')) {
                 return;
             }
             batchGradingAbortFlag = true;
@@ -1593,11 +1589,19 @@
             batchResultsMap = {};
             try {
                 localStorage.removeItem(TEST_ANSWERS_STORAGE_KEY);
+                localStorage.removeItem('tech_exam_answers');
             } catch (e) {}
 
+            const inputEl = document.getElementById('test-answer-input');
+            if (inputEl) inputEl.value = '';
+            const statusEl = document.getElementById('test-autosave-status');
+            if (statusEl) statusEl.innerText = '';
+            updateTestHeaderStatus();
+
             closeBatchGradeModal();
-            renderTestCard();
-            alert('🗑️ 작성된 모든 답안이 초기화되었습니다.');
+            if (currentDeck && currentDeck.length > 0 && document.getElementById('test-view').style.display !== 'none') {
+                renderTestCard();
+            }
         }
 
         function toggleMastered(event) {

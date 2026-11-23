@@ -25,7 +25,10 @@
                 </h1>
                 <p class="text-sm text-slate-400 mt-1">자율 선택형 백지 인출 및 일괄 복사 시뮬레이터</p>
             </div>
-            <div>
+            <div class="flex items-center gap-2">
+                <button onclick="resetAllAnswers()" class="bg-rose-950/80 hover:bg-rose-900 text-rose-300 border border-rose-800/70 px-3.5 py-2 rounded-lg text-sm font-medium transition shadow-lg flex items-center gap-2 cursor-pointer">
+                    <i class="fa-solid fa-trash-can"></i> 전체 답안 초기화
+                </button>
                 <button onclick="copyAllAnswers()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-lg text-sm font-medium transition shadow-lg flex items-center gap-2 cursor-pointer">
                     <i class="fa-solid fa-copy"></i> 📋 내가 푼 답안 전체 복사
                 </button>
@@ -1387,6 +1390,31 @@
                 currentQuestionIndex = newIndex;
                 renderSolveView();
             }
+        }
+
+        // 🗑️ 전체 답안 초기화 기능
+        function resetAllAnswers() {
+            if (!confirm("작성한 모든 답안을 초기화하시겠습니까?")) {
+                return;
+            }
+            try {
+                localStorage.removeItem('tech_exam_answers');
+                localStorage.removeItem('itpe_test_answers_v1');
+            } catch (e) {}
+
+            // 현재 화면의 모든 답안 입력칸(textarea/input) 즉시 빈 값("") 동기화
+            const textarea = document.getElementById('answer-textarea');
+            if (textarea) textarea.value = "";
+
+            // 대시보드 및 작성 화면 즉시 갱신 (새로고침 없이 상태 동기화)
+            if (!document.getElementById('view-dashboard').classList.contains('hidden')) {
+                renderDashboard();
+            }
+            if (!document.getElementById('view-solve').classList.contains('hidden') && activeQuestions.length > 0) {
+                renderSolveView();
+            }
+
+            showToast("작성한 모든 답안이 초기화되었습니다.", "bg-slate-700");
         }
 
         // 📋 내가 푼 답안 전체 복사 기능
