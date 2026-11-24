@@ -84,27 +84,27 @@
         .front-main-title { font-size: clamp(1.85rem, 6.8vw, 3.3rem); font-weight: 900; line-height: 1.28; color: #ffffff; word-break: break-word; overflow-wrap: anywhere; letter-spacing: -0.02em; text-shadow: 0 2px 10px rgba(0, 0, 0, 0.35); width: 100%; }
         .front-mnemonic-box { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; max-width: 100%; padding: 16px 14px; background: rgba(250, 204, 21, 0.18); border: 2px solid rgba(250, 204, 21, 0.65); border-radius: 16px; color: #fef08a; font-size: clamp(1.15rem, 4.4vw, 2rem); font-weight: 800; letter-spacing: 0.02em; line-height: 1.4; word-break: break-word; overflow-wrap: anywhere; box-shadow: 0 6px 16px rgba(0, 0, 0, 0.28); }
         .card-body { width: 100%; max-width: 100%; min-width: 0; font-size: 0.88rem; color: var(--text-secondary); line-height: 1.45; flex: 1; overflow-y: auto; overflow-x: hidden; display: flex; flex-direction: column; gap: 12px; padding-right: 2px; box-sizing: border-box; }
-        .card-body > div { width: 100%; max-width: 100%; min-width: 0; box-sizing: border-box; }
-        .keywords-container { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 6px; width: 100%; max-width: 100%; }
+        .card-body > div { width: 100%; max-width: 100%; min-width: 0; height: auto !important; max-height: none !important; overflow: visible !important; flex-shrink: 0 !important; box-sizing: border-box; }
+        .keywords-container { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 6px; width: 100%; max-width: 100%; height: auto !important; overflow: visible !important; flex-shrink: 0 !important; }
         .keyword-badge { background: rgba(56, 189, 248, 0.15); color: var(--accent); padding: 3px 8px; border-radius: 16px; font-size: 0.72rem; font-weight: 500; max-width: 100%; word-break: break-word; overflow-wrap: anywhere; white-space: normal; }
 
         /* Back Section Labels */
-        .back-section-label { width: 100%; font-size: 0.72rem; font-weight: 700; color: #93c5fd; letter-spacing: 0.03em; margin-bottom: 4px; display: flex; align-items: center; gap: 5px; }
+        .back-section-label { width: 100%; font-size: 0.72rem; font-weight: 700; color: #93c5fd; letter-spacing: 0.03em; margin-bottom: 4px; display: flex; align-items: center; gap: 5px; flex-shrink: 0 !important; }
         .back-section-label::before { content: ""; display: inline-block; width: 3px; height: 11px; background: var(--accent); border-radius: 2px; flex-shrink: 0; }
 
         /* ⓪ Top Definition Callout Area */
-        .definition-wrapper { display: none; flex-direction: column; width: 100%; max-width: 100%; min-width: 0; }
-        .definition-callout { width: 100%; max-width: 100%; background: linear-gradient(135deg, rgba(30, 58, 138, 0.55) 0%, rgba(15, 23, 42, 0.85) 100%); border: 1px solid rgba(56, 189, 248, 0.4); border-left: 4px solid var(--accent); padding: 10px 12px; border-radius: 8px; color: #f8fafc; font-size: 0.86rem; font-weight: 600; line-height: 1.45; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2); word-break: break-word; overflow-wrap: anywhere; box-sizing: border-box; }
+        .definition-wrapper { display: none; flex-direction: column; width: 100%; max-width: 100%; min-width: 0; height: auto !important; max-height: none !important; overflow: visible !important; flex-shrink: 0 !important; }
+        .definition-callout { width: 100%; max-width: 100%; height: auto !important; max-height: none !important; overflow: visible !important; flex-shrink: 0 !important; background: linear-gradient(135deg, rgba(30, 58, 138, 0.55) 0%, rgba(15, 23, 42, 0.85) 100%); border: 1px solid rgba(56, 189, 248, 0.4); border-left: 4px solid var(--accent); padding: 10px 12px; border-radius: 8px; color: #f8fafc; font-size: 0.86rem; font-weight: 600; line-height: 1.45; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2); word-break: break-word; overflow-wrap: anywhere; box-sizing: border-box; }
 
         /* ① Top Diagram Area */
-        .diagram-wrapper { display: none; flex-direction: column; width: 100%; max-width: 100%; min-width: 0; }
-        .diagram-box { width: 100%; max-width: 100%; background: rgba(2, 6, 23, 0.55); border: 1px solid rgba(56, 189, 248, 0.25); padding: 10px 12px; border-radius: 8px; font-family: "Pretendard", "Malgun Gothic", monospace; font-size: 0.8rem; white-space: pre-wrap; word-break: break-word; overflow-wrap: anywhere; overflow-x: hidden; line-height: 1.5; color: #e2e8f0; box-sizing: border-box; }
-        .diagram-box.has-image { background: #ffffff; padding: 8px; display: flex; flex-direction: column; gap: 10px; justify-content: center; align-items: stretch; white-space: normal; overflow-x: hidden; }
+        .diagram-wrapper { display: none; flex-direction: column; width: 100%; max-width: 100%; min-width: 0; height: auto !important; max-height: none !important; overflow: visible !important; flex-shrink: 0 !important; }
+        .diagram-box { width: 100%; max-width: 100%; height: auto !important; max-height: none !important; overflow: visible !important; flex-shrink: 0 !important; background: rgba(2, 6, 23, 0.55); border: 1px solid rgba(56, 189, 248, 0.25); padding: 10px 12px; border-radius: 8px; font-family: "Pretendard", "Malgun Gothic", monospace; font-size: 0.8rem; white-space: pre-wrap; word-break: break-word; overflow-wrap: anywhere; line-height: 1.5; color: #e2e8f0; box-sizing: border-box; }
+        .diagram-box.has-image { background: #ffffff; padding: 8px; display: flex; flex-direction: column; gap: 10px; justify-content: center; align-items: stretch; white-space: normal; height: auto !important; max-height: none !important; overflow: visible !important; flex-shrink: 0 !important; }
         .card-face img, .diagram-box img, .test-answer-accordion img { max-width: 100%; height: auto; max-height: 380px; object-fit: contain; border-radius: 6px; display: block; margin: 0 auto; }
 
         /* ② Bottom Sub-note Table Area */
-        .subnote-table-wrapper { display: none; flex-direction: column; width: 100%; max-width: 100%; min-width: 0; overflow-x: hidden; }
-        .subnote-table { table-layout: fixed; width: 100%; max-width: 100%; border-collapse: collapse; font-size: 0.78rem; background: rgba(15, 23, 42, 0.65); border-radius: 8px; overflow: hidden; border: 1px solid #334155; word-break: break-word; overflow-wrap: anywhere; box-sizing: border-box; }
+        .subnote-table-wrapper { display: none; flex-direction: column; width: 100%; max-width: 100%; min-width: 0; height: auto !important; max-height: none !important; overflow: visible !important; flex-shrink: 0 !important; }
+        .subnote-table { table-layout: fixed; width: 100%; max-width: 100%; height: auto !important; max-height: none !important; overflow: visible !important; flex-shrink: 0 !important; border-collapse: collapse; font-size: 0.78rem; background: rgba(15, 23, 42, 0.65); border-radius: 8px; border: 1px solid #334155; word-break: break-word; overflow-wrap: anywhere; box-sizing: border-box; }
         .subnote-table th { background: #1e3a8a; color: #e0f2fe; font-weight: 700; padding: 7px 6px; border: 1px solid #334155; text-align: center; font-size: 0.74rem; word-break: break-word; overflow-wrap: anywhere; }
         .subnote-table td { padding: 7px 6px; border: 1px solid #334155; color: #f1f5f9; vertical-align: middle; line-height: 1.4; word-break: break-word; overflow-wrap: anywhere; }
         .subnote-table th:nth-child(1), .subnote-table td.col-major { width: 21%; font-weight: 700; color: #7dd3fc; background: rgba(30, 58, 138, 0.28); text-align: center; }
@@ -112,11 +112,11 @@
         .subnote-table th:nth-child(3), .subnote-table td.col-desc { width: 55%; color: #e2e8f0; text-align: left; white-space: pre-line; word-break: break-word; overflow-wrap: anywhere; }
 
         /* ③ 3단락 실전 차별화 콜아웃 및 ASCII 다이어그램 스타일 */
-        .diff-callout { display: none; flex-direction: column; gap: 6px; width: 100%; max-width: 100%; min-width: 0; background: linear-gradient(135deg, rgba(245, 158, 11, 0.16), rgba(244, 63, 94, 0.1)); border: 1px solid rgba(251, 191, 36, 0.55); border-left: 4px solid #f59e0b; border-radius: 10px; padding: 11px 12px; margin-top: 8px; box-shadow: 0 0 0 1px rgba(251, 191, 36, 0.08) inset; overflow-x: hidden; box-sizing: border-box; }
-        .diff-title { width: 100%; font-size: 0.8rem; font-weight: 800; color: #fbbf24; letter-spacing: 0.02em; word-break: break-word; overflow-wrap: anywhere; }
-        .diff-text { width: 100%; max-width: 100%; font-size: 0.84rem; color: #fef3c7; line-height: 1.55; white-space: pre-line; word-break: break-word; overflow-wrap: anywhere; }
-        .details-ascii { width: 100%; max-width: 100%; background: rgba(2, 6, 23, 0.65); border: 1px solid rgba(56, 189, 248, 0.25); padding: 9px 10px; border-radius: 8px; font-family: "D2Coding", "Consolas", "Malgun Gothic", monospace; font-size: 0.72rem; line-height: 1.35; white-space: pre-wrap; word-break: break-word; overflow-wrap: anywhere; overflow-x: hidden; color: #e2e8f0; margin: 0; box-sizing: border-box; }
-        .details-note { width: 100%; max-width: 100%; font-size: 0.8rem; color: #cbd5e1; line-height: 1.45; white-space: pre-line; word-break: break-word; overflow-wrap: anywhere; margin-top: 6px; }
+        .diff-callout { display: none; flex-direction: column; gap: 6px; width: 100%; max-width: 100%; min-width: 0; height: auto !important; max-height: none !important; overflow: visible !important; flex-shrink: 0 !important; background: linear-gradient(135deg, rgba(245, 158, 11, 0.16), rgba(244, 63, 94, 0.1)); border: 1px solid rgba(251, 191, 36, 0.55); border-left: 4px solid #f59e0b; border-radius: 10px; padding: 11px 12px; margin-top: 8px; box-shadow: 0 0 0 1px rgba(251, 191, 36, 0.08) inset; box-sizing: border-box; }
+        .diff-title { width: 100%; font-size: 0.8rem; font-weight: 800; color: #fbbf24; letter-spacing: 0.02em; word-break: break-word; overflow-wrap: anywhere; flex-shrink: 0 !important; }
+        .diff-text { width: 100%; max-width: 100%; height: auto !important; max-height: none !important; overflow: visible !important; flex-shrink: 0 !important; font-size: 0.84rem; color: #fef3c7; line-height: 1.55; white-space: pre-line; word-break: break-word; overflow-wrap: anywhere; }
+        .details-ascii { width: 100%; max-width: 100%; height: auto !important; max-height: none !important; overflow: visible !important; flex-shrink: 0 !important; background: rgba(2, 6, 23, 0.65); border: 1px solid rgba(56, 189, 248, 0.25); padding: 9px 10px; border-radius: 8px; font-family: "D2Coding", "Consolas", "Malgun Gothic", monospace; font-size: 0.72rem; line-height: 1.35; white-space: pre-wrap; word-break: break-word; overflow-wrap: anywhere; color: #e2e8f0; margin: 0; box-sizing: border-box; }
+        .details-note { width: 100%; max-width: 100%; height: auto !important; max-height: none !important; overflow: visible !important; flex-shrink: 0 !important; font-size: 0.8rem; color: #cbd5e1; line-height: 1.45; white-space: pre-line; word-break: break-word; overflow-wrap: anywhere; margin-top: 6px; }
         /* Controls */
         .controls { display: flex; gap: 8px; margin-top: 10px; padding-bottom: 10px; }
         .ctrl-btn { flex: 1; background: var(--card-bg); border: 1px solid var(--border-color); color: var(--text-primary); padding: 13px 8px; border-radius: 10px; font-weight: 700; font-size: 0.92rem; cursor: pointer; transition: all 0.15s; white-space: nowrap; }
@@ -788,15 +788,39 @@
 
             tableWrapper.style.display = 'flex';
 
-            const normalized = rows.map(r => {
-                if (Array.isArray(r)) {
-                    return { major: r[0] || '', minor: r[1] || '', desc: r[2] || '' };
+            const cleanMdSep = str => String(str || '')
+                .replace(/^\s*\|?(?:\s*:?-{2,}:?\s*\|)+\s*:?-{2,}:?\s*\|?\s*$/gm, '')
+                .replace(/\|(?:\s*:?-{2,}:?\s*\|)+/g, '')
+                .replace(/\n{3,}/g, '\n\n')
+                .trim();
+
+            const normalized = [];
+            rows.forEach(r => {
+                const rawItem = Array.isArray(r)
+                    ? { major: r[0] || '', minor: r[1] || '', desc: r[2] || '' }
+                    : {
+                        major: r.major ?? r.category ?? r.대분류 ?? '',
+                        minor: r.minor ?? r.sub ?? r.subCategory ?? r.소분류 ?? '',
+                        desc: r.desc ?? r.feature ?? r.특징 ?? ''
+                    };
+                if (typeof rawItem.desc === 'string' && /\|\s*:?-{2,}/.test(rawItem.desc)) {
+                    const parsedSubRows = parseMdTableRows(rawItem.desc);
+                    if (parsedSubRows && parsedSubRows.length > 0) {
+                        parsedSubRows.forEach(pr => {
+                            normalized.push({
+                                major: cleanMdSep(pr.major),
+                                minor: cleanMdSep(pr.minor),
+                                desc: cleanMdSep(pr.desc)
+                            });
+                        });
+                        return;
+                    }
                 }
-                return {
-                    major: r.major ?? r.category ?? r.대분류 ?? '',
-                    minor: r.minor ?? r.sub ?? r.subCategory ?? r.소분류 ?? '',
-                    desc: r.desc ?? r.feature ?? r.특징 ?? ''
-                };
+                normalized.push({
+                    major: cleanMdSep(rawItem.major),
+                    minor: cleanMdSep(rawItem.minor),
+                    desc: cleanMdSep(rawItem.desc)
+                });
             });
 
             const rowspans = new Array(normalized.length).fill(1);
