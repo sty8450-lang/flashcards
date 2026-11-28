@@ -265,6 +265,33 @@
         .tutor-input:focus { border-color: var(--accent); }
         .tutor-send-btn { background: var(--accent-gradient); color: #ffffff; border: none; padding: 0 16px; height: 40px; border-radius: 10px; font-size: 0.86rem; font-weight: 800; cursor: pointer; white-space: nowrap; flex-shrink: 0; transition: opacity 0.15s; }
         .tutor-send-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        /* ===== 답안 카드(문항형) 신규 섹션: ② 목적·필요성 / ③ 구성요소 표 / ④ 적용·사례 / ⑤ 비교표·답안 한 줄 / ⚠ 보완 필요 ===== */
+        .front-exam-pill { display: inline-flex; align-items: center; justify-content: center; gap: 4px; background: rgba(56, 189, 248, 0.16); border: 1px solid rgba(56, 189, 248, 0.55); color: #bae6fd; padding: 3px 12px; border-radius: 999px; font-size: 0.78rem; font-weight: 800; letter-spacing: 0.02em; }
+        .bullet-section { display: none; flex-direction: column; width: 100%; max-width: 100%; min-width: 0; height: auto !important; max-height: none !important; overflow: visible !important; flex-shrink: 0 !important; }
+        .bullet-list { display: flex; flex-direction: column; gap: 5px; width: 100%; max-width: 100%; min-width: 0; font-size: 0.82rem; color: #e2e8f0; line-height: 1.5; word-break: break-word; overflow-wrap: anywhere; }
+        .bullet-item { position: relative; padding-left: 13px; width: 100%; }
+        .bullet-item::before { content: "•"; position: absolute; left: 2px; top: 0; color: #38bdf8; font-weight: 900; }
+        .para-item { width: 100%; color: #e2e8f0; }
+        .para-item + .para-item { margin-top: 4px; }
+        .bullet-list strong, .definition-callout strong { color: #fde047; }
+        .bullet-list code, .definition-callout code { background: rgba(2, 6, 23, 0.9); color: #7dd3fc; padding: 1px 4px; border-radius: 4px; font-family: monospace; }
+        .md-tables-wrapper { display: none; flex-direction: column; gap: 8px; width: 100%; max-width: 100%; min-width: 0; height: auto !important; max-height: none !important; overflow: visible !important; flex-shrink: 0 !important; }
+        .md-table-scroll { width: 100%; max-width: 100%; min-width: 0; overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: 8px; }
+        .md-table { border-collapse: collapse; min-width: 100%; font-size: 0.76rem; background: rgba(15, 23, 42, 0.7); border: 1px solid #334155; }
+        .md-table th { background: #1e3a8a; color: #e0f2fe; font-weight: 700; padding: 6px 8px; border: 1px solid #334155; text-align: center; font-size: 0.74rem; }
+        .md-table td { padding: 6px 8px; border: 1px solid #334155; color: #f1f5f9; line-height: 1.45; vertical-align: top; word-break: break-word; overflow-wrap: anywhere; }
+        .md-table td.row-head { font-weight: 700; color: #7dd3fc; background: rgba(30, 58, 138, 0.25); text-align: center; }
+        .md-table strong { color: #fde047; }
+        .md-table code { background: rgba(2, 6, 23, 0.9); color: #7dd3fc; padding: 1px 4px; border-radius: 4px; font-family: monospace; }
+        .note-callout { display: none; flex-direction: column; gap: 3px; width: 100%; max-width: 100%; min-width: 0; height: auto !important; max-height: none !important; overflow: visible !important; flex-shrink: 0 !important; background: rgba(120, 53, 15, 0.22); border: 1px dashed rgba(251, 191, 36, 0.5); border-left: 4px solid rgba(251, 191, 36, 0.85); border-radius: 8px; padding: 9px 11px; margin-top: 2px; box-sizing: border-box; }
+        .note-title { font-size: 0.74rem; font-weight: 800; color: #fcd34d; }
+        .note-text { font-size: 0.79rem; color: #fde68a; line-height: 1.5; word-break: break-word; overflow-wrap: anywhere; }
+        .answer-line { display: none; width: 100%; margin-top: 6px; padding: 8px 10px; background: rgba(2, 6, 23, 0.55); border: 1px solid rgba(251, 191, 36, 0.45); border-radius: 8px; font-size: 0.82rem; font-weight: 700; color: #fef3c7; line-height: 1.5; word-break: break-word; overflow-wrap: anywhere; box-sizing: border-box; }
+        .answer-line .answer-label { display: block; font-size: 0.72rem; font-weight: 800; color: #fbbf24; margin-bottom: 2px; }
+        .extra-note { font-size: 0.76rem; color: #cbd5e1; line-height: 1.5; margin-top: 2px; }
+        .card-image-grid { display: flex; flex-direction: column; gap: 8px; width: 100%; margin-top: 8px; }
+        .card-image-grid img { width: 100%; max-width: 100%; border-radius: 8px; border: 1px solid #334155; background: #f8fafc; }
     </style>
 </head>
 <body>
@@ -327,6 +354,7 @@
                             <span class="front-domain-pill" id="front-domain">도메인</span>
                         </div>
                         <div class="front-center-area">
+                            <div class="front-exam-pill" id="front-exam" style="display:none;">1교시 1</div>
                             <div class="front-main-title" id="front-title">토픽 제목</div>
                             <div class="front-mnemonic-box" id="front-mnemonic">💡 두음: -</div>
                         </div>
@@ -347,11 +375,20 @@
                                 <div class="definition-callout" id="back-definition"></div>
                             </div>
 
+                            <!-- ① ② 목적·필요성 (문항형 답안 카드) -->
+                            <div class="bullet-section" id="back-purpose-wrapper">
+                                <div class="back-section-label" id="back-purpose-label">② 목적·필요성</div>
+                                <div class="bullet-list" id="back-purpose"></div>
+                            </div>
+
                             <!-- ① 상단: 다이어그램(diagram) 영역 -->
                             <div class="diagram-wrapper" id="diagram-wrapper">
                                 <div class="back-section-label">구성도 / 핵심 개념도</div>
                                 <div class="diagram-box" id="back-diagram"></div>
                             </div>
+
+                            <!-- ② 하단: ③ 구성요소 표 (열 수 가변) -->
+                            <div class="md-tables-wrapper" id="back-detail-tables"></div>
 
                             <!-- ② 하단: 기술사 서브노트 스타일 표(Table) 영역 -->
                             <div class="subnote-table-wrapper" id="table-wrapper">
@@ -368,10 +405,24 @@
                                 </table>
                             </div>
 
+                            <!-- ④ 적용·사례 (문항형 답안 카드) -->
+                            <div class="bullet-section" id="back-apply-wrapper">
+                                <div class="back-section-label">④ 적용·사례</div>
+                                <div class="bullet-list" id="back-apply"></div>
+                            </div>
+
                             <!-- ③ 최하단: 3단락 실전 차별화 영역 -->
                             <div class="diff-callout" id="diff-wrapper">
                                 <div class="diff-title">🎯 [3단락] 기술사적 차별화 포인트</div>
+                                <div class="md-tables-wrapper" id="back-compare-tables"></div>
                                 <div class="diff-text" id="back-diff"></div>
+                                <div class="answer-line" id="back-answer-line"></div>
+                            </div>
+
+                            <!-- ④ ⚠ 보완 필요 -->
+                            <div class="note-callout" id="back-note-wrapper">
+                                <div class="note-title">⚠️ 보완 필요</div>
+                                <div class="note-text" id="back-note"></div>
                             </div>
                         </div>
 
@@ -441,10 +492,17 @@
                     <div class="definition-callout" id="test-ans-definition"></div>
                 </div>
 
+                <div class="bullet-section" id="test-ans-purpose-wrapper">
+                    <div class="back-section-label" id="test-ans-purpose-label">② 목적·필요성</div>
+                    <div class="bullet-list" id="test-ans-purpose"></div>
+                </div>
+
                 <div class="diagram-wrapper" id="test-ans-diag-wrapper">
                     <div class="back-section-label">구성도 / 핵심 개념도</div>
                     <div class="diagram-box" id="test-ans-diagram"></div>
                 </div>
+
+                <div class="md-tables-wrapper" id="test-ans-detail-tables"></div>
 
                 <div class="subnote-table-wrapper" id="test-ans-table-wrapper">
                     <div class="back-section-label">핵심 서브노트 요약표</div>
@@ -460,9 +518,21 @@
                     </table>
                 </div>
 
+                <div class="bullet-section" id="test-ans-apply-wrapper">
+                    <div class="back-section-label">④ 적용·사례</div>
+                    <div class="bullet-list" id="test-ans-apply"></div>
+                </div>
+
                 <div class="diff-callout" id="test-ans-diff-wrapper">
                     <div class="diff-title">🎯 [3단락] 기술사적 차별화 포인트</div>
+                    <div class="md-tables-wrapper" id="test-ans-compare-tables"></div>
                     <div class="diff-text" id="test-ans-diff"></div>
+                    <div class="answer-line" id="test-ans-answer-line"></div>
+                </div>
+
+                <div class="note-callout" id="test-ans-note-wrapper">
+                    <div class="note-title">⚠️ 보완 필요</div>
+                    <div class="note-text" id="test-ans-note"></div>
                 </div>
             </div>
 
@@ -875,8 +945,6 @@
             diagBox.classList.remove('has-image');
             diagBox.innerHTML = '';
 
-            const imgSrc = card.diagramImg || (typeof card.diagram === 'string' && /\.(png|jpe?g|gif|webp|svg)$/i.test(card.diagram.trim()) ? card.diagram.trim() : null);
-
             let asciiPart = '';
             let mdTableRows = null;
 
@@ -891,25 +959,39 @@
                     asciiPart = card.details.trim();
                 }
             }
+            if (!asciiPart && typeof card.diagram === 'string' && !card.diagram.trim().startsWith('<img')) {
+                asciiPart = card.diagram.trim();
+            }
 
-            if (imgSrc) {
+            const imgSrcs = [];
+            if (typeof card.diagramImg === 'string' && card.diagramImg.trim()) {
+                imgSrcs.push(card.diagramImg.trim());
+            }
+            if (Array.isArray(card.images)) {
+                card.images.forEach(n => { if (n && imgSrcs.indexOf(n) === -1) imgSrcs.push(n); });
+            }
+            if (!imgSrcs.length && typeof card.diagram === 'string' && /\.(png|jpe?g|gif|webp|svg)$/i.test(card.diagram.trim())) {
+                imgSrcs.push(card.diagram.trim());
+            }
+
+            let html = '';
+            if (asciiPart) {
+                html += `<pre class="details-ascii">${escapeHtml(asciiPart)}</pre>`;
+            }
+            if (imgSrcs.length) {
+                html += '<div class="card-image-grid">' + imgSrcs.map(src =>
+                    `<img src="${escapeHtml(src)}" alt="${escapeHtml(card.topic || '')} 구성도" loading="lazy">`
+                ).join('') + '</div>';
+            }
+
+            if (html) {
                 diagWrapper.style.display = 'flex';
-                diagBox.classList.add('has-image');
-                let imgHtml = `<img src="${imgSrc}" alt="${card.topic} 구성도">`;
-                if (asciiPart) {
-                    imgHtml += `<pre class="details-ascii" style="width:100%; margin-top:8px;">${asciiPart}</pre>`;
-                }
-                diagBox.innerHTML = imgHtml;
+                if (imgSrcs.length) diagBox.classList.add('has-image');
+                diagBox.innerHTML = html;
             } else if (typeof card.diagram === 'string' && card.diagram.trim().startsWith('<img')) {
                 diagWrapper.style.display = 'flex';
                 diagBox.classList.add('has-image');
                 diagBox.innerHTML = card.diagram;
-            } else if (asciiPart) {
-                diagWrapper.style.display = 'flex';
-                diagBox.innerHTML = `<pre class="details-ascii">${asciiPart}</pre>`;
-            } else if (card.diagram && card.diagram.trim() !== '') {
-                diagWrapper.style.display = 'flex';
-                diagBox.innerText = card.diagram;
             } else {
                 diagWrapper.style.display = 'none';
             }
@@ -917,6 +999,212 @@
             const finalTableRows = card.tableRows || mdTableRows;
             renderSubnoteTableInto(finalTableRows, tableWrapperId, tableBodyId);
         }
+
+        /* ==========================================
+         * 📄 답안 카드(문항형) 섹션 렌더링 유틸
+         *   카드 스키마:
+         *   { topic, exam, definition[], purpose[], diagram, detailTables[{head,rows}],
+         *     application[], compareTables[{head,rows}], answerLine, differentiation[],
+         *     keywords[], note, extra[] }
+         *   기존 스키마(details/tableRows/differentiation 문자열)도 그대로 지원한다.
+         * ========================================== */
+        function safeInline(text) {
+            return formatInlineMd(escapeHtml(String(text == null ? '' : text)));
+        }
+
+        function cardItemsHtml(items) {
+            if (!items) return '';
+            if (typeof items === 'string') return safeInline(items).replace(/\n/g, '<br>');
+            if (!Array.isArray(items)) return '';
+            return items.map(it => {
+                if (it && typeof it === 'object') {
+                    const text = safeInline(it.text || '');
+                    return it.type === 'li'
+                        ? `<div class="bullet-item">${text}</div>`
+                        : `<div class="para-item">${text}</div>`;
+                }
+                return `<div class="para-item">${safeInline(it)}</div>`;
+            }).join('');
+        }
+
+        function cardItemsText(items) {
+            if (!items) return '';
+            if (typeof items === 'string') return items;
+            if (!Array.isArray(items)) return '';
+            return items.map(it => {
+                if (it && typeof it === 'object') return (it.type === 'li' ? '· ' : '') + (it.text || '');
+                return String(it);
+            }).filter(Boolean).join(' / ');
+        }
+
+        function gridToHtml(grid) {
+            if (!grid || !Array.isArray(grid.head) || !grid.head.length) return '';
+            const head = grid.head.map(h => `<th>${safeInline(h)}</th>`).join('');
+            const rows = (grid.rows || []).map(row =>
+                '<tr>' + row.map((cell, i) => `<td${i === 0 ? ' class="row-head"' : ''}>${safeInline(cell)}</td>`).join('') + '</tr>'
+            ).join('');
+            return `<table class="md-table"><thead><tr>${head}</tr></thead><tbody>${rows}</tbody></table>`;
+        }
+
+        function renderMdTablesInto(wrapperId, grids, labelText) {
+            const wrapper = document.getElementById(wrapperId);
+            if (!wrapper) return false;
+            wrapper.innerHTML = '';
+            const valid = (Array.isArray(grids) ? grids : []).filter(g => g && Array.isArray(g.head) && g.head.length && Array.isArray(g.rows) && g.rows.length);
+            if (!valid.length) {
+                wrapper.style.display = 'none';
+                return false;
+            }
+            if (labelText) {
+                const label = document.createElement('div');
+                label.className = 'back-section-label';
+                label.innerText = labelText;
+                wrapper.appendChild(label);
+            }
+            valid.forEach(g => {
+                const scroll = document.createElement('div');
+                scroll.className = 'md-table-scroll';
+                scroll.innerHTML = gridToHtml(g);
+                wrapper.appendChild(scroll);
+            });
+            wrapper.style.display = 'flex';
+            return true;
+        }
+
+        function renderCardBody(card, ids) {
+            // ① 1단락 정의
+            const defWrapper = document.getElementById(ids.definitionWrapper);
+            const defBox = document.getElementById(ids.definition);
+            const defHtml = cardItemsHtml(card.definition);
+            if (defWrapper && defBox) {
+                if (defHtml) {
+                    defWrapper.style.display = 'flex';
+                    defBox.innerHTML = defHtml;
+                } else {
+                    defWrapper.style.display = 'none';
+                    defBox.innerHTML = '';
+                }
+            }
+
+            // ② 목적·필요성
+            const purposeWrapper = document.getElementById(ids.purposeWrapper);
+            const purposeBox = document.getElementById(ids.purpose);
+            const purposeHtml = cardItemsHtml(card.purpose);
+            if (purposeWrapper && purposeBox) {
+                if (purposeHtml) {
+                    const labelEl = document.getElementById(ids.purposeLabel);
+                    if (labelEl) labelEl.innerText = `② ${card.purposeLabel || '목적·필요성'}`;
+                    purposeBox.innerHTML = purposeHtml;
+                    purposeWrapper.style.display = 'flex';
+                } else {
+                    purposeWrapper.style.display = 'none';
+                    purposeBox.innerHTML = '';
+                }
+            }
+
+            // ③ 구성도 + 구성요소 표
+            populateDiagramAndTable(card, ids.diagramWrapper, ids.diagram, ids.legacyTableWrapper, ids.legacyTableBody);
+            renderMdTablesInto(ids.detailTables, card.detailTables, '③ 구성요소 표');
+
+            // ④ 적용·사례
+            const applyWrapper = document.getElementById(ids.applyWrapper);
+            const applyBox = document.getElementById(ids.apply);
+            const applyHtml = cardItemsHtml(card.application);
+            if (applyWrapper && applyBox) {
+                if (applyHtml) {
+                    applyBox.innerHTML = applyHtml;
+                    applyWrapper.style.display = 'flex';
+                } else {
+                    applyWrapper.style.display = 'none';
+                    applyBox.innerHTML = '';
+                }
+            }
+
+            // ⑤ 차별화: 비교표 + 답안 한 줄 + 보충 서술
+            const diffWrapper = document.getElementById(ids.diffWrapper);
+            const diffBox = document.getElementById(ids.diff);
+            const hasCompare = renderMdTablesInto(ids.compareTables, card.compareTables, '');
+            const diffText = card.differentiation
+                ? (typeof card.differentiation === 'string' ? card.differentiation : cardItemsText(card.differentiation))
+                : '';
+            if (diffBox) {
+                diffBox.innerHTML = diffText ? safeInline(diffText) : '';
+            }
+            const answerEl = document.getElementById(ids.answerLine);
+            if (answerEl) {
+                if (card.answerLine) {
+                    answerEl.innerHTML = `<span class="answer-label">✍️ 답안 한 줄 (3단락 첫 문장)</span>${safeInline(card.answerLine)}`;
+                    answerEl.style.display = 'block';
+                } else {
+                    answerEl.innerHTML = '';
+                    answerEl.style.display = 'none';
+                }
+            }
+            if (diffWrapper) {
+                diffWrapper.style.display = (hasCompare || diffText || card.answerLine) ? 'flex' : 'none';
+            }
+
+            // ⚠ 보완 필요 / 참고
+            const noteWrapper = document.getElementById(ids.noteWrapper);
+            const noteBox = document.getElementById(ids.note);
+            if (noteWrapper && noteBox) {
+                const parts = [];
+                if (card.note) parts.push(`<div class="note-text">${safeInline(card.note)}</div>`);
+                (Array.isArray(card.extra) ? card.extra : []).forEach(e => parts.push(`<div class="extra-note">${safeInline(e)}</div>`));
+                cardItemsText(card.detailNote) && parts.push(`<div class="extra-note">${safeInline(cardItemsText(card.detailNote))}</div>`);
+                if (parts.length) {
+                    const titleEl = noteWrapper.querySelector('.note-title');
+                    if (titleEl) titleEl.innerText = card.note ? '⚠️ 보완 필요' : '📎 참고';
+                    noteBox.innerHTML = parts.join('');
+                    noteWrapper.style.display = 'flex';
+                } else {
+                    noteBox.innerHTML = '';
+                    noteWrapper.style.display = 'none';
+                }
+            }
+        }
+
+        const STUDY_IDS = {
+            definitionWrapper: 'definition-wrapper',
+            definition: 'back-definition',
+            purposeWrapper: 'back-purpose-wrapper',
+            purpose: 'back-purpose',
+            purposeLabel: 'back-purpose-label',
+            diagramWrapper: 'diagram-wrapper',
+            diagram: 'back-diagram',
+            legacyTableWrapper: 'table-wrapper',
+            legacyTableBody: 'back-table-body',
+            detailTables: 'back-detail-tables',
+            applyWrapper: 'back-apply-wrapper',
+            apply: 'back-apply',
+            compareTables: 'back-compare-tables',
+            diffWrapper: 'diff-wrapper',
+            diff: 'back-diff',
+            answerLine: 'back-answer-line',
+            noteWrapper: 'back-note-wrapper',
+            note: 'back-note'
+        };
+
+        const TEST_IDS = {
+            definitionWrapper: 'test-ans-def-wrapper',
+            definition: 'test-ans-definition',
+            purposeWrapper: 'test-ans-purpose-wrapper',
+            purpose: 'test-ans-purpose',
+            purposeLabel: 'test-ans-purpose-label',
+            diagramWrapper: 'test-ans-diag-wrapper',
+            diagram: 'test-ans-diagram',
+            legacyTableWrapper: 'test-ans-table-wrapper',
+            legacyTableBody: 'test-ans-table-body',
+            detailTables: 'test-ans-detail-tables',
+            applyWrapper: 'test-ans-apply-wrapper',
+            apply: 'test-ans-apply',
+            compareTables: 'test-ans-compare-tables',
+            diffWrapper: 'test-ans-diff-wrapper',
+            diff: 'test-ans-diff',
+            answerLine: 'test-ans-answer-line',
+            noteWrapper: 'test-ans-note-wrapper',
+            note: 'test-ans-note'
+        };
 
         function renderCard() {
             const card = currentDeck[currentIndex];
@@ -926,6 +1214,17 @@
             document.getElementById('front-domain').innerText = card.domain;
             document.getElementById('front-title').innerText = card.topic;
 
+            const examEl = document.getElementById('front-exam');
+            if (examEl) {
+                if (card.exam) {
+                    examEl.style.display = 'inline-flex';
+                    examEl.innerText = `📌 ${card.exam}`;
+                } else {
+                    examEl.style.display = 'none';
+                    examEl.innerText = '';
+                }
+            }
+
             const mnemonicEl = document.getElementById('front-mnemonic');
             if (card.mnemonic && card.mnemonic.trim() !== '') {
                 mnemonicEl.style.display = 'flex';
@@ -934,7 +1233,7 @@
                 mnemonicEl.style.display = 'none';
             }
             
-            document.getElementById('back-domain').innerText = `${card.domain} · 서브노트`;
+            document.getElementById('back-domain').innerText = `${card.domain}${card.exam ? ' · ' + card.exam : ''} · 서브노트`;
             document.getElementById('back-title').innerText = card.topic;
             
             const kwContainer = document.getElementById('back-keywords');
@@ -951,27 +1250,7 @@
                 kwContainer.style.display = 'none';
             }
 
-            const defWrapper = document.getElementById('definition-wrapper');
-            const defBox = document.getElementById('back-definition');
-            if (card.definition && card.definition.trim() !== '') {
-                defWrapper.style.display = 'flex';
-                defBox.innerText = card.definition;
-            } else {
-                defWrapper.style.display = 'none';
-                defBox.innerText = '';
-            }
-
-            populateDiagramAndTable(card, 'diagram-wrapper', 'back-diagram', 'table-wrapper', 'back-table-body');
-
-            const diffWrapper = document.getElementById('diff-wrapper');
-            const diffBox = document.getElementById('back-diff');
-            if (card.differentiation && card.differentiation.trim() !== '') {
-                diffWrapper.style.display = 'flex';
-                diffBox.innerText = card.differentiation;
-            } else {
-                diffWrapper.style.display = 'none';
-                diffBox.innerText = '';
-            }
+            renderCardBody(card, STUDY_IDS);
 
             const backScroll = document.getElementById('back-scroll-body');
             if (backScroll) backScroll.scrollTop = 0;
@@ -1087,7 +1366,7 @@
             const card = currentDeck[currentIndex];
             const key = getTopicKey(card);
 
-            document.getElementById('test-domain-pill').innerText = `${card.domain} 도메인 · 실전 백지 인출`;
+            document.getElementById('test-domain-pill').innerText = `${card.domain}${card.exam ? ' · ' + card.exam : ' 도메인'} · 실전 백지 인출`;
             document.getElementById('test-topic-title').innerText = card.topic;
             document.getElementById('test-progress-text').innerText = `${currentIndex + 1} / ${currentDeck.length}`;
 
@@ -1120,18 +1399,7 @@
                     kwBox.appendChild(span);
                 });
             }
-            document.getElementById('test-ans-definition').innerText = card.definition || '';
-            populateDiagramAndTable(card, 'test-ans-diag-wrapper', 'test-ans-diagram', 'test-ans-table-wrapper', 'test-ans-table-body');
-
-            const diffWrapper = document.getElementById('test-ans-diff-wrapper');
-            const diffBox = document.getElementById('test-ans-diff');
-            if (card.differentiation && card.differentiation.trim() !== '') {
-                diffWrapper.style.display = 'flex';
-                diffBox.innerText = card.differentiation;
-            } else {
-                diffWrapper.style.display = 'none';
-                diffBox.innerText = '';
-            }
+            renderCardBody(card, TEST_IDS);
         }
 
         function toggleTestAnswerSheet() {
@@ -1234,21 +1502,41 @@
             };
         }
 
-        function buildExaminerSystemPrompt(card) {
-            const topic = card.topic || '';
-            const definition = card.definition || '';
-            const mnemonic = card.mnemonic || '';
-            const keywords = Array.isArray(card.keywords) ? card.keywords.join(', ') : '';
-            const differentiation = card.differentiation || '';
-
-            let tableSummary = '';
+        function cardTableSummaryText(card) {
             if (Array.isArray(card.tableRows) && card.tableRows.length > 0) {
-                tableSummary = card.tableRows
+                return card.tableRows
                     .map(r => `[${r.major || r.category || ''}] ${r.minor || r.sub || ''}: ${r.desc || ''}`)
                     .join(' / ');
-            } else if (typeof card.details === 'string' && card.details.trim()) {
-                tableSummary = card.details.trim();
             }
+            const grids = Array.isArray(card.detailTables) ? card.detailTables : [];
+            if (grids.length) {
+                return grids.map(g => {
+                    const head = (g.head || []).join(' | ');
+                    const rows = (g.rows || []).map(r => r.join(' | ')).join(' / ');
+                    return `[${head}] ${rows}`;
+                }).join(' ‖ ');
+            }
+            if (typeof card.tableRows === 'string' && card.tableRows.trim()) {
+                return card.tableRows.trim();
+            }
+            if (typeof card.details === 'string' && card.details.trim()) {
+                return card.details.trim();
+            }
+            return '';
+        }
+
+        function buildExaminerSystemPrompt(card) {
+            const topic = card.topic || '';
+            const exam = card.exam || '';
+            const definition = cardItemsText(card.definition);
+            const mnemonic = card.mnemonic || '';
+            const keywords = Array.isArray(card.keywords) ? card.keywords.join(', ') : '';
+            const purpose = cardItemsText(card.purpose);
+            const application = cardItemsText(card.application);
+            const differentiation = card.answerLine
+                ? `${cardItemsText(card.differentiation)} ${card.answerLine}`.trim()
+                : cardItemsText(card.differentiation);
+            const tableSummary = cardTableSummaryText(card);
 
             return `당신은 정보관리기술사 실전 채점위원입니다. 인사말 없이 두괄식 마크다운으로 10점 만점 기준 채점을 수행하십시오:
 1. 📊 예상 점수 (10점 만점)
@@ -1257,12 +1545,14 @@
 4. 💡 3단락 실전 차별화 제언
 
 [원본 카드 모범 답안 기준]
-- 토픽명: ${topic}
+- 토픽명: ${topic}${exam ? ` (${exam})` : ''}
 - 핵심 두음: ${mnemonic}
 - 1단락 정의(모범): ${definition}
 - 필수 채점 키워드: ${keywords}
-- 2단락 핵심 구성요소(표/개념도): ${tableSummary}
-- 3단락 실전 차별화 포인트: ${differentiation}`;
+${purpose ? `- 2단락 목적·필요성: ${purpose}
+` : ''}- 2단락 핵심 구성요소(표/개념도): ${tableSummary}
+${application ? `- 4단락 적용·사례: ${application}
+` : ''}- 3단락 실전 차별화 포인트: ${differentiation}`;
         }
 
         function parseScoreFromMarkdown(mdText) {
@@ -1918,26 +2208,25 @@
 
         function buildCardSystemPrompt(card) {
             const topic = card.topic || '';
-            const definition = card.definition || '';
+            const exam = card.exam || '';
+            const definition = cardItemsText(card.definition);
             const keywords = Array.isArray(card.keywords) ? card.keywords.join(', ') : '';
-            const differentiation = card.differentiation || '';
-
-            let tableSummary = '';
-            if (Array.isArray(card.tableRows) && card.tableRows.length > 0) {
-                tableSummary = card.tableRows
-                    .map(r => `[${r.major || r.category || ''}] ${r.minor || r.sub || ''}: ${r.desc || ''}`)
-                    .join(' / ');
-            } else if (typeof card.details === 'string' && card.details.trim()) {
-                tableSummary = card.details.trim();
-            }
+            const purpose = cardItemsText(card.purpose);
+            const application = cardItemsText(card.application);
+            const differentiation = card.answerLine
+                ? `${cardItemsText(card.differentiation)} ${card.answerLine}`.trim()
+                : cardItemsText(card.differentiation);
+            const tableSummary = cardTableSummaryText(card);
 
             return `당신은 정보관리기술사 수험 전문 수석 코치입니다. 인사말과 서론은 생략하고 즉시 본론부터 마크다운으로 답변하십시오.
 현재 수험생이 학습 중인 토픽 정보:
-- 토픽명: ${topic}
+- 토픽명: ${topic}${exam ? ` (${exam})` : ''}
 - 1단락 정의: ${definition}
 - 주요 키워드: ${keywords}
 - 2단락 핵심 구성요소: ${tableSummary}
-- 차별화 포인트: ${differentiation}
+${purpose ? `- 목적·필요성: ${purpose}
+` : ''}${application ? `- 적용·사례: ${application}
+` : ''}- 차별화 포인트: ${differentiation}
 
 수험생의 질문이나 작성 답안에 대해 정보관리기술사 1교시/2교시 실전 채점 기준(단락 구성, 차별화 키워드, 실무 적합성)에 맞추어 날카롭고 핵심 위주로 피드백하십시오.`;
         }
